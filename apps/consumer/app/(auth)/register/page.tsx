@@ -6,8 +6,7 @@ import { useRouter } from "next/navigation";
 import { AuthLayout } from "@/components/ui/AuthLayout";
 import { AuthInput } from "@/components/ui/AuthInput";
 import { AuthButton } from "@/components/ui/AuthButton";
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+import { API_URL, parseJsonResponse } from "@/lib/api";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -27,14 +26,16 @@ export default function RegisterPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password, name, role: "consumer" }),
       });
-      const data = await res.json();
+      const data = await parseJsonResponse<{ error?: string; token?: string; user?: unknown }>(res);
       if (!res.ok) throw new Error(data.error || "Registration failed");
+      if (!data.token || !data.user) throw new Error("Invalid response from server");
       localStorage.setItem("token", data.token);
       localStorage.setItem("user", JSON.stringify(data.user));
       router.push("/dashboard");
       router.refresh();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Registration failed");
+      const msg = err instanceof Error ? err.message : "Registration failed";
+      setError(msg === "Failed to fetch" ? "Unable to connect. Please try again." : msg);
     } finally {
       setLoading(false);
     }
