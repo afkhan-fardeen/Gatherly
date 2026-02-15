@@ -26,13 +26,19 @@ const corsOrigins = [
   process.env.VENDOR_URL || "http://localhost:3002",
   process.env.ADMIN_URL || "http://localhost:3003",
   process.env.CONSUMER_URL_MOBILE,
+  // Production fallbacks – ensure CORS works even if env vars missing
+  "https://gatherly-consumer.vercel.app",
+  "https://gatherly-vendor.vercel.app",
 ].filter((x): x is string => Boolean(x));
+
+// Dedupe and trim (no trailing slash) for consistent matching
+const normalizedOrigins = [...new Set(corsOrigins.map((o) => o.replace(/\/$/, "")))];
 
 // In development, allow all origins for mobile testing (avoids CORS issues)
 const corsOptions =
   process.env.NODE_ENV !== "production"
     ? { origin: true, credentials: true }
-    : { origin: corsOrigins, credentials: true };
+    : { origin: normalizedOrigins, credentials: true };
 
 app.use(cors(corsOptions));
 app.use(express.json());
