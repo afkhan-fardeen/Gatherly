@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "tsx watch src/server.ts",
     "build": "prisma generate && tsc",
-    "build:render": "cd ../.. && pnpm install && cd packages/api && pnpm exec prisma generate && tsc",
+    "build:render": "cd ../.. && pnpm install && pnpm --filter @gatherly/shared build && cd packages/api && pnpm exec prisma generate && tsc",
     "start": "node dist/server.js",
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate dev",
