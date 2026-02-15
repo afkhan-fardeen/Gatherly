@@ -1,0 +1,19 @@
+{
+  "name": "gatherly",
+  "private": true,
+  "scripts": {
+    "dev": "pnpm run dev:api",
+    "dev:api": "pnpm --filter api dev",
+    "dev:consumer": "pnpm --filter consumer dev",
+    "dev:vendor": "pnpm --filter vendor dev",
+    "db:up": "docker compose up -d",
+    "db:down": "docker compose down",
+    "db:studio": "pnpm --filter api db:studio",
+    "db:migrate": "pnpm --filter api db:migrate",
+    "db:seed": "pnpm --filter api db:seed"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "packageManager": "pnpm@9.14.2"
+}
