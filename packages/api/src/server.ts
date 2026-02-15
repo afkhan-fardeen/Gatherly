@@ -19,7 +19,7 @@ import { vendorRouter } from "./routes/vendor.js";
 import { vendorsRouter } from "./routes/vendors.js";
 
 const app = express();
-const PORT = process.env.API_PORT || 3001;
+const PORT = process.env.PORT || process.env.API_PORT || 3001;
 
 const corsOrigins = [
   process.env.CONSUMER_URL || "http://localhost:3000",
