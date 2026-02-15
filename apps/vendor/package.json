@@ -3,7 +3,6 @@
   "version": "0.0.1",
   "private": true,
   "engines": { "node": "20.x" },
-  "packageManager": "pnpm@8.15.6",
   "scripts": {
     "dev": "next dev -p 3002 -H 0.0.0.0",
     "build": "next build",

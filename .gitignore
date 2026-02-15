@@ -1,7 +1,5 @@
 # Dependencies
 node_modules
-.pnpm-store
-
 # Environment
 .env
 .env.local
@@ -27,8 +25,6 @@ Thumbs.db
 # Logs
 *.log
 npm-debug.log*
-pnpm-debug.log*
-
 # Testing
 coverage
 .nyc_output

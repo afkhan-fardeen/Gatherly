@@ -2,12 +2,11 @@
   "name": "api",
   "version": "0.0.1",
   "private": true,
-  "packageManager": "pnpm@8.15.6",
   "type": "module",
   "scripts": {
     "dev": "tsx watch src/server.ts",
     "build": "prisma generate && tsc",
-    "build:render": "cd ../.. && pnpm install && pnpm --filter @gatherly/shared build && cd packages/api && pnpm exec prisma generate && tsc",
+    "build:render": "cd ../.. && npm install && npm run build -w @gatherly/shared && cd packages/api && npx prisma generate && tsc",
     "start": "node dist/server.js",
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate dev",
@@ -16,7 +15,7 @@
     "db:seed": "tsx prisma/seed.ts"
   },
   "dependencies": {
-    "@gatherly/shared": "workspace:*",
+    "@gatherly/shared": "file:../shared",
     "@prisma/client": "^5.22.0",
     "bcryptjs": "^2.4.3",
     "cloudinary": "^2.9.0",

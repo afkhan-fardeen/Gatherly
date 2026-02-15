@@ -1,19 +1,19 @@
 {
   "name": "gatherly",
   "private": true,
+  "workspaces": ["apps/*", "packages/*"],
   "scripts": {
-    "dev": "pnpm run dev:api",
-    "dev:api": "pnpm --filter api dev",
-    "dev:consumer": "pnpm --filter consumer dev",
-    "dev:vendor": "pnpm --filter vendor dev",
+    "dev": "npm run dev:api",
+    "dev:api": "npm run dev -w api",
+    "dev:consumer": "npm run dev -w consumer",
+    "dev:vendor": "npm run dev -w vendor",
     "db:up": "docker compose up -d",
     "db:down": "docker compose down",
-    "db:studio": "pnpm --filter api db:studio",
-    "db:migrate": "pnpm --filter api db:migrate",
-    "db:seed": "pnpm --filter api db:seed"
+    "db:studio": "npm run db:studio -w api",
+    "db:migrate": "npm run db:migrate -w api",
+    "db:seed": "npm run db:seed -w api"
   },
   "engines": {
     "node": ">=18"
-  },
-  "packageManager": "pnpm@8.15.6"
+  }
 }
