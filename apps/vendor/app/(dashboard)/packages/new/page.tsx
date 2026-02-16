@@ -236,7 +236,7 @@ export default function NewPackagePage() {
                   </select>
                 </div>
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-slate-700">Base price ($) *</label>
+                  <label className="text-sm font-medium text-slate-700">Base price (BD) *</label>
                   <input
                     type="number"
                     step="0.01"
@@ -381,7 +381,7 @@ export default function NewPackagePage() {
               <div>
                 <dt className="text-slate-500">Pricing</dt>
                 <dd className="font-medium">
-                  ${parseFloat(form.basePrice || "0").toFixed(2)}
+                  {parseFloat(form.basePrice || "0").toFixed(2)} BD
                   {form.priceType === "per_person" ? " per person" : " fixed"}
                   {(form.minGuests || form.maxGuests) &&
                     ` · ${form.minGuests || "?"}–${form.maxGuests || "?"} guests`}

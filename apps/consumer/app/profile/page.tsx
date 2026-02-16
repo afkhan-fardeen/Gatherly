@@ -68,7 +68,7 @@ export default function ProfilePage() {
   return (
     <AppLayout>
       <header className="sticky top-0 z-40 bg-white/80 ios-blur px-6 py-3 border-b border-slate-100 shrink-0">
-        <h1 className="text-lg font-bold tracking-tight">Profile</h1>
+        <h1 className="text-xl font-bold tracking-tight">Profile</h1>
       </header>
 
       <main className="p-6 pb-32 space-y-6">

@@ -193,7 +193,7 @@ export default function BookingsPage() {
                     </span>
                   </div>
                   <p className="mt-2 font-semibold text-slate-900">
-                    ${parseFloat(b.totalAmount).toLocaleString()}
+                    {parseFloat(b.totalAmount).toLocaleString()} BD
                   </p>
                   <div className="flex flex-wrap gap-2 mt-2">
                     <span

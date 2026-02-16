@@ -132,8 +132,8 @@ export default function PackagesListPage() {
                       <h3 className="font-semibold text-slate-900">{pkg.name}</h3>
                       <p className="text-sm text-slate-500 truncate">
                         {pkg.priceType === "per_person"
-                          ? `$${parseFloat(pkg.basePrice).toFixed(2)}/person`
-                          : `$${parseFloat(pkg.basePrice).toFixed(2)} fixed`}
+                          ? `${parseFloat(pkg.basePrice).toFixed(2)} BD/person`
+                          : `${parseFloat(pkg.basePrice).toFixed(2)} BD fixed`}
                         {pkg.minGuests != null || pkg.maxGuests != null
                           ? ` · ${pkg.minGuests ?? "?"}–${pkg.maxGuests ?? "?"} guests`
                           : ""}

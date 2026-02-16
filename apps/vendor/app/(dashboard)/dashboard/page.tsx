@@ -140,7 +140,7 @@ export default function VendorDashboardPage() {
           />
           <MetricCard
             label="Revenue (This Month)"
-            value={loading ? "—" : `$${revenueThisMonth.toLocaleString()}`}
+            value={loading ? "—" : `${revenueThisMonth.toLocaleString()} BD`}
             icon={
               <div className="w-12 h-12 bg-emerald-500/10 rounded-xl flex items-center justify-center">
                 <CurrencyDollar size={24} weight="regular" className="text-emerald-500" />
@@ -239,8 +239,7 @@ export default function VendorDashboardPage() {
                         {b.user.name} · {b.package.name} · {b.guestCount} guests
                       </p>
                       <p className="text-xs text-slate-400 mt-2">
-                        {new Date(b.event.date).toLocaleDateString()} · $
-                        {parseFloat(b.totalAmount).toLocaleString()}
+                        {new Date(b.event.date).toLocaleDateString()} · {parseFloat(b.totalAmount).toLocaleString()} BD
                       </p>
                       <span
                         className={`inline-block mt-2 px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase ${

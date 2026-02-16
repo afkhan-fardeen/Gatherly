@@ -49,7 +49,7 @@ export function CateringContent() {
             <ArrowLeft size={20} weight="regular" className="text-slate-600" />
           </Link>
           <div>
-            <h1 className="text-lg font-bold tracking-tight">Catering</h1>
+            <h1 className="text-xl font-bold tracking-tight">Catering</h1>
             <p className="text-slate-500 text-xs">Find the best caterers</p>
           </div>
         </div>

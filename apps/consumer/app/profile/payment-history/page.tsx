@@ -48,7 +48,7 @@ export default function PaymentHistoryPage() {
           >
             <ArrowLeft size={20} weight="regular" className="text-slate-600" />
           </Link>
-          <h1 className="text-lg font-bold tracking-tight">Payment history</h1>
+          <h1 className="text-xl font-bold tracking-tight">Payment history</h1>
         </div>
       </header>
 

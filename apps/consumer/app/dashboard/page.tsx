@@ -71,7 +71,7 @@ export default function DashboardPage() {
   return (
     <AppLayout>
       <header className="px-6 py-3 shrink-0">
-        <h1 className="text-lg font-bold tracking-tight">
+        <h1 className="text-xl font-bold tracking-tight">
           Hello, {user?.name?.split(" ")[0] ?? "there"}
         </h1>
       </header>

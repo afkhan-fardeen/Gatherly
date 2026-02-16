@@ -377,7 +377,7 @@ export default function BookingDetailPage() {
               <div>
                 <p className="font-medium text-slate-900">{booking.package.name}</p>
                 <p className="mt-1 text-lg font-semibold text-slate-900">
-                  ${parseFloat(booking.totalAmount).toLocaleString()} total
+                  {parseFloat(booking.totalAmount).toLocaleString()} BD total
                 </p>
               </div>
             </div>

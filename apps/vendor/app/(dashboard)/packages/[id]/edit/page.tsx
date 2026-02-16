@@ -452,7 +452,7 @@ export default function EditPackagePage() {
                 </select>
               </div>
               <div className="space-y-2">
-                <label className="text-sm font-medium text-slate-700">Base price ($) *</label>
+                <label className="text-sm font-medium text-slate-700">Base price (BD) *</label>
                 <input
                   type="number"
                   step="0.01"

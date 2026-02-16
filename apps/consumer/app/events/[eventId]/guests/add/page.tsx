@@ -65,7 +65,7 @@ export default function AddGuestPage() {
           >
             <ArrowLeft size={20} weight="regular" className="text-slate-600" />
           </Link>
-          <h1 className="text-lg font-bold tracking-tight">Add Guest</h1>
+          <h1 className="text-xl font-bold tracking-tight">Add Guest</h1>
         </div>
       </header>
 

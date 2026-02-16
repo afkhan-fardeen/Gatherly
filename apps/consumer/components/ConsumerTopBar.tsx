@@ -57,9 +57,9 @@ export function ConsumerTopBar() {
   }
 
   return (
-    <div className="sticky top-0 z-40 bg-white/90 ios-blur border-b border-slate-100 shrink-0">
+    <div className="sticky top-0 z-50 bg-white/90 ios-blur border-b border-slate-100 rounded-b-lg shrink-0">
       <div className="flex justify-between items-center px-6 py-2">
-        <Logo href="/dashboard" className="text-2xl md:text-3xl" />
+        <Logo href="/dashboard" className="text-4xl md:text-5xl" />
         <div className="flex items-center gap-2">
           <Link
             href="/notifications"
@@ -76,7 +76,7 @@ export function ConsumerTopBar() {
           <button
             type="button"
             onClick={() => setProfileOpen(!profileOpen)}
-            className="w-9 h-9 rounded-md overflow-hidden bg-primary/10 flex items-center justify-center shrink-0 border-2 border-transparent hover:border-primary/30 transition-colors"
+            className="w-9 h-9 rounded-full overflow-hidden bg-primary/10 flex items-center justify-center shrink-0 border-2 border-transparent hover:border-primary/30 transition-colors"
           >
             {user?.profilePictureUrl ? (
               <img

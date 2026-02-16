@@ -124,7 +124,7 @@ export default function CreateEventPage() {
             </button>
           )}
           <div>
-            <h1 className="text-lg font-bold tracking-tight">
+            <h1 className="text-xl font-bold tracking-tight">
               Create Event
             </h1>
             <p className="text-slate-500 text-xs">

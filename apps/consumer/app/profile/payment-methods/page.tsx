@@ -101,7 +101,7 @@ export default function PaymentMethodsPage() {
           >
             ←
           </Link>
-          <h1 className="text-lg font-bold tracking-tight">Payment methods</h1>
+          <h1 className="text-xl font-bold tracking-tight">Payment methods</h1>
         </div>
       </header>
 

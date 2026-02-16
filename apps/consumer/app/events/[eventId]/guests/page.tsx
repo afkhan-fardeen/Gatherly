@@ -119,7 +119,7 @@ export default function GuestsPage() {
       <header className="sticky top-0 z-40 bg-white/80 ios-blur px-6 py-3 border-b border-slate-100 shrink-0">
         <div className="flex justify-between items-start mb-6">
           <div>
-            <h1 className="text-lg font-bold tracking-tight">
+            <h1 className="text-xl font-bold tracking-tight">
               Manage Your Guests
             </h1>
             <p className="text-slate-500 text-xs font-semibold mt-0.5">

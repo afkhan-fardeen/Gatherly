@@ -141,7 +141,7 @@ export default function EditProfilePage() {
           >
             <ArrowLeft size={18} weight="regular" className="text-slate-600" />
           </Link>
-          <h1 className="text-base font-bold tracking-tight">Edit profile</h1>
+          <h1 className="text-xl font-bold tracking-tight">Edit profile</h1>
         </div>
       </header>
 
