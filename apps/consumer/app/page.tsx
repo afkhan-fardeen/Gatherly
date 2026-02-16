@@ -5,21 +5,9 @@ import { ForkKnife, Calendar, CalendarCheck } from "@phosphor-icons/react";
 import { Logo } from "@/components/Logo";
 
 const FEATURES = [
-  {
-    icon: ForkKnife,
-    label: "Find caterers",
-    description: "Browse top-rated catering vendors",
-  },
-  {
-    icon: Calendar,
-    label: "Manage events",
-    description: "Create and organize your events",
-  },
-  {
-    icon: CalendarCheck,
-    label: "Book with confidence",
-    description: "Secure bookings, easy management",
-  },
+  { icon: ForkKnife, label: "Find caterers", description: "Browse top-rated catering vendors" },
+  { icon: Calendar, label: "Manage events", description: "Create and organize your events" },
+  { icon: CalendarCheck, label: "Book with confidence", description: "Secure bookings, easy management" },
 ];
 
 export default function HomePage() {
@@ -36,7 +24,7 @@ export default function HomePage() {
           </Link>
           <Link
             href="/register"
-            className="px-4 py-2 text-sm font-medium bg-primary text-white rounded-none hover:bg-primary/90"
+            className="px-4 py-2 text-sm font-medium bg-primary text-white rounded-md hover:bg-primary/90"
           >
             Sign Up
           </Link>
@@ -56,7 +44,7 @@ export default function HomePage() {
           </p>
           <Link
             href="/register"
-            className="px-8 py-3 bg-primary text-white font-semibold rounded-none hover:bg-primary/90 transition-colors"
+            className="px-8 py-3 bg-primary text-white font-semibold rounded-md hover:bg-primary/90 transition-colors"
           >
             Get Started
           </Link>
@@ -67,9 +55,9 @@ export default function HomePage() {
             {FEATURES.map(({ icon: Icon, label, description }) => (
               <div
                 key={label}
-                className="flex flex-col items-center text-center p-4 rounded-none border border-slate-100 hover:bg-slate-50/50 transition-colors"
+                className="flex flex-col items-center text-center p-4 rounded-md border border-slate-100 hover:bg-slate-50/50 transition-colors"
               >
-                <div className="w-12 h-12 rounded-none bg-primary/10 flex items-center justify-center mb-3">
+                <div className="w-12 h-12 rounded-md bg-primary/10 flex items-center justify-center mb-3">
                   <Icon size={24} weight="regular" className="text-primary" />
                 </div>
                 <h3 className="font-semibold text-slate-900">{label}</h3>

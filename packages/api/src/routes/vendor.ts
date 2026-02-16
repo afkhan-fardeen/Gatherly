@@ -338,7 +338,7 @@ vendorRouter.get("/bookings", vendorAuth, async (req: Request, res: Response) =>
     include: {
       user: { select: { id: true, name: true, email: true } },
       event: { select: { name: true, date: true, guestCount: true } },
-      package: { select: { name: true } },
+      package: { select: { name: true, imageUrl: true } },
     },
   });
 
@@ -404,7 +404,7 @@ vendorRouter.patch("/bookings/:id/status", vendorAuth, async (req: Request, res:
     include: {
       user: { select: { id: true, name: true, email: true } },
       event: { select: { name: true, date: true, guestCount: true } },
-      package: { select: { name: true } },
+      package: { select: { name: true, imageUrl: true } },
     },
   });
 
@@ -469,6 +469,7 @@ vendorRouter.get("/reviews", vendorAuth, async (req: Request, res: Response) => 
       take: limit,
       include: {
         user: { select: { name: true } },
+        booking: { include: { package: { select: { name: true, imageUrl: true } } } },
       },
     }),
     prisma.review.count({ where: { vendorId: req.vendor!.id } }),

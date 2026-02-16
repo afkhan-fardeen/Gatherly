@@ -7,16 +7,12 @@ import {
   Clock,
   Star,
   CurrencyDollar,
-  Package,
   Plus,
   CalendarPlus,
-  ChatCircleText,
-  ChartBar,
 } from "@phosphor-icons/react";
 import { VendorLayout } from "@/components/VendorLayout";
 import { PageHeader } from "@/components/PageHeader";
 import { MetricCard } from "@/components/MetricCard";
-import { QuickActionCard } from "@/components/QuickActionCard";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 
@@ -31,6 +27,7 @@ interface Vendor {
 interface Booking {
   id: string;
   status: string;
+  paymentStatus: string | null;
   totalAmount: string;
   guestCount: number;
   createdAt: string;
@@ -66,12 +63,18 @@ export default function VendorDashboardPage() {
 
   const pendingCount = bookings.filter((b) => b.status === "pending").length;
   const recentBookings = bookings.slice(0, 5);
-  const revenue = bookings
-    .filter((b) => b.status === "confirmed")
+  const now = new Date();
+  const thisMonthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+  const revenueThisMonth = bookings
+    .filter(
+      (b) =>
+        (b.paymentStatus || "unpaid") === "paid" &&
+        new Date(b.event.date) >= thisMonthStart
+    )
     .reduce((sum, b) => sum + parseFloat(b.totalAmount || "0"), 0);
 
   return (
-    <VendorLayout businessName={vendor?.businessName}>
+    <VendorLayout>
       <div className="space-y-12">
         <PageHeader
           title="Dashboard"
@@ -136,8 +139,8 @@ export default function VendorDashboardPage() {
             }
           />
           <MetricCard
-            label="Monthly Revenue"
-            value={loading ? "—" : `$${revenue.toLocaleString()}`}
+            label="Revenue (This Month)"
+            value={loading ? "—" : `$${revenueThisMonth.toLocaleString()}`}
             icon={
               <div className="w-12 h-12 bg-emerald-500/10 rounded-xl flex items-center justify-center">
                 <CurrencyDollar size={24} weight="regular" className="text-emerald-500" />
@@ -153,53 +156,27 @@ export default function VendorDashboardPage() {
 
         {/* Quick Actions */}
         <section>
-          <div className="flex items-center justify-between mb-5">
-            <h2 className="text-lg font-bold text-slate-900">Quick Actions</h2>
-            <Link href="/packages" className="text-sm text-primary font-medium hover:underline">
-              View all tools
+          <div className="flex flex-wrap items-center gap-4">
+            <Link
+              href="/packages"
+              className="text-primary font-medium hover:underline"
+            >
+              Manage Packages
             </Link>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 md:gap-6">
-            <QuickActionCard
-              title="Manage Packages"
-              subtitle="Update your pricing"
-              href="/packages/new"
-              icon={
-                <div className="w-12 h-12 bg-indigo-50 rounded-xl flex items-center justify-center">
-                  <Package size={24} weight="regular" className="text-indigo-500" />
-                </div>
-              }
-            />
-            <QuickActionCard
-              title="View Bookings"
-              subtitle="Check calendar status"
+            <span className="text-slate-300">|</span>
+            <Link
               href="/bookings"
-              icon={
-                <div className="w-12 h-12 bg-emerald-50 rounded-xl flex items-center justify-center">
-                  <CalendarCheck size={24} weight="regular" className="text-emerald-500" />
-                </div>
-              }
-            />
-            <QuickActionCard
-              title="Customer Feedback"
-              subtitle="Read latest reviews"
-              disabled
-              icon={
-                <div className="w-12 h-12 bg-pink-50 rounded-xl flex items-center justify-center">
-                  <ChatCircleText size={24} weight="regular" className="text-pink-500" />
-                </div>
-              }
-            />
-            <QuickActionCard
-              title="Sales Reports"
-              subtitle="Download PDF reports"
-              disabled
-              icon={
-                <div className="w-12 h-12 bg-amber-50 rounded-xl flex items-center justify-center">
-                  <ChartBar size={24} weight="regular" className="text-amber-500" />
-                </div>
-              }
-            />
+              className="text-primary font-medium hover:underline"
+            >
+              View Bookings
+            </Link>
+            <span className="text-slate-300">|</span>
+            <Link
+              href="/reviews"
+              className="text-primary font-medium hover:underline"
+            >
+              Reviews
+            </Link>
           </div>
         </section>
 
@@ -252,7 +229,7 @@ export default function VendorDashboardPage() {
               {recentBookings.map((b) => (
                 <Link
                   key={b.id}
-                  href="/bookings"
+                  href={`/bookings/${b.id}`}
                   className="block p-5 rounded-xl border border-slate-200 bg-white hover:border-slate-300 transition-all"
                 >
                   <div className="flex justify-between items-start">

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
@@ -12,34 +12,45 @@ import {
   Star,
   SignOut,
   MagnifyingGlass,
-  Gear,
   Bell,
+  CaretRight,
 } from "@phosphor-icons/react";
 import { Logo } from "./Logo";
 
 interface VendorLayoutProps {
   children: React.ReactNode;
-  businessName?: string;
+}
+
+interface Notification {
+  id: string;
+  title: string;
+  message: string;
+  link: string | null;
+  isRead: boolean;
+  createdAt: string;
 }
 
 const NAV_ITEMS = [
   { href: "/dashboard", label: "Dashboard", icon: House },
-  { href: "/profile", label: "Profile", icon: User },
   { href: "/packages", label: "Packages", icon: Package },
   { href: "/bookings", label: "Bookings", icon: CalendarCheck },
   { href: "/notifications", label: "Notifications", icon: Bell },
-  { href: "/availability", label: "Availability", icon: CalendarBlank },
+  { href: "/availability", label: "Unavailable dates", icon: CalendarBlank },
   { href: "/reviews", label: "Reviews", icon: Star },
 ];
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 
-export function VendorLayout({ children, businessName }: VendorLayoutProps) {
+export function VendorLayout({ children }: VendorLayoutProps) {
   const pathname = usePathname();
   const router = useRouter();
   const [unreadCount, setUnreadCount] = useState(0);
+  const [businessName, setBusinessName] = useState<string | null>(null);
   const [profilePictureUrl, setProfilePictureUrl] = useState<string | null>(null);
   const [userName, setUserName] = useState<string | null>(null);
+  const [notificationOpen, setNotificationOpen] = useState(false);
+  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const notifRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -50,6 +61,7 @@ export function VendorLayout({ children, businessName }: VendorLayoutProps) {
       .then((r) => (r.ok ? r.json() : null))
       .then((v) => {
         if (v) {
+          setBusinessName(v.businessName ?? null);
           setProfilePictureUrl(v.user?.profilePictureUrl ?? null);
           setUserName(v.user?.name ?? null);
         }
@@ -58,14 +70,41 @@ export function VendorLayout({ children, businessName }: VendorLayoutProps) {
   }, []);
 
   useEffect(() => {
+    if (!notificationOpen) return;
     const token = localStorage.getItem("token");
     if (!token) return;
-    fetch(`${API_URL}/api/notifications/unread-count`, {
+    fetch(`${API_URL}/api/notifications?limit=5`, {
       headers: { Authorization: `Bearer ${token}` },
     })
-      .then((r) => (r.ok ? r.json() : { count: 0 }))
-      .then((d) => setUnreadCount(d.count ?? 0))
-      .catch(() => setUnreadCount(0));
+      .then((r) => (r.ok ? r.json() : { items: [] }))
+      .then((d) => setNotifications(d.items ?? []))
+      .catch(() => setNotifications([]));
+  }, [notificationOpen]);
+
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (notifRef.current && !notifRef.current.contains(e.target as Node)) {
+        setNotificationOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) return;
+    function fetchUnread() {
+      fetch(`${API_URL}/api/notifications/unread-count`, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+        .then((r) => (r.ok ? r.json() : { count: 0 }))
+        .then((d) => setUnreadCount(d.count ?? 0))
+        .catch(() => setUnreadCount(0));
+    }
+    fetchUnread();
+    const interval = setInterval(fetchUnread, 30000);
+    return () => clearInterval(interval);
   }, [pathname]);
 
   function handleLogout() {
@@ -104,8 +143,8 @@ export function VendorLayout({ children, businessName }: VendorLayoutProps) {
             href="/profile"
             className="flex items-center gap-3 px-3 py-2 rounded-lg font-medium text-slate-600 hover:bg-slate-100 transition-colors"
           >
-            <Gear size={20} weight="regular" />
-            Account
+            <User size={20} weight="regular" />
+            Profile
           </Link>
         </nav>
         <div className="p-4 border-t border-slate-200">
@@ -137,26 +176,67 @@ export function VendorLayout({ children, businessName }: VendorLayoutProps) {
               />
             </div>
           </div>
-          <Link
-            href="/notifications"
-            className="relative p-2 rounded-lg hover:bg-slate-100 transition-colors"
-          >
-            <Bell size={22} weight="regular" className="text-slate-600" />
-            {unreadCount > 0 && (
-              <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] rounded-full bg-rose-500 text-white text-[10px] font-bold flex items-center justify-center px-1">
-                {unreadCount > 99 ? "99+" : unreadCount}
-              </span>
+          <div className="relative" ref={notifRef}>
+            <button
+              type="button"
+              onClick={() => setNotificationOpen(!notificationOpen)}
+              className="relative p-2 rounded-lg hover:bg-slate-100 transition-colors"
+            >
+              <Bell size={22} weight="regular" className="text-slate-600" />
+              {unreadCount > 0 && (
+                <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] rounded-full bg-rose-500 text-white text-[10px] font-bold flex items-center justify-center px-1">
+                  {unreadCount > 99 ? "99+" : unreadCount}
+                </span>
+              )}
+            </button>
+            {notificationOpen && (
+              <div className="absolute right-0 top-full mt-2 w-72 max-h-[280px] overflow-y-auto bg-white rounded-lg shadow-lg border border-slate-200 py-2 z-50">
+                <div className="px-4 py-2 border-b border-slate-100">
+                  <span className="font-semibold text-slate-900 text-sm">Notifications</span>
+                </div>
+                {notifications.length === 0 ? (
+                  <p className="px-4 py-6 text-sm text-slate-500 text-center">No notifications</p>
+                ) : (
+                  <div className="py-1">
+                    {notifications.slice(0, 5).map((n) => (
+                      <div
+                        key={n.id}
+                        className={`px-4 py-2 hover:bg-slate-50 ${!n.isRead ? "bg-primary/5" : ""}`}
+                      >
+                        <p className="font-medium text-sm text-slate-900 truncate">{n.title}</p>
+                        <p className="text-xs text-slate-500 truncate">{n.message}</p>
+                        {n.link && (
+                          <Link
+                            href={n.link}
+                            onClick={() => setNotificationOpen(false)}
+                            className="inline-flex items-center gap-1 mt-1 text-xs font-medium text-primary hover:underline"
+                          >
+                            View <CaretRight size={12} weight="bold" />
+                          </Link>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
+                <Link
+                  href="/notifications"
+                  onClick={() => setNotificationOpen(false)}
+                  className="block px-4 py-2.5 text-sm font-medium text-primary hover:bg-primary/5 border-t border-slate-100"
+                >
+                  View all notifications
+                </Link>
+              </div>
             )}
-          </Link>
+          </div>
           <Link
             href="/profile"
             className="flex items-center gap-3 pl-2 group cursor-pointer"
           >
             <div className="text-right hidden sm:block">
-              <p className="text-sm font-semibold leading-none mb-1">
-                {businessName || "Vendor Portal"}
+              <p className="text-sm font-semibold leading-none mb-1 text-slate-900">
+                {businessName || "—"}
               </p>
-              <p className="text-xs text-slate-500">Premium Vendor</p>
+              <p className="text-xs text-slate-500">{userName || "—"}</p>
             </div>
             <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center border-2 border-slate-200 overflow-hidden group-hover:border-primary transition-all shrink-0">
               {profilePictureUrl ? (
@@ -182,7 +262,7 @@ export function VendorLayout({ children, businessName }: VendorLayoutProps) {
         </header>
 
         <div className="flex-1 overflow-y-auto px-6 py-8 md:py-12 pb-12 bg-slate-50">
-          <div className="max-w-[1400px] mx-auto">{children}</div>
+          <div className="max-w-7xl mx-auto w-full">{children}</div>
         </div>
       </main>
 

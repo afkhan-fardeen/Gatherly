@@ -6,7 +6,7 @@ const TAG_PALETTE = [
   "bg-blue-100 text-blue-800",
   "bg-violet-100 text-violet-800",
   "bg-rose-100 text-rose-800",
-  "bg-teal-100 text-teal-800",
+  "bg-blue-100 text-blue-800",
 ] as const;
 
 function hashString(str: string): number {
@@ -24,12 +24,12 @@ export function getTagColor(value: string): string {
 }
 
 const BOOKING_STATUS_STYLES: Record<string, string> = {
-  pending: "bg-pending/10 text-pending",
-  confirmed: "bg-confirmed/10 text-confirmed",
-  in_preparation: "bg-pending/10 text-pending",
-  delivered: "bg-confirmed/10 text-confirmed",
-  completed: "bg-confirmed/10 text-confirmed",
-  cancelled: "bg-cancelled/10 text-cancelled",
+  pending: "bg-amber-100 text-amber-800",
+  confirmed: "bg-emerald-100 text-emerald-800",
+  in_preparation: "bg-blue-100 text-blue-800",
+  delivered: "bg-blue-100 text-blue-800",
+  completed: "bg-slate-200 text-slate-700",
+  cancelled: "bg-red-100 text-red-800",
 };
 
 export function getBookingStatusStyle(status: string): string {

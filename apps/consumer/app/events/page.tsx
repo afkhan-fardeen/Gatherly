@@ -59,7 +59,7 @@ export default function EventsPage() {
           </div>
           <Link
             href="/events/create"
-            className="w-10 h-10 rounded-none bg-primary text-white flex items-center justify-center shadow-lg shadow-primary/20"
+            className="w-10 h-10 rounded-md bg-primary text-white flex items-center justify-center shadow-lg shadow-primary/20"
           >
             <Plus size={20} weight="regular" />
           </Link>
@@ -68,7 +68,7 @@ export default function EventsPage() {
           <button
             type="button"
             onClick={() => setTab("upcoming")}
-            className={`flex-1 py-2 rounded-none text-sm font-semibold ${
+            className={`flex-1 py-2 rounded-md text-sm font-semibold ${
               tab === "upcoming" ? "bg-primary/10 text-primary" : "bg-slate-100 text-slate-500"
             }`}
           >
@@ -77,7 +77,7 @@ export default function EventsPage() {
           <button
             type="button"
             onClick={() => setTab("past")}
-            className={`flex-1 py-2 rounded-none text-sm font-semibold ${
+            className={`flex-1 py-2 rounded-md text-sm font-semibold ${
               tab === "past" ? "bg-primary/10 text-primary" : "bg-slate-100 text-slate-500"
             }`}
           >
@@ -92,7 +92,7 @@ export default function EventsPage() {
             {[1, 2, 3].map((i) => (
               <div
                 key={i}
-                className="h-24 bg-slate-100 rounded-none animate-pulse"
+                className="h-24 bg-slate-100 rounded-md animate-pulse"
               />
             ))}
           </div>
@@ -105,7 +105,7 @@ export default function EventsPage() {
             </p>
             <Link
               href="/events/create"
-              className="inline-block mt-6 px-6 py-3 bg-primary text-white font-semibold rounded-none"
+              className="inline-block mt-6 px-6 py-3 bg-primary text-white font-semibold rounded-md"
             >
               Create Event
             </Link>
@@ -135,7 +135,7 @@ export default function EventsPage() {
               return (
                 <div
                   key={event.id}
-                  className="border border-slate-100 rounded-none overflow-hidden"
+                  className="border border-slate-100 rounded-md overflow-hidden"
                 >
                   <Link
                     href={`/events/${event.id}`}
@@ -156,7 +156,7 @@ export default function EventsPage() {
                           <span className="text-slate-400 text-xs">
                             {event._count?.guests ?? 0} guests
                           </span>
-                          <Tag value={event.eventType} variant="eventType" className="rounded-none">
+                          <Tag value={event.eventType} variant="eventType" className="rounded-md">
                             {event.eventType.replace(/_/g, " ")}
                           </Tag>
                         </div>

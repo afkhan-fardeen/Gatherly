@@ -129,7 +129,7 @@ export default function EditProfilePage() {
   }
 
   const inputClass =
-    "w-full h-12 px-4 bg-slate-50 border border-slate-200 rounded-none text-slate-900 placeholder:text-slate-400 focus:ring-2 focus:ring-primary/20 focus:bg-white transition-all outline-none";
+    "w-full h-12 px-4 bg-slate-50 border border-slate-200 rounded-md text-slate-900 placeholder:text-slate-400 focus:ring-2 focus:ring-primary/20 focus:bg-white transition-all outline-none";
 
   return (
     <AppLayout>
@@ -137,7 +137,7 @@ export default function EditProfilePage() {
         <div className="flex items-center gap-3">
           <Link
             href="/profile"
-            className="w-9 h-9 rounded-none bg-slate-100 flex items-center justify-center shrink-0"
+            className="w-9 h-9 rounded-md bg-slate-100 flex items-center justify-center shrink-0"
           >
             <ArrowLeft size={18} weight="regular" className="text-slate-600" />
           </Link>
@@ -151,7 +151,7 @@ export default function EditProfilePage() {
           <div className="flex flex-col items-center">
             <label className="block text-sm font-medium text-slate-700 mb-2">Profile photo</label>
             <div className="relative">
-              <div className="w-24 h-24 rounded-none border-2 border-slate-200 overflow-hidden bg-slate-100 flex items-center justify-center shrink-0">
+              <div className="w-24 h-24 rounded-md border-2 border-slate-200 overflow-hidden bg-slate-100 flex items-center justify-center shrink-0">
                 {form.profilePictureUrl ? (
                   <img
                     src={form.profilePictureUrl}
@@ -169,7 +169,7 @@ export default function EditProfilePage() {
                   </span>
                 )}
               </div>
-              <label className="absolute bottom-0 right-0 w-8 h-8 rounded-none bg-primary text-white flex items-center justify-center cursor-pointer hover:bg-primary/90">
+              <label className="absolute bottom-0 right-0 w-8 h-8 rounded-md bg-primary text-white flex items-center justify-center cursor-pointer hover:bg-primary/90">
                 <Camera size={16} weight="bold" />
                 <input
                   type="file"
@@ -225,7 +225,7 @@ export default function EditProfilePage() {
           <button
             type="submit"
             disabled={saving}
-            className="w-full py-3 bg-primary text-white font-semibold rounded-none hover:bg-primary/90 disabled:opacity-50 transition-colors"
+            className="w-full py-3 bg-primary text-white font-semibold rounded-md hover:bg-primary/90 disabled:opacity-50 transition-colors"
           >
             {saving ? "Saving..." : "Save changes"}
           </button>

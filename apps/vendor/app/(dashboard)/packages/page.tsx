@@ -16,6 +16,7 @@ interface Pkg {
   minGuests: number | null;
   maxGuests: number | null;
   isActive: boolean;
+  imageUrl: string | null;
 }
 
 export default function PackagesListPage() {
@@ -65,7 +66,7 @@ export default function PackagesListPage() {
   const inactivePackages = packages.filter((p) => !p.isActive);
 
   return (
-    <VendorLayout businessName={vendor?.businessName}>
+    <VendorLayout>
       <header className="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold tracking-tight text-slate-900">Packages</h1>
@@ -116,8 +117,16 @@ export default function PackagesListPage() {
                     key={pkg.id}
                     className="flex items-center gap-5 p-5 rounded-xl border border-slate-200 bg-white"
                   >
-                    <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
-                      <Package size={24} weight="regular" className="text-primary" />
+                    <div className="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center overflow-hidden shrink-0">
+                      {pkg.imageUrl ? (
+                        <img
+                          src={pkg.imageUrl}
+                          alt=""
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <Package size={24} weight="regular" className="text-primary" />
+                      )}
                     </div>
                     <div className="flex-1 min-w-0">
                       <h3 className="font-semibold text-slate-900">{pkg.name}</h3>
@@ -164,8 +173,16 @@ export default function PackagesListPage() {
                     key={pkg.id}
                     className="flex items-center gap-5 p-5 rounded-xl border border-slate-200 bg-slate-50/50"
                   >
-                    <div className="w-12 h-12 rounded-xl bg-slate-200 flex items-center justify-center shrink-0">
-                      <Package size={24} weight="regular" className="text-slate-500" />
+                    <div className="w-14 h-14 rounded-xl bg-slate-200 flex items-center justify-center overflow-hidden shrink-0">
+                      {pkg.imageUrl ? (
+                        <img
+                          src={pkg.imageUrl}
+                          alt=""
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <Package size={24} weight="regular" className="text-slate-500" />
+                      )}
                     </div>
                     <div className="flex-1 min-w-0">
                       <h3 className="font-semibold text-slate-600">{pkg.name}</h3>

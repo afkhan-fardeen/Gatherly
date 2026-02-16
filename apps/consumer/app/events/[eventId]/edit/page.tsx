@@ -126,7 +126,7 @@ export default function EditEventPage() {
   }
 
   const inputClass =
-    "w-full px-4 py-3 border border-slate-200 rounded-none focus:ring-2 focus:ring-primary/20 outline-none min-h-[44px]";
+    "w-full px-4 py-3 border border-slate-200 rounded-md focus:ring-2 focus:ring-primary/20 outline-none min-h-[44px]";
 
   return (
     <AppLayout>
@@ -134,7 +134,7 @@ export default function EditEventPage() {
         <div className="flex items-center gap-3">
           <Link
             href={`/events/${eventId}`}
-            className="w-9 h-9 rounded-none bg-slate-100 flex items-center justify-center shrink-0"
+            className="w-9 h-9 rounded-md bg-slate-100 flex items-center justify-center shrink-0"
           >
             <ArrowLeft size={18} weight="regular" className="text-slate-600" />
           </Link>
@@ -249,7 +249,7 @@ export default function EditEventPage() {
           <button
             type="submit"
             disabled={saving}
-            className="w-full py-3 bg-primary text-white font-semibold rounded-none hover:bg-primary/90 disabled:opacity-50"
+            className="w-full py-3 bg-primary text-white font-semibold rounded-md hover:bg-primary/90 disabled:opacity-50"
           >
             {saving ? "Saving…" : "Save changes"}
           </button>

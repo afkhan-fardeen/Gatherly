@@ -96,7 +96,7 @@ export default function PackageDetailPage() {
         <div className="flex items-center gap-3">
           <Link
             href={eventId ? `/vendor/${id}?eventId=${eventId}` : `/vendor/${id}`}
-            className="w-9 h-9 rounded-none bg-slate-100 flex items-center justify-center shrink-0"
+            className="w-9 h-9 rounded-md bg-slate-100 flex items-center justify-center shrink-0"
           >
             <ArrowLeft size={18} weight="regular" className="text-slate-600" />
           </Link>
@@ -110,7 +110,7 @@ export default function PackageDetailPage() {
       <main className="flex-1 overflow-y-auto overflow-x-hidden pb-24 min-h-0">
         <div className="p-4 space-y-6">
           {pkg.imageUrl && (
-            <div className="w-full h-48 overflow-hidden bg-slate-100 rounded-none -mx-4 mt-0">
+            <div className="w-full h-48 overflow-hidden bg-slate-100 rounded-md -mx-4 mt-0">
               <img src={pkg.imageUrl} alt="" className="w-full h-full object-cover" />
             </div>
           )}
@@ -122,7 +122,7 @@ export default function PackageDetailPage() {
             )}
           </div>
 
-          <div className="p-4 bg-slate-50 border border-slate-100 rounded-none space-y-2">
+          <div className="p-4 bg-slate-50 border border-slate-100 rounded-md space-y-2">
             <p className="text-primary font-bold text-xl">
               {pkg.priceType === "per_person"
                 ? `From ${Number(pkg.basePrice).toFixed(2)} BD per person`
@@ -151,14 +151,14 @@ export default function PackageDetailPage() {
                 {pkg.packageItems.map((item, i) => (
                   <div
                     key={i}
-                    className="flex items-center gap-3 p-3 border border-slate-100 bg-white rounded-none"
+                    className="flex items-center gap-3 p-3 border border-slate-100 bg-white rounded-md"
                   >
                     {item.imageUrl ? (
-                      <div className="w-12 h-12 rounded-none overflow-hidden bg-slate-100 shrink-0">
+                      <div className="w-12 h-12 rounded-md overflow-hidden bg-slate-100 shrink-0">
                         <img src={item.imageUrl} alt="" className="w-full h-full object-cover" />
                       </div>
                     ) : (
-                      <div className="w-12 h-12 rounded-none bg-slate-100 flex items-center justify-center shrink-0">
+                      <div className="w-12 h-12 rounded-md bg-slate-100 flex items-center justify-center shrink-0">
                         <ForkKnife size={20} weight="regular" className="text-slate-400" />
                       </div>
                     )}
@@ -171,7 +171,7 @@ export default function PackageDetailPage() {
 
           <Link
             href={bookHref}
-            className="block w-full py-3 bg-primary text-white font-semibold text-center rounded-none hover:bg-primary/90 transition-colors"
+            className="block w-full py-3 bg-primary text-white font-semibold text-center rounded-md hover:bg-primary/90 transition-colors"
           >
             Book this package
           </Link>

@@ -14,6 +14,7 @@ import {
   Star,
 } from "@phosphor-icons/react";
 import { AppLayout } from "@/components/AppLayout";
+import { OrderProgress } from "@/components/OrderProgress";
 import { getBookingStatusStyle } from "@/components/ui/Tag";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
@@ -236,7 +237,7 @@ export default function BookingDetailPage() {
         <div className="flex items-center gap-3">
           <Link
             href="/bookings"
-            className="w-9 h-9 rounded-none bg-slate-100 flex items-center justify-center shrink-0"
+            className="w-9 h-9 rounded-md bg-slate-100 flex items-center justify-center shrink-0"
           >
             <ArrowLeft size={18} weight="regular" className="text-slate-600" />
           </Link>
@@ -252,10 +253,22 @@ export default function BookingDetailPage() {
       </header>
 
       <main className="p-6 pb-32 space-y-6">
-        {/* Status */}
+        {/* Cancelled banner */}
+        {booking.status === "cancelled" && (
+          <div className="p-4 rounded-md bg-cancelled/10 border border-cancelled/20">
+            <p className="text-sm font-semibold text-cancelled">This booking was cancelled</p>
+          </div>
+        )}
+
+        {/* Order progress (hidden when cancelled) */}
+        {booking.status !== "cancelled" && (
+          <OrderProgress status={booking.status} paymentStatus={booking.paymentStatus} />
+        )}
+
+        {/* Status badge */}
         <div className="flex items-center justify-between">
           <span
-            className={`px-3 py-1.5 rounded-none text-xs font-extrabold uppercase ${getBookingStatusStyle(
+            className={`px-3 py-1.5 rounded-md text-xs font-extrabold uppercase ${getBookingStatusStyle(
               booking.status
             )}`}
           >
@@ -267,8 +280,8 @@ export default function BookingDetailPage() {
         </div>
 
         {/* Vendor */}
-        <div className="flex items-center gap-4 p-4 border border-slate-100 rounded-none">
-          <div className="w-14 h-14 rounded-none bg-slate-100 flex items-center justify-center shrink-0 overflow-hidden">
+        <div className="flex items-center gap-4 p-4 border border-slate-100 rounded-md">
+          <div className="w-14 h-14 rounded-md bg-slate-100 flex items-center justify-center shrink-0 overflow-hidden">
             {booking.vendor.logoUrl ? (
               <img
                 src={booking.vendor.logoUrl}
@@ -326,7 +339,7 @@ export default function BookingDetailPage() {
               {booking.package.packageItems.map((item, i) => (
                 <li
                   key={i}
-                  className="flex items-center gap-3 p-3 border border-slate-100 rounded-none"
+                  className="flex items-center gap-3 p-3 border border-slate-100 rounded-md"
                 >
                   <Package size={18} weight="regular" className="text-slate-400 shrink-0" />
                   <div>
@@ -354,7 +367,7 @@ export default function BookingDetailPage() {
         )}
 
         {/* Total */}
-        <div className="p-4 bg-slate-50 border border-slate-100 rounded-none">
+        <div className="p-4 bg-slate-50 border border-slate-100 rounded-md">
           <p className="text-slate-600 text-sm">Total</p>
           <p className="text-primary font-bold text-xl">
             {Number(booking.totalAmount).toFixed(2)} BD
@@ -367,7 +380,7 @@ export default function BookingDetailPage() {
             <button
               type="button"
               onClick={openPayModal}
-              className="w-full py-3 rounded-none bg-primary text-white font-semibold flex items-center justify-center gap-2 hover:bg-primary/90"
+              className="w-full py-3 rounded-md bg-primary text-white font-semibold flex items-center justify-center gap-2 hover:bg-primary/90"
             >
               <CreditCard size={18} weight="bold" />
               Pay {Number(booking.totalAmount).toFixed(2)} BD
@@ -377,7 +390,7 @@ export default function BookingDetailPage() {
             <button
               type="button"
               onClick={() => setReviewModal(true)}
-              className="w-full py-3 rounded-none bg-slate-100 text-slate-700 font-semibold flex items-center justify-center gap-2 hover:bg-slate-200"
+              className="w-full py-3 rounded-md bg-slate-100 text-slate-700 font-semibold flex items-center justify-center gap-2 hover:bg-slate-200"
             >
               <Star size={18} weight="bold" />
               Leave a review
@@ -389,7 +402,7 @@ export default function BookingDetailPage() {
       {/* Pay modal */}
       {payModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
-          <div className="bg-white rounded-none p-6 max-w-sm w-full shadow-xl">
+          <div className="bg-white rounded-md p-6 max-w-sm w-full shadow-xl">
             <h3 className="text-lg font-bold mb-4">Pay {Number(booking.totalAmount).toFixed(2)} BD</h3>
             <p className="text-slate-500 text-sm mb-4">
               {booking.vendor.businessName} · {booking.package.name}
@@ -400,7 +413,7 @@ export default function BookingDetailPage() {
                 <select
                   value={selectedPaymentId ?? ""}
                   onChange={(e) => setSelectedPaymentId(e.target.value || null)}
-                  className="w-full px-4 py-3 rounded-none border border-slate-200 text-slate-900"
+                  className="w-full px-4 py-3 rounded-md border border-slate-200 text-slate-900"
                 >
                   {paymentMethods.map((m) => (
                     <option key={m.id} value={m.id}>
@@ -428,7 +441,7 @@ export default function BookingDetailPage() {
                   placeholder="4242 4242 4242 4242"
                   value={newCardNumber}
                   onChange={(e) => setNewCardNumber(e.target.value.replace(/\D/g, "").slice(0, 19))}
-                  className="w-full px-4 py-3 rounded-none border border-slate-200 text-slate-900 placeholder:text-slate-400"
+                  className="w-full px-4 py-3 rounded-md border border-slate-200 text-slate-900 placeholder:text-slate-400"
                 />
                 {paymentMethods.length > 0 && (
                   <button
@@ -449,7 +462,7 @@ export default function BookingDetailPage() {
               <button
                 type="button"
                 onClick={() => setPayModal(false)}
-                className="flex-1 py-3 rounded-none border border-slate-200 font-semibold text-slate-600 hover:bg-slate-50"
+                className="flex-1 py-3 rounded-md border border-slate-200 font-semibold text-slate-600 hover:bg-slate-50"
               >
                 Cancel
               </button>
@@ -461,7 +474,7 @@ export default function BookingDetailPage() {
                   (!useNewCard && !selectedPaymentId) ||
                   (useNewCard && newCardNumber.replace(/\D/g, "").length < 13)
                 }
-                className="flex-1 py-3 rounded-none bg-primary text-white font-semibold hover:bg-primary/90 disabled:opacity-50"
+                className="flex-1 py-3 rounded-md bg-primary text-white font-semibold hover:bg-primary/90 disabled:opacity-50"
               >
                 {payingId === booking.id ? "Paying…" : "Pay"}
               </button>
@@ -473,7 +486,7 @@ export default function BookingDetailPage() {
       {/* Review modal */}
       {reviewModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
-          <div className="bg-white rounded-none p-6 max-w-sm w-full shadow-xl">
+          <div className="bg-white rounded-md p-6 max-w-sm w-full shadow-xl">
             <h3 className="text-lg font-bold mb-4">Leave a review</h3>
             <p className="text-slate-500 text-sm mb-4">
               {booking.vendor.businessName} · {booking.package.name}
@@ -497,7 +510,7 @@ export default function BookingDetailPage() {
               onChange={(e) => setReviewText(e.target.value)}
               placeholder="Your review (optional)"
               rows={3}
-              className="w-full px-4 py-3 rounded-none border border-slate-200 text-slate-900 placeholder:text-slate-400 mb-4 resize-none"
+              className="w-full px-4 py-3 rounded-md border border-slate-200 text-slate-900 placeholder:text-slate-400 mb-4 resize-none"
             />
             <div className="flex gap-2">
               <button
@@ -507,7 +520,7 @@ export default function BookingDetailPage() {
                   setReviewText("");
                   setReviewRating(5);
                 }}
-                className="flex-1 py-3 rounded-none border border-slate-200 font-semibold text-slate-600 hover:bg-slate-50"
+                className="flex-1 py-3 rounded-md border border-slate-200 font-semibold text-slate-600 hover:bg-slate-50"
               >
                 Cancel
               </button>
@@ -515,7 +528,7 @@ export default function BookingDetailPage() {
                 type="button"
                 onClick={handleSubmitReview}
                 disabled={submittingReview}
-                className="flex-1 py-3 rounded-none bg-primary text-white font-semibold hover:bg-primary/90 disabled:opacity-50"
+                className="flex-1 py-3 rounded-md bg-primary text-white font-semibold hover:bg-primary/90 disabled:opacity-50"
               >
                 {submittingReview ? "Submitting…" : "Submit"}
               </button>

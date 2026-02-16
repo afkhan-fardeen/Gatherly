@@ -34,7 +34,7 @@ export default function ComingSoonPage() {
         <div className="flex items-center gap-4">
           <Link
             href="/services"
-            className="w-10 h-10 rounded-none bg-slate-100 flex items-center justify-center"
+            className="w-10 h-10 rounded-md bg-slate-100 flex items-center justify-center"
           >
 <ArrowLeft size={20} weight="regular" className="text-slate-600" />
           </Link>
@@ -45,10 +45,10 @@ export default function ComingSoonPage() {
       </header>
 
       <main className="p-6 pb-32 flex flex-col items-center justify-center min-h-[50vh]">
-        <div className="w-20 h-20 rounded-none bg-slate-100 flex items-center justify-center mb-6">
+        <div className="w-20 h-20 rounded-md bg-slate-100 flex items-center justify-center mb-6">
           <service.Icon size={40} weight="regular" className="text-slate-400" />
         </div>
-        <span className="px-3 py-1 rounded-none text-xs font-bold uppercase bg-slate-100 text-slate-500 mb-4">
+        <span className="px-3 py-1 rounded-md text-xs font-bold uppercase bg-slate-100 text-slate-500 mb-4">
           Coming Soon
         </span>
         <h2 className="text-xl font-bold text-center mb-2">
@@ -60,7 +60,7 @@ export default function ComingSoonPage() {
         </p>
         <Link
           href="/services"
-          className="px-6 py-3 bg-primary text-white font-semibold rounded-none"
+          className="px-6 py-3 bg-primary text-white font-semibold rounded-md"
         >
           Browse Services
         </Link>

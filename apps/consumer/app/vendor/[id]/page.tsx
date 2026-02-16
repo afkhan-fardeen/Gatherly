@@ -124,7 +124,7 @@ export default function VendorProfilePage() {
         <div className="flex items-center gap-3">
           <Link
             href="/services/catering"
-            className="w-9 h-9 rounded-none bg-slate-100 flex items-center justify-center shrink-0"
+            className="w-9 h-9 rounded-md bg-slate-100 flex items-center justify-center shrink-0"
           >
             <ArrowLeft size={18} weight="regular" className="text-slate-600" />
           </Link>
@@ -176,7 +176,7 @@ export default function VendorProfilePage() {
         {(vendor.cuisineTypes?.length ?? 0) > 0 && (
           <div className="px-4 pt-3 pb-2 flex flex-wrap gap-2">
             {vendor.cuisineTypes.map((c) => (
-              <Tag key={c} value={c} variant="cuisine" className="rounded-none">
+              <Tag key={c} value={c} variant="cuisine" className="rounded-md">
                 {c}
               </Tag>
             ))}
@@ -195,11 +195,11 @@ export default function VendorProfilePage() {
               {packages.map((pkg) => (
                 <div
                   key={pkg.id}
-                  className="border border-slate-200 bg-white overflow-hidden rounded-none"
+                  className="border border-slate-200 bg-white overflow-hidden rounded-md"
                 >
                   <div className="p-4">
                     {pkg.imageUrl && (
-                      <div className="w-full h-28 overflow-hidden bg-slate-100 mb-4 rounded-none">
+                      <div className="w-full h-28 overflow-hidden bg-slate-100 mb-4 rounded-md">
                         <img src={pkg.imageUrl} alt="" className="w-full h-full object-cover" />
                       </div>
                     )}
@@ -226,7 +226,7 @@ export default function VendorProfilePage() {
                         {pkg.packageItems.slice(0, 4).map((item, i) => (
                           <span
                             key={i}
-                            className="px-2 py-0.5 bg-slate-100 text-slate-600 text-xs rounded-none"
+                            className="px-2 py-0.5 bg-slate-100 text-slate-600 text-xs rounded-md"
                           >
                             {item.name}
                           </span>
@@ -346,7 +346,7 @@ export default function VendorProfilePage() {
                 reviews.map((r) => (
                   <div
                     key={r.id}
-                    className="p-4 bg-slate-50 border border-slate-100 rounded-none"
+                    className="p-4 bg-slate-50 border border-slate-100 rounded-md"
                   >
                     <div className="flex items-center gap-2 mb-1">
                       <span className="font-semibold text-sm">{r.user.name}</span>

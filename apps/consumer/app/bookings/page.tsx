@@ -6,6 +6,7 @@ import toast from "react-hot-toast";
 import { CalendarCheck, ForkKnife, CreditCard } from "@phosphor-icons/react";
 import { AppLayout } from "@/components/AppLayout";
 import { getBookingStatusStyle } from "@/components/ui/Tag";
+import { getBookingStatusLine } from "@/lib/bookingStatus";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 
@@ -13,11 +14,11 @@ interface Booking {
   id: string;
   bookingReference: string;
   status: string;
-  paymentStatus: string;
+  paymentStatus: string | null;
   totalAmount: number;
   vendor: { businessName: string; logoUrl: string | null };
   event: { name: string; date: string };
-  package: { name: string };
+  package: { name: string; imageUrl: string | null };
   reviews: { id: string }[];
 }
 
@@ -172,17 +173,24 @@ export default function BookingsPage() {
       <header className="sticky top-0 z-40 bg-white/80 ios-blur px-4 py-3 border-b border-slate-100 shrink-0">
         <h1 className="text-lg font-bold tracking-tight">My Bookings</h1>
         <div className="flex gap-2 mt-4">
-          {(["active", "past", "cancelled"] as Tab[]).map((t) => (
-            <button
-              key={t}
-              onClick={() => setTab(t)}
-              className={`flex-1 py-2 rounded-none text-sm font-semibold capitalize ${
-                tab === t ? "bg-primary/10 text-primary" : "bg-slate-100 text-slate-500"
-              }`}
-            >
-              {t}
-            </button>
-          ))}
+          {(["active", "past", "cancelled"] as Tab[]).map((t) => {
+            const activeStyles: Record<Tab, string> = {
+              active: "bg-emerald-100 text-emerald-800",
+              past: "bg-slate-200 text-slate-700",
+              cancelled: "bg-red-100 text-red-800",
+            };
+            return (
+              <button
+                key={t}
+                onClick={() => setTab(t)}
+                className={`flex-1 py-2 rounded-md text-sm font-semibold capitalize ${
+                  tab === t ? activeStyles[t] : "bg-slate-100 text-slate-500"
+                }`}
+              >
+                {t}
+              </button>
+            );
+          })}
         </div>
       </header>
 
@@ -192,7 +200,7 @@ export default function BookingsPage() {
             {[1, 2, 3].map((i) => (
               <div
                 key={i}
-                className="h-24 bg-slate-100 rounded-none animate-pulse"
+                className="h-24 bg-slate-100 rounded-md animate-pulse"
               />
             ))}
           </div>
@@ -220,12 +228,18 @@ export default function BookingsPage() {
                   href={`/bookings/${booking.id}`}
                   className="flex items-center gap-4 flex-1 min-w-0"
                 >
-                  <div className="w-10 h-10 rounded-none bg-slate-100 flex items-center justify-center shrink-0 overflow-hidden">
-                    {booking.vendor.logoUrl ? (
+                  <div className="w-12 h-12 rounded-md bg-slate-100 flex items-center justify-center shrink-0 overflow-hidden">
+                    {booking.package.imageUrl ? (
+                      <img
+                        src={booking.package.imageUrl}
+                        alt=""
+                        className="w-full h-full object-cover"
+                      />
+                    ) : booking.vendor.logoUrl ? (
                       <img
                         src={booking.vendor.logoUrl}
                         alt=""
-                        className="w-full h-full object-cover rounded-none"
+                        className="w-full h-full object-cover"
                       />
                     ) : (
                       <ForkKnife size={20} weight="regular" className="text-slate-400" />
@@ -237,6 +251,9 @@ export default function BookingsPage() {
                     </p>
                     <p className="text-slate-500 text-xs">
                       {new Date(booking.event.date).toLocaleDateString()} · {Number(booking.totalAmount).toFixed(2)} BD
+                    </p>
+                    <p className="text-slate-500 text-xs mt-0.5">
+                      {getBookingStatusLine(booking.status, booking.paymentStatus)}
                     </p>
                   </div>
                 </Link>
@@ -251,7 +268,7 @@ export default function BookingsPage() {
                         openPayModal(booking);
                       }}
                       disabled={payingId === booking.id}
-                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-none bg-primary text-white text-xs font-semibold hover:bg-primary/90 disabled:opacity-50"
+                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-primary text-white text-xs font-semibold hover:bg-primary/90 disabled:opacity-50"
                     >
                       <CreditCard size={14} weight="bold" />
                       Pay
@@ -266,13 +283,13 @@ export default function BookingsPage() {
                         e.stopPropagation();
                         setReviewModal(booking);
                       }}
-                      className="px-3 py-1.5 rounded-none bg-slate-100 text-slate-700 text-xs font-semibold hover:bg-slate-200"
+                      className="px-3 py-1.5 rounded-md bg-slate-100 text-slate-700 text-xs font-semibold hover:bg-slate-200"
                     >
                       Leave review
                     </button>
                   )}
                   <span
-                    className={`px-2.5 py-1 rounded-none text-[10px] font-extrabold uppercase ${getBookingStatusStyle(
+                    className={`px-2.5 py-1 rounded-md text-[10px] font-extrabold uppercase ${getBookingStatusStyle(
                       booking.status
                     )}`}
                   >
@@ -287,7 +304,7 @@ export default function BookingsPage() {
 
       {payModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
-          <div className="bg-white rounded-none p-6 max-w-sm w-full shadow-xl">
+          <div className="bg-white rounded-md p-6 max-w-sm w-full shadow-xl">
             <h3 className="text-lg font-bold mb-4">Pay {Number(payModal.totalAmount).toFixed(2)} BD</h3>
             <p className="text-slate-500 text-sm mb-4">
               {payModal.vendor.businessName} · {payModal.package.name}
@@ -298,7 +315,7 @@ export default function BookingsPage() {
                 <select
                   value={selectedPaymentId ?? ""}
                   onChange={(e) => setSelectedPaymentId(e.target.value || null)}
-                  className="w-full px-4 py-3 rounded-none border border-slate-200 text-slate-900"
+                  className="w-full px-4 py-3 rounded-md border border-slate-200 text-slate-900"
                 >
                   {paymentMethods.map((m) => (
                     <option key={m.id} value={m.id}>
@@ -326,7 +343,7 @@ export default function BookingsPage() {
                   placeholder="4242 4242 4242 4242"
                   value={newCardNumber}
                   onChange={(e) => setNewCardNumber(e.target.value.replace(/\D/g, "").slice(0, 19))}
-                  className="w-full px-4 py-3 rounded-none border border-slate-200 text-slate-900 placeholder:text-slate-400"
+                  className="w-full px-4 py-3 rounded-md border border-slate-200 text-slate-900 placeholder:text-slate-400"
                 />
                 {paymentMethods.length > 0 && (
                   <button
@@ -347,7 +364,7 @@ export default function BookingsPage() {
               <button
                 type="button"
                 onClick={() => setPayModal(null)}
-                className="flex-1 py-3 rounded-none border border-slate-200 font-semibold text-slate-600 hover:bg-slate-50"
+                className="flex-1 py-3 rounded-md border border-slate-200 font-semibold text-slate-600 hover:bg-slate-50"
               >
                 Cancel
               </button>
@@ -359,7 +376,7 @@ export default function BookingsPage() {
                   (!useNewCard && !selectedPaymentId) ||
                   (useNewCard && newCardNumber.replace(/\D/g, "").length < 13)
                 }
-                className="flex-1 py-3 rounded-none bg-primary text-white font-semibold hover:bg-primary/90 disabled:opacity-50"
+                className="flex-1 py-3 rounded-md bg-primary text-white font-semibold hover:bg-primary/90 disabled:opacity-50"
               >
                 {payingId === payModal.id ? "Paying…" : "Pay"}
               </button>
@@ -370,7 +387,7 @@ export default function BookingsPage() {
 
       {reviewModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
-          <div className="bg-white rounded-none p-6 max-w-sm w-full shadow-xl">
+          <div className="bg-white rounded-md p-6 max-w-sm w-full shadow-xl">
             <h3 className="text-lg font-bold mb-4">Leave a review</h3>
             <p className="text-slate-500 text-sm mb-4">
               {reviewModal.vendor.businessName} · {reviewModal.package.name}
@@ -394,7 +411,7 @@ export default function BookingsPage() {
               onChange={(e) => setReviewText(e.target.value)}
               placeholder="Your review (optional)"
               rows={3}
-              className="w-full px-4 py-3 rounded-none border border-slate-200 text-slate-900 placeholder:text-slate-400 mb-4 resize-none"
+              className="w-full px-4 py-3 rounded-md border border-slate-200 text-slate-900 placeholder:text-slate-400 mb-4 resize-none"
             />
             <div className="flex gap-2">
               <button
@@ -404,7 +421,7 @@ export default function BookingsPage() {
                   setReviewText("");
                   setReviewRating(5);
                 }}
-                className="flex-1 py-3 rounded-none border border-slate-200 font-semibold text-slate-600 hover:bg-slate-50"
+                className="flex-1 py-3 rounded-md border border-slate-200 font-semibold text-slate-600 hover:bg-slate-50"
               >
                 Cancel
               </button>
@@ -412,7 +429,7 @@ export default function BookingsPage() {
                 type="button"
                 onClick={handleSubmitReview}
                 disabled={submittingReview}
-                className="flex-1 py-3 rounded-none bg-primary text-white font-semibold hover:bg-primary/90 disabled:opacity-50"
+                className="flex-1 py-3 rounded-md bg-primary text-white font-semibold hover:bg-primary/90 disabled:opacity-50"
               >
                 {submittingReview ? "Submitting…" : "Submit"}
               </button>

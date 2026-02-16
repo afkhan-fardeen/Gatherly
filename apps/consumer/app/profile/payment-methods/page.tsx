@@ -117,12 +117,12 @@ export default function PaymentMethodsPage() {
             placeholder="Card number (e.g. 4242…)"
             value={cardNumber}
             onChange={(e) => setCardNumber(e.target.value.replace(/\D/g, "").slice(0, 19))}
-            className="flex-1 px-4 py-3 rounded-none border border-slate-200 text-slate-900 placeholder:text-slate-400"
+            className="flex-1 px-4 py-3 rounded-md border border-slate-200 text-slate-900 placeholder:text-slate-400"
           />
           <button
             type="submit"
             disabled={adding || cardNumber.replace(/\D/g, "").length < 13}
-            className="px-4 py-3 rounded-none bg-primary text-white font-semibold hover:bg-primary/90 disabled:opacity-50 flex items-center gap-2"
+            className="px-4 py-3 rounded-md bg-primary text-white font-semibold hover:bg-primary/90 disabled:opacity-50 flex items-center gap-2"
           >
             <Plus size={18} weight="bold" />
             Add
@@ -132,11 +132,11 @@ export default function PaymentMethodsPage() {
         {loading ? (
           <div className="space-y-2">
             {[1, 2].map((i) => (
-              <div key={i} className="h-16 bg-slate-100 rounded-none animate-pulse" />
+              <div key={i} className="h-16 bg-slate-100 rounded-md animate-pulse" />
             ))}
           </div>
         ) : methods.length === 0 ? (
-          <div className="text-center py-12 rounded-none border border-slate-200 bg-white">
+          <div className="text-center py-12 rounded-md border border-slate-200 bg-white">
             <CreditCard size={48} weight="regular" className="text-slate-300 mx-auto" />
             <p className="text-slate-500 mt-4 font-medium">No saved cards</p>
             <p className="text-slate-400 text-sm mt-1">Add a card above</p>
@@ -146,10 +146,10 @@ export default function PaymentMethodsPage() {
             {methods.map((m) => (
               <div
                 key={m.id}
-                className="flex items-center justify-between p-4 rounded-none border border-slate-200 bg-white"
+                className="flex items-center justify-between p-4 rounded-md border border-slate-200 bg-white"
               >
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-none bg-slate-100 flex items-center justify-center">
+                  <div className="w-10 h-10 rounded-md bg-slate-100 flex items-center justify-center">
                     <CreditCard size={20} weight="regular" className="text-slate-500" />
                   </div>
                   <div>
@@ -161,7 +161,7 @@ export default function PaymentMethodsPage() {
                   type="button"
                   onClick={() => handleDelete(m.id)}
                   disabled={deletingId === m.id}
-                  className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-none transition-colors disabled:opacity-50"
+                  className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-md transition-colors disabled:opacity-50"
                   aria-label="Remove card"
                 >
                   <Trash size={18} weight="regular" />

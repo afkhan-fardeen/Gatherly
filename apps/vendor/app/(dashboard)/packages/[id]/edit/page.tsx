@@ -7,11 +7,19 @@ import { VendorLayout } from "@/components/VendorLayout";
 import { PageHeader } from "@/components/PageHeader";
 import { FormSection } from "@/components/FormSection";
 import { AuthButton } from "@/components/ui/AuthButton";
+import { StepIndicator } from "@/components/ui/StepIndicator";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 
 const inputClass =
   "w-full px-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-900 placeholder:text-slate-400 form-input-focus";
+
+const EDIT_STEPS = [
+  { label: "Basic info" },
+  { label: "Pricing" },
+  { label: "Menu items" },
+  { label: "Review" },
+];
 
 const MENU_CATEGORIES = ["Appetizer", "Main", "Dessert", "Beverage", "Other"] as const;
 
@@ -233,6 +241,7 @@ export default function EditPackagePage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
+  const [step, setStep] = useState(1);
   const [pkg, setPkg] = useState<{ isActive: boolean; imageUrl?: string | null; packageItems?: PackageItem[] } | null>(null);
   const [form, setForm] = useState({
     name: "",
@@ -325,12 +334,14 @@ export default function EditPackagePage() {
 
   return (
     <VendorLayout>
-      <div className="max-w-3xl mx-auto">
+      <div className="max-w-5xl mx-auto">
         <PageHeader
           title="Edit package"
           subtitle="Update your catering package."
           backLink={{ href: "/packages", label: "Back to packages" }}
         />
+
+        <StepIndicator steps={EDIT_STEPS} currentStep={step} />
 
         <form onSubmit={handleSubmit} className="space-y-10">
           {error && (
@@ -339,6 +350,24 @@ export default function EditPackagePage() {
             </div>
           )}
 
+          {(step === 1 || step === 2 || step === 3 || step === 4) && (
+            <div className="flex gap-2 mb-6">
+              {[1, 2, 3, 4].map((s) => (
+                <button
+                  key={s}
+                  type="button"
+                  onClick={() => setStep(s)}
+                  className={`px-4 py-2 rounded-lg text-sm font-medium ${
+                    step === s ? "bg-primary text-white" : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                  }`}
+                >
+                  {EDIT_STEPS[s - 1].label}
+                </button>
+              ))}
+            </div>
+          )}
+
+          {(step === 1 || step === 4) && (
           <FormSection title="Package Details">
             <div className="space-y-2">
               <label className="text-sm font-medium text-slate-700">Package name *</label>
@@ -401,7 +430,9 @@ export default function EditPackagePage() {
               />
             </div>
           </FormSection>
+          )}
 
+          {(step === 2 || step === 4) && (
           <FormSection title="Pricing">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
@@ -435,7 +466,9 @@ export default function EditPackagePage() {
               </div>
             </div>
           </FormSection>
+          )}
 
+          {(step === 2 || step === 4) && (
           <FormSection title="Capacity">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
@@ -462,7 +495,9 @@ export default function EditPackagePage() {
               </div>
             </div>
           </FormSection>
+          )}
 
+          {(step === 2 || step === 4) && (
           <FormSection title="Dietary Tags">
             <div className="space-y-2">
               <input
@@ -474,8 +509,11 @@ export default function EditPackagePage() {
               />
             </div>
           </FormSection>
+          )}
 
+          {(step === 3 || step === 4) && (
           <MenuItemsSection packageId={id} items={pkg?.packageItems ?? []} onItemsChange={(items) => setPkg((p) => (p ? { ...p, packageItems: items } : null))} />
+          )}
 
           <div className="pt-10 flex items-center justify-end gap-4 border-t border-slate-100">
             <Link

@@ -1,23 +1,16 @@
 "use client";
 
 import Link from "next/link";
-import {
-  ForkKnife,
-  Confetti,
-  Armchair,
-  MusicNotes,
-  Camera,
-  DotsThree,
-} from "@phosphor-icons/react";
+import Image from "next/image";
 import { AppLayout } from "@/components/AppLayout";
 
 const SERVICES = [
-  { slug: "catering", name: "Catering", Icon: ForkKnife, available: true },
-  { slug: "decor", name: "Decor", Icon: Confetti, available: false },
-  { slug: "rentals", name: "Rentals", Icon: Armchair, available: false },
-  { slug: "entertainment", name: "Entertainment", Icon: MusicNotes, available: false },
-  { slug: "photography", name: "Photography", Icon: Camera, available: false },
-  { slug: "misc", name: "Miscellaneous", Icon: DotsThree, available: false },
+  { slug: "catering", name: "Catering", image: "/images/services/catering.jpg", available: true },
+  { slug: "decor", name: "Decor", image: "/images/services/decor.jpg", available: false },
+  { slug: "rentals", name: "Rentals", image: "/images/services/rentals.jpg", available: false },
+  { slug: "entertainment", name: "Entertainment", image: "/images/services/entertainment.jpg", available: false },
+  { slug: "photography", name: "Photography", image: "/images/services/photography.jpg", available: false },
+  { slug: "misc", name: "Miscellaneous", image: "/images/services/pexels-gcman105-916416.jpg", available: false },
 ];
 
 export default function ServicesPage() {
@@ -31,39 +24,53 @@ export default function ServicesPage() {
       </header>
 
       <main className="p-6 pb-32">
-        <div className="grid grid-cols-3 gap-3">
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
           {SERVICES.map((service) =>
             service.available ? (
               <Link
                 key={service.slug}
                 href={`/services/${service.slug}`}
-                className="flex flex-col items-center p-3 border border-slate-100 rounded-none hover:bg-slate-50 transition-colors min-w-0"
+                className="group flex flex-col overflow-hidden border border-slate-100 rounded-md hover:border-slate-200 transition-colors min-w-0 p-0"
               >
-                <div className="w-10 h-10 rounded-none bg-primary/10 flex items-center justify-center mb-2">
-                  <service.Icon size={20} weight="regular" className="text-primary" />
+                <div className="relative aspect-[4/3] w-full overflow-hidden">
+                  <Image
+                    src={service.image}
+                    alt={service.name}
+                    fill
+                    className="object-cover group-hover:scale-105 transition-transform duration-300"
+                    sizes="(max-width: 640px) 50vw, 33vw"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                  <span className="absolute bottom-2 left-2 right-2 text-sm font-semibold text-white drop-shadow-sm">
+                    {service.name}
+                  </span>
+                  <span className="absolute top-2 right-2 px-2 py-0.5 rounded-md text-[10px] font-bold uppercase bg-confirmed/90 text-white">
+                    Available
+                  </span>
                 </div>
-                <span className="text-xs font-semibold text-center truncate w-full">
-                  {service.name}
-                </span>
-                <span className="inline-block mt-2 px-2 py-0.5 rounded-none text-[10px] font-bold uppercase bg-confirmed/10 text-confirmed">
-                  Available
-                </span>
               </Link>
             ) : (
               <Link
                 key={service.slug}
                 href={`/services/coming-soon/${service.slug}`}
-                className="flex flex-col items-center p-3 border border-slate-100 rounded-none opacity-75 min-w-0"
+                className="group flex flex-col overflow-hidden border border-slate-100 rounded-md opacity-90 hover:opacity-100 transition-opacity min-w-0 p-0"
               >
-                <div className="w-10 h-10 rounded-none bg-slate-100 flex items-center justify-center mb-2">
-                  <service.Icon size={20} weight="regular" className="text-slate-400" />
+                <div className="relative aspect-[4/3] w-full overflow-hidden">
+                  <Image
+                    src={service.image}
+                    alt={service.name}
+                    fill
+                    className="object-cover opacity-70 group-hover:scale-105 transition-transform duration-300"
+                    sizes="(max-width: 640px) 50vw, 33vw"
+                  />
+                  <div className="absolute inset-0 bg-slate-900/40" />
+                  <span className="absolute bottom-2 left-2 right-2 text-sm font-semibold text-white drop-shadow-sm">
+                    {service.name}
+                  </span>
+                  <span className="absolute top-2 right-2 px-2 py-0.5 rounded-md text-[10px] font-bold uppercase bg-slate-700/90 text-white">
+                    Coming Soon
+                  </span>
                 </div>
-                <span className="text-xs font-semibold text-center truncate w-full">
-                  {service.name}
-                </span>
-                <span className="inline-block mt-2 px-2 py-0.5 rounded-none text-[10px] font-bold uppercase bg-slate-100 text-slate-500">
-                  Coming Soon
-                </span>
               </Link>
             )
           )}

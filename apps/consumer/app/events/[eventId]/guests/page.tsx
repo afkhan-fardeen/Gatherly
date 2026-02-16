@@ -42,7 +42,7 @@ function StatusBadge({ status }: { status: string }) {
   };
   return (
     <span
-      className={`px-3 py-1 rounded-none text-[10px] font-extrabold uppercase tracking-wider ${
+      className={`px-3 py-1 rounded-md text-[10px] font-extrabold uppercase tracking-wider ${
         styles[status] ?? styles.pending
       }`}
     >
@@ -59,7 +59,7 @@ function StatusDot({ status }: { status: string }) {
   };
   return (
     <span
-      className={`absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-none border-2 border-white ${
+      className={`absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-md border-2 border-white ${
         colors[status] ?? "bg-pending"
       }`}
     />
@@ -128,15 +128,15 @@ export default function GuestsPage() {
           </div>
           <Link
             href="/notifications"
-            className="w-10 h-10 rounded-none bg-slate-100 flex items-center justify-center shrink-0"
+            className="w-10 h-10 rounded-md bg-slate-100 flex items-center justify-center shrink-0"
           >
             <Bell size={20} weight="regular" className="text-slate-600" />
           </Link>
         </div>
-        <div className="flex items-center gap-4 md:gap-6 bg-slate-50 p-4 rounded-none border border-slate-100 min-w-0">
+        <div className="flex items-center gap-4 md:gap-6 bg-slate-50 p-4 rounded-md border border-slate-100 min-w-0">
           <div className="relative w-16 h-16 md:w-20 md:h-20 shrink-0">
             <div
-              className="circular-progress w-full h-full rounded-none flex items-center justify-center"
+              className="circular-progress w-full h-full rounded-md flex items-center justify-center"
               style={{
                 background: `radial-gradient(closest-side, white 79%, transparent 80% 100%), conic-gradient(var(--primary) ${progressPercent}%, #e2e8f0 0%)`,
               }}
@@ -161,9 +161,9 @@ export default function GuestsPage() {
                   {confirmedCount}/{total}
                 </span>
               </div>
-              <div className="w-full h-1.5 bg-slate-200 rounded-none overflow-hidden">
+              <div className="w-full h-1.5 bg-slate-200 rounded-md overflow-hidden">
                 <div
-                  className="h-full bg-confirmed rounded-none transition-all"
+                  className="h-full bg-confirmed rounded-md transition-all"
                   style={{ width: `${progressPercent}%` }}
                 />
               </div>
@@ -180,7 +180,7 @@ export default function GuestsPage() {
           <div className="relative flex-grow">
             <MagnifyingGlass size={20} weight="regular" className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" />
             <input
-              className="w-full bg-slate-100 border-none rounded-none py-3 pl-10 pr-4 text-sm focus:ring-1 focus:ring-primary/20 outline-none"
+              className="w-full bg-slate-100 border-none rounded-md py-3 pl-10 pr-4 text-sm focus:ring-1 focus:ring-primary/20 outline-none"
               placeholder="Search by name..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
@@ -188,7 +188,7 @@ export default function GuestsPage() {
           </div>
           <Link
             href={`/events/${eventId}/guests/add`}
-            className="bg-primary text-white p-3 rounded-none shadow-lg shadow-primary/20 flex items-center justify-center"
+            className="bg-primary text-white p-3 rounded-md shadow-lg shadow-primary/20 flex items-center justify-center"
           >
             <UserPlus size={20} weight="regular" />
           </Link>
@@ -218,7 +218,7 @@ export default function GuestsPage() {
               >
                 <div className="flex items-center gap-4 min-w-0">
                   <div className="relative shrink-0">
-                    <div className="w-12 h-12 rounded-none bg-slate-100 flex items-center justify-center font-bold text-slate-600">
+                    <div className="w-12 h-12 rounded-md bg-slate-100 flex items-center justify-center font-bold text-slate-600">
                       {getInitials(guest.name)}
                     </div>
                     <StatusDot status={guest.rsvpStatus} />
@@ -233,7 +233,7 @@ export default function GuestsPage() {
                         {guest.name}
                       </h4>
                       {guest.plusOneAllowed && (
-                        <span className="text-[9px] font-extrabold bg-primary/10 text-primary px-1.5 py-0.5 rounded-none uppercase">
+                        <span className="text-[9px] font-extrabold bg-primary/10 text-primary px-1.5 py-0.5 rounded-md uppercase">
                           +1 Guest
                         </span>
                       )}

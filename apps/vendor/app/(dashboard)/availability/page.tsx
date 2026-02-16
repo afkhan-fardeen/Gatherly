@@ -101,9 +101,13 @@ export default function AvailabilityPage() {
     <VendorLayout>
       <div>
         <PageHeader
-          title="Availability"
-          subtitle="Mark dates when you're unavailable for bookings."
+          title="Unavailable dates"
+          subtitle="Block dates when you're unavailable. Customers won't be able to book catering for blocked dates."
         />
+
+        <div className="mb-6 p-4 rounded-xl bg-slate-50 border border-slate-200 text-sm text-slate-600">
+          <strong className="text-slate-800">How it works:</strong> Gray = available, Red = blocked. Click a date to toggle. Past dates cannot be changed.
+        </div>
 
         {error && (
           <div className="mb-6 p-3 rounded-xl bg-red-50 text-red-600 text-sm border border-red-100">
@@ -111,7 +115,7 @@ export default function AvailabilityPage() {
           </div>
         )}
 
-        <div className="p-6 rounded-xl border border-slate-200 bg-white">
+        <div className="p-6 rounded-xl border border-slate-200 bg-white max-w-md mx-auto max-h-[calc(100vh-280px)] overflow-y-auto">
           <div className="flex items-center justify-between mb-6">
             <button
               type="button"
@@ -159,7 +163,7 @@ export default function AvailabilityPage() {
                   type="button"
                   onClick={() => isInMonth && !isPast && toggleDate(dateStr)}
                   disabled={Boolean(!isInMonth || isPast)}
-                  className={`aspect-square rounded-lg text-sm font-medium transition-colors ${
+                  className={`w-8 h-8 rounded-lg text-sm font-medium transition-colors ${
                     !isInMonth
                       ? "invisible"
                       : isPast
@@ -175,7 +179,7 @@ export default function AvailabilityPage() {
             })}
           </div>
           <p className="mt-4 text-sm text-slate-500">
-            Click a date to mark it unavailable. Click again to remove. Gray dates are in the past.
+            Click a date to mark it unavailable. Click again to unblock.
           </p>
         </div>
       </div>

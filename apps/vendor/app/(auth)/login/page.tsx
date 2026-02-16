@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { Envelope, Lock } from "@phosphor-icons/react";
 import { AuthLayout } from "@/components/ui/AuthLayout";
 import { AuthInput } from "@/components/ui/AuthInput";
 import { AuthButton } from "@/components/ui/AuthButton";
@@ -67,6 +68,7 @@ export default function VendorLoginPage() {
           onChange={setEmail}
           error={error}
           required
+          icon={<Envelope size={18} weight="regular" />}
         />
         <AuthInput
           label="Password"
@@ -75,6 +77,7 @@ export default function VendorLoginPage() {
           value={password}
           onChange={setPassword}
           required
+          icon={<Lock size={18} weight="regular" />}
         />
         <AuthButton loading={loading}>Sign in</AuthButton>
       </form>

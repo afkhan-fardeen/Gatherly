@@ -141,7 +141,7 @@ bookingsRouter.get("/", async (req, res) => {
     include: {
       vendor: { select: { businessName: true, logoUrl: true } },
       event: { select: { name: true, date: true } },
-      package: { select: { name: true } },
+      package: { select: { name: true, imageUrl: true } },
       reviews: { select: { id: true } },
     },
   });
@@ -220,9 +220,21 @@ bookingsRouter.patch("/:id/pay", async (req, res) => {
     where: { id },
     data: { paymentStatus: "paid", paymentMethod: paymentMethodLabel },
     include: {
-      vendor: { select: { businessName: true, logoUrl: true } },
+      user: { select: { name: true } },
+      vendor: { select: { businessName: true, logoUrl: true, userId: true } },
       event: { select: { name: true, date: true } },
       package: { select: { name: true } },
+    },
+  });
+
+  await prisma.notification.create({
+    data: {
+      userId: updated.vendor.userId,
+      type: "payment_received",
+      title: "Payment received",
+      message: `${updated.user.name} paid for ${updated.event.name}`,
+      link: `/bookings/${updated.id}`,
+      metadata: { bookingId: updated.id, targetApp: "vendor" },
     },
   });
 

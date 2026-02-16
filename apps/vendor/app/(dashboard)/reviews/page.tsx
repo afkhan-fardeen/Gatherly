@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Star } from "@phosphor-icons/react";
+import { Package, Star } from "@phosphor-icons/react";
 import { VendorLayout } from "@/components/VendorLayout";
 import { PageHeader } from "@/components/PageHeader";
 
@@ -16,6 +16,7 @@ interface Review {
   reviewText: string | null;
   createdAt: string;
   user: { name: string };
+  booking?: { package: { name: string; imageUrl?: string | null } };
 }
 
 interface ReviewsData {
@@ -93,14 +94,25 @@ export default function ReviewsPage() {
               </p>
             </div>
           ) : (
-            <div className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {reviews.map((r) => (
                 <div
                   key={r.id}
                   className="p-6 rounded-xl border border-slate-200 bg-white"
                 >
-                  <div className="flex items-start justify-between gap-4">
-                    <div>
+                  <div className="flex items-start gap-4">
+                    <div className="w-12 h-12 rounded-xl bg-slate-100 flex items-center justify-center overflow-hidden shrink-0">
+                      {r.booking?.package?.imageUrl ? (
+                        <img
+                          src={r.booking.package.imageUrl}
+                          alt=""
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <Package size={24} weight="regular" className="text-slate-500" />
+                      )}
+                    </div>
+                    <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1">
                         <div className="flex gap-0.5">
                           {[1, 2, 3, 4, 5].map((i) => (
@@ -123,6 +135,11 @@ export default function ReviewsPage() {
                       <p className="text-sm font-medium text-slate-900">
                         {r.user?.name ?? "Anonymous"}
                       </p>
+                      {r.booking?.package?.name && (
+                        <p className="text-xs text-primary font-medium mt-0.5">
+                          For: {r.booking.package.name}
+                        </p>
+                      )}
                       <p className="text-xs text-slate-500 mt-1">
                         {new Date(r.createdAt).toLocaleDateString(undefined, {
                           year: "numeric",

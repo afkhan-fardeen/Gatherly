@@ -74,7 +74,7 @@ export default function ProfilePage() {
       <main className="p-6 pb-32 space-y-6">
         {/* User block */}
         <div className="flex flex-col items-center py-6">
-          <div className="w-16 h-16 rounded-none border-2 border-white shadow-md overflow-hidden bg-slate-100 flex items-center justify-center shrink-0">
+          <div className="w-16 h-16 rounded-md border-2 border-white shadow-md overflow-hidden bg-slate-100 flex items-center justify-center shrink-0">
             {user.profilePictureUrl ? (
               <img
                 src={user.profilePictureUrl}
@@ -112,13 +112,13 @@ export default function ProfilePage() {
         </div>
 
         {/* Links */}
-        <div className="bg-white rounded-none shadow-sm border border-slate-100 overflow-hidden divide-y divide-slate-100">
+        <div className="bg-white rounded-md shadow-sm border border-slate-100 overflow-hidden divide-y divide-slate-100">
           <Link
             href="/bookings"
             className="flex items-center justify-between p-3 active:bg-slate-50 transition-colors"
           >
             <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-none bg-primary/10 flex items-center justify-center">
+              <div className="w-9 h-9 rounded-md bg-primary/10 flex items-center justify-center">
                 <CalendarCheck size={18} weight="regular" className="text-primary" />
               </div>
               <span className="font-medium text-sm">My Bookings</span>
@@ -130,7 +130,7 @@ export default function ProfilePage() {
             className="flex items-center justify-between p-3 active:bg-slate-50 transition-colors"
           >
             <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-none bg-primary/10 flex items-center justify-center">
+              <div className="w-9 h-9 rounded-md bg-primary/10 flex items-center justify-center">
                 <Bell size={18} weight="regular" className="text-primary" />
               </div>
               <span className="font-medium text-sm">Notifications</span>
@@ -142,7 +142,7 @@ export default function ProfilePage() {
             className="flex items-center justify-between p-3 active:bg-slate-50 transition-colors"
           >
             <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-none bg-primary/10 flex items-center justify-center">
+              <div className="w-9 h-9 rounded-md bg-primary/10 flex items-center justify-center">
                 <CreditCard size={18} weight="regular" className="text-primary" />
               </div>
               <span className="font-medium text-sm">Payment methods</span>
@@ -154,7 +154,7 @@ export default function ProfilePage() {
         {/* Sign Out */}
         <button
           onClick={handleLogout}
-          className="w-full py-3 text-red-500 font-semibold text-sm text-center flex items-center justify-center gap-2 hover:bg-red-50 rounded-none transition-colors"
+          className="w-full py-3 text-red-500 font-semibold text-sm text-center flex items-center justify-center gap-2 hover:bg-red-50 rounded-md transition-colors"
         >
           <SignOut size={18} weight="regular" />
           Sign Out

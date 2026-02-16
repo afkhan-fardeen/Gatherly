@@ -115,7 +115,7 @@ export default function EventDetailPage() {
         <div className="flex items-center gap-3">
           <Link
             href="/events"
-            className="w-9 h-9 rounded-none bg-slate-100 flex items-center justify-center shrink-0"
+            className="w-9 h-9 rounded-md bg-slate-100 flex items-center justify-center shrink-0"
           >
             <ArrowLeft size={18} weight="regular" className="text-slate-600" />
           </Link>
@@ -128,7 +128,7 @@ export default function EventDetailPage() {
       <main className="p-4 pb-32 space-y-6">
         <div className="space-y-4">
           <div className="flex items-center gap-2 mt-1">
-            <Tag value={event.eventType} variant="eventType" className="rounded-none">
+            <Tag value={event.eventType} variant="eventType" className="rounded-md">
               {event.eventType.replace(/_/g, " ")}
             </Tag>
           </div>
@@ -175,7 +175,7 @@ export default function EventDetailPage() {
               </p>
               <div className="flex flex-wrap gap-1.5">
                 {event.dietaryRequirements.map((d) => (
-                  <Tag key={d} value={d} variant="cuisine" className="rounded-none">
+                  <Tag key={d} value={d} variant="cuisine" className="rounded-md">
                     {d}
                   </Tag>
                 ))}

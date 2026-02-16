@@ -3,7 +3,7 @@ import { ArrowLeft } from "@phosphor-icons/react";
 
 interface PageHeaderProps {
   title: string;
-  subtitle?: string;
+  subtitle?: React.ReactNode;
   backLink?: { href: string; label: string };
   action?: React.ReactNode;
 }

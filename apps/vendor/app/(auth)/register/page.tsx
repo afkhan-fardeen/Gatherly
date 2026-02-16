@@ -3,17 +3,15 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { Envelope, Lock, User, Storefront, ForkKnife, MapPin, Tag, CaretDown } from "@phosphor-icons/react";
 import { AuthLayout } from "@/components/ui/AuthLayout";
 import { AuthInput } from "@/components/ui/AuthInput";
 import { AuthButton } from "@/components/ui/AuthButton";
 import { VENDOR_CATEGORIES } from "@/lib/categories";
 import { API_URL, parseJsonResponse } from "@/lib/api";
 
-type Step = 1 | 2 | 3;
-
 export default function VendorRegisterPage() {
   const router = useRouter();
-  const [step, setStep] = useState<Step>(1);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -60,7 +58,7 @@ export default function VendorRegisterPage() {
           ...(areasArr.length > 0 && { serviceAreas: areasArr }),
         }),
       });
-      router.push("/dashboard");
+      router.replace("/dashboard");
       router.refresh();
     } catch (err) {
       const msg = err instanceof Error ? err.message : "Registration failed";
@@ -70,154 +68,12 @@ export default function VendorRegisterPage() {
     }
   }
 
-  if (step === 1) {
-    return (
-      <AuthLayout
-        title="Create vendor account"
-        footer={
-          <p className="text-[15px] text-slate-500">
-            Already have an account?{" "}
-            <Link
-              href="/login"
-              className="text-slate-900 font-semibold hover:underline decoration-primary decoration-2 underline-offset-4"
-            >
-              Sign in
-            </Link>
-          </p>
-        }
-      >
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            setError("");
-            if (!businessName.trim()) {
-              setError("Business name is required");
-              return;
-            }
-            setStep(2);
-          }}
-          className="space-y-5 flex-1"
-        >
-          <AuthInput
-            label="Name"
-            placeholder="Your name"
-            value={name}
-            onChange={setName}
-            required
-          />
-          <AuthInput
-            label="Email"
-            type="email"
-            placeholder="you@example.com"
-            value={email}
-            onChange={setEmail}
-            required
-          />
-          <AuthInput
-            label="Password"
-            type="password"
-            placeholder="At least 8 characters"
-            value={password}
-            onChange={setPassword}
-            required
-            minLength={8}
-          />
-          <AuthInput
-            label="Business name"
-            placeholder="Your catering business name"
-            value={businessName}
-            onChange={setBusinessName}
-            error={error}
-            required
-          />
-          <AuthButton type="submit">Continue</AuthButton>
-        </form>
-      </AuthLayout>
-    );
-  }
-
-  if (step === 2) {
-    return (
-      <AuthLayout
-        title="Select your category"
-        footer={
-          <p className="text-[15px] text-slate-500">
-            <button
-              type="button"
-              onClick={() => setStep(1)}
-              className="text-slate-900 font-semibold hover:underline decoration-primary decoration-2 underline-offset-4"
-            >
-              Back
-            </button>
-            {" · "}
-            Already have an account?{" "}
-            <Link
-              href="/login"
-              className="text-slate-900 font-semibold hover:underline decoration-primary decoration-2 underline-offset-4"
-            >
-              Sign in
-            </Link>
-          </p>
-        }
-      >
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            if (category === "catering") setStep(3);
-          }}
-          className="space-y-6 flex-1"
-        >
-          <p className="text-sm text-slate-600">
-            Choose the service category for your business. More categories coming soon.
-          </p>
-          <div className="grid grid-cols-2 gap-3">
-            {VENDOR_CATEGORIES.map(({ slug, name, Icon, available }) => (
-              <button
-                key={slug}
-                type="button"
-                onClick={() => available && setCategory(slug)}
-                disabled={!available}
-                className={`flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all text-left ${
-                  category === slug
-                    ? "border-primary bg-primary/5"
-                    : available
-                    ? "border-slate-200 hover:border-slate-300 hover:bg-slate-50"
-                    : "border-slate-100 bg-slate-50/50 opacity-60 cursor-not-allowed"
-                }`}
-              >
-                <div
-                  className={`w-12 h-12 rounded-lg flex items-center justify-center ${
-                    available ? "bg-primary/10" : "bg-slate-200"
-                  }`}
-                >
-                  <Icon size={24} weight="regular" className={available ? "text-primary" : "text-slate-400"} />
-                </div>
-                <span className="font-semibold text-slate-900">{name}</span>
-                {!available && (
-                  <span className="text-[10px] font-bold uppercase text-slate-400">Coming soon</span>
-                )}
-              </button>
-            ))}
-          </div>
-          <AuthButton type="submit">Continue</AuthButton>
-        </form>
-      </AuthLayout>
-    );
-  }
-
   return (
     <AuthLayout
-      title="Optional details"
+      title="Create vendor account"
+      wide
       footer={
         <p className="text-[15px] text-slate-500">
-          <button
-            type="button"
-            onClick={() => setStep(2)}
-            className="text-slate-900 font-semibold hover:underline decoration-primary decoration-2 underline-offset-4"
-          >
-            Back
-          </button>
-          {" · "}
           Already have an account?{" "}
           <Link
             href="/login"
@@ -228,20 +84,90 @@ export default function VendorRegisterPage() {
         </p>
       }
     >
-      <form onSubmit={handleSubmit} className="space-y-5 flex-1">
-        <AuthInput
-          label="Cuisine types (optional)"
-          placeholder="e.g. Italian, BBQ, Vegan"
-          value={cuisineTypes}
-          onChange={setCuisineTypes}
-        />
-        <AuthInput
-          label="Service areas (optional)"
-          placeholder="e.g. Downtown, North Side"
-          value={serviceAreas}
-          onChange={setServiceAreas}
-        />
-        <AuthButton loading={loading}>Sign Up</AuthButton>
+      <form onSubmit={handleSubmit} className="flex-1">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-5">
+          <AuthInput
+            label="Name"
+            placeholder="Your name"
+            value={name}
+            onChange={setName}
+            required
+            icon={<User size={18} weight="regular" />}
+          />
+          <AuthInput
+            label="Business name"
+            placeholder="Your catering business name"
+            value={businessName}
+            onChange={setBusinessName}
+            error={error}
+            required
+            icon={<Storefront size={18} weight="regular" />}
+          />
+          <AuthInput
+            label="Email"
+            type="email"
+            placeholder="you@example.com"
+            value={email}
+            onChange={setEmail}
+            required
+            icon={<Envelope size={18} weight="regular" />}
+          />
+          <AuthInput
+            label="Password"
+            type="password"
+            placeholder="At least 8 characters"
+            value={password}
+            onChange={setPassword}
+            required
+            minLength={8}
+            icon={<Lock size={18} weight="regular" />}
+          />
+          <div>
+            <label
+              htmlFor="category"
+              className="block text-sm font-medium text-slate-600 mb-2 ml-1"
+            >
+              Service category
+            </label>
+            <div className="flex items-center h-[58px] bg-slate-50 border border-slate-200 rounded-xl focus-within:ring-2 focus-within:ring-primary/20 focus-within:border-primary/30 focus-within:bg-white transition-all">
+              <div className="pl-4 shrink-0 text-slate-400">
+                <Tag size={18} weight="regular" />
+              </div>
+              <select
+                id="category"
+                value={category}
+                onChange={(e) => setCategory(e.target.value)}
+                className="flex-1 min-w-0 h-full bg-transparent pl-3 pr-10 text-slate-900 outline-none appearance-none cursor-pointer"
+              >
+              {VENDOR_CATEGORIES.map(({ slug, name, available }) => (
+                <option key={slug} value={slug} disabled={!available}>
+                  {name}{!available ? " (Coming soon)" : ""}
+                </option>
+              ))}
+              </select>
+              <div className="pr-4 shrink-0 text-slate-400 pointer-events-none">
+                <CaretDown size={16} weight="bold" />
+              </div>
+            </div>
+          </div>
+          <AuthInput
+            label="Cuisine types (optional)"
+            placeholder="e.g. Italian, BBQ, Vegan"
+            value={cuisineTypes}
+            onChange={setCuisineTypes}
+            icon={<ForkKnife size={18} weight="regular" />}
+          />
+          <AuthInput
+            label="Service areas (optional)"
+            placeholder="e.g. Downtown, North Side"
+            value={serviceAreas}
+            onChange={setServiceAreas}
+            icon={<MapPin size={18} weight="regular" />}
+          />
+        </div>
+        <div className="mt-6">
+          <AuthButton loading={loading}>Sign Up</AuthButton>
+        </div>
       </form>
     </AuthLayout>
   );

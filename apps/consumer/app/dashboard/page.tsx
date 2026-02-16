@@ -1,452 +1,195 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
-import {
-  ForkKnife,
-  Confetti,
-  Armchair,
-  MusicNotes,
-  Camera,
-  DotsThree,
-  Calendar,
-  CalendarCheck,
-  CaretRight,
-  Bell,
-  User,
-  SignOut,
-} from "@phosphor-icons/react";
+import { CalendarPlus, CaretRight } from "@phosphor-icons/react";
 import { AppLayout } from "@/components/AppLayout";
-import { Logo } from "@/components/Logo";
-import { Tag, getBookingStatusStyle } from "@/components/ui/Tag";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 
-interface User {
-  id: string;
-  name: string;
-  email: string;
-  role: string;
-  profilePictureUrl?: string | null;
-}
+const SERVICES = [
+  { slug: "catering", name: "Catering", image: "/images/services/catering.jpg", available: true },
+  { slug: "decor", name: "Decor", image: "/images/services/decor.jpg", available: false },
+  { slug: "rentals", name: "Rentals", image: "/images/services/rentals.jpg", available: false },
+  { slug: "entertainment", name: "Entertainment", image: "/images/services/entertainment.jpg", available: false },
+  { slug: "photography", name: "Photography", image: "/images/services/photography.jpg", available: false },
+  { slug: "misc", name: "Miscellaneous", image: "/images/services/pexels-gcman105-916416.jpg", available: false },
+];
 
 interface Event {
   id: string;
   name: string;
   date: string;
   eventType: string;
-  status: string;
+  guestCount: number;
 }
-
-interface Booking {
-  id: string;
-  status: string;
-  vendor: { businessName: string };
-  event: { name: string };
-  package: { name: string };
-}
-
-const SERVICES = [
-  { slug: "catering", name: "Catering", Icon: ForkKnife, available: true },
-  { slug: "decor", name: "Decor", Icon: Confetti, available: false },
-  { slug: "rentals", name: "Rentals", Icon: Armchair, available: false },
-  { slug: "entertainment", name: "Entertainment", Icon: MusicNotes, available: false },
-  { slug: "photography", name: "Photography", Icon: Camera, available: false },
-  { slug: "misc", name: "Miscellaneous", Icon: DotsThree, available: false },
-];
 
 export default function DashboardPage() {
   const router = useRouter();
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<{ name: string } | null>(null);
   const [events, setEvents] = useState<Event[]>([]);
-  const [bookings, setBookings] = useState<Booking[]>([]);
-  const [unreadCount, setUnreadCount] = useState(0);
   const [loading, setLoading] = useState(true);
-  const [profileOpen, setProfileOpen] = useState(false);
-  const profileRefMobile = useRef<HTMLDivElement>(null);
-  const profileRefDesktop = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    function handleClickOutside(e: MouseEvent) {
-      const target = e.target as Node;
-      const inside = profileRefMobile.current?.contains(target) || profileRefDesktop.current?.contains(target);
-      if (!inside) setProfileOpen(false);
-    }
-    if (profileOpen) document.addEventListener("click", handleClickOutside);
-    return () => document.removeEventListener("click", handleClickOutside);
-  }, [profileOpen]);
-
-  function handleLogout() {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    router.push("/");
-    router.refresh();
-  }
 
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (!token) {
-      window.location.href = "/login";
-      return;
-    }
-    const stored = localStorage.getItem("user");
-    if (stored) setUser(JSON.parse(stored));
-    fetch(`${API_URL}/api/auth/me`, { headers: { Authorization: `Bearer ${token}` } })
-      .then((res) => (res.ok ? res.json() : null))
-      .then((data) => {
-        if (data) {
-          setUser((prev) => (prev ? { ...prev, ...data } : data));
-          const merged = stored ? { ...JSON.parse(stored), ...data } : data;
-          localStorage.setItem("user", JSON.stringify(merged));
-        }
-      })
-      .catch(() => {});
-  }, []);
-
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (!token || !user) {
-      setLoading(false);
+      router.replace("/login");
       return;
     }
     const headers = { Authorization: `Bearer ${token}` };
     Promise.all([
-      fetch(`${API_URL}/api/events`, { headers }).then((r) =>
-        r.ok ? r.json() : []
-      ),
-      fetch(`${API_URL}/api/bookings`, { headers }).then((r) =>
-        r.ok ? r.json() : []
-      ),
-      fetch(`${API_URL}/api/notifications`, { headers }).then((r) =>
-        r.ok ? r.json() : { items: [] }
-      ),
+      fetch(`${API_URL}/api/auth/me`, { headers }).then((r) => (r.ok ? r.json() : null)),
+      fetch(`${API_URL}/api/events`, { headers }).then((r) => (r.ok ? r.json() : [])),
     ])
-      .then(([evts, bks, notifs]) => {
-        setEvents(evts);
-        setBookings(bks);
-        const unread = (notifs?.items ?? []).filter((n: { isRead: boolean }) => !n.isRead).length;
-        setUnreadCount(unread);
+      .then(([u, evts]) => {
+        setUser(u);
+        setEvents(evts || []);
       })
       .catch(() => {})
       .finally(() => setLoading(false));
-  }, [user]);
+  }, [router]);
 
-  if (!user) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <p className="text-slate-500">Loading...</p>
-      </div>
-    );
-  }
-
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
   const upcomingEvents = events
-    .filter((e) => new Date(e.date) >= new Date() && e.status !== "cancelled")
+    .filter((e) => new Date(e.date) >= today)
     .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
     .slice(0, 3);
 
-  const latestBooking = bookings[0];
+  if (loading) {
+    return (
+      <AppLayout>
+        <main className="p-6 pb-32 flex items-center justify-center min-h-[50vh]">
+          <div className="animate-pulse text-slate-400">Loading...</div>
+        </main>
+      </AppLayout>
+    );
+  }
 
   return (
     <AppLayout>
-      <header className="sticky top-0 z-40 bg-white/80 ios-blur px-4 py-3 border-b border-slate-100 shrink-0">
-        <div className="flex justify-between items-center md:items-start">
-          <div className="md:hidden flex justify-between items-center w-full">
-            <Logo href="/dashboard" />
-            <div className="flex items-center gap-2">
-              <Link
-                href="/notifications"
-                className="relative w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center shrink-0"
-              >
-                <Bell size={20} weight="regular" className="text-slate-600" />
-                {unreadCount > 0 && (
-                  <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] px-1 flex items-center justify-center bg-primary text-white text-[10px] font-bold rounded-full">
-                    {unreadCount > 99 ? "99+" : unreadCount}
-                  </span>
-                )}
-              </Link>
-              <div className="relative" ref={profileRefMobile}>
-                <button
-                  type="button"
-                  onClick={() => setProfileOpen(!profileOpen)}
-                  className="w-10 h-10 rounded-none bg-primary/10 flex items-center justify-center shrink-0 overflow-hidden"
-                >
-                  {user.profilePictureUrl ? (
-                    <img
-                      src={user.profilePictureUrl}
-                      alt=""
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <span className="font-semibold text-primary text-sm">
-                      {user.name.split(" ").map((n) => n[0]).join("").toUpperCase().slice(0, 2)}
-                    </span>
-                  )}
-                </button>
-                {profileOpen && (
-                  <div className="absolute right-0 top-full mt-2 w-48 py-1 bg-white rounded-none shadow-lg border border-slate-100 z-50">
-                    <Link
-                      href="/profile"
-                      onClick={() => setProfileOpen(false)}
-                      className="flex items-center gap-3 px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50"
-                    >
-                      <User size={18} weight="regular" />
-                      Profile
-                    </Link>
-                    <button
-                      type="button"
-                      onClick={() => { setProfileOpen(false); handleLogout(); }}
-                      className="flex items-center gap-3 w-full px-4 py-2.5 text-sm font-medium text-red-500 hover:bg-red-50"
-                    >
-                      <SignOut size={18} weight="regular" />
-                      Log out
-                    </button>
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-          <div className="hidden md:flex md:flex-1 md:justify-between md:items-start">
-            <div>
-              <h1 className="text-lg font-bold tracking-tight">Dashboard</h1>
-              <p className="text-slate-500 text-xs mt-0.5">
-                Hello, {user.name.split(" ")[0]}
-              </p>
-            </div>
-            <div className="flex items-center gap-2">
-              <Link
-                href="/notifications"
-                className="relative w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center shrink-0"
-              >
-                <Bell size={20} weight="regular" className="text-slate-600" />
-                {unreadCount > 0 && (
-                  <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] px-1 flex items-center justify-center bg-primary text-white text-[10px] font-bold rounded-full">
-                    {unreadCount > 99 ? "99+" : unreadCount}
-                  </span>
-                )}
-              </Link>
-              <div className="relative" ref={profileRefDesktop}>
-                <button
-                  type="button"
-                  onClick={() => setProfileOpen(!profileOpen)}
-                  className="w-10 h-10 rounded-none bg-primary/10 flex items-center justify-center shrink-0 overflow-hidden"
-                >
-                  {user.profilePictureUrl ? (
-                    <img
-                      src={user.profilePictureUrl}
-                      alt=""
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <span className="font-semibold text-primary text-sm">
-                      {user.name.split(" ").map((n) => n[0]).join("").toUpperCase().slice(0, 2)}
-                    </span>
-                  )}
-                </button>
-                {profileOpen && (
-                  <div className="absolute right-0 top-full mt-2 w-48 py-1 bg-white rounded-none shadow-lg border border-slate-100 z-50">
-                    <Link
-                      href="/profile"
-                      onClick={() => setProfileOpen(false)}
-                      className="flex items-center gap-3 px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50"
-                    >
-                      <User size={18} weight="regular" />
-                      Profile
-                    </Link>
-                    <button
-                      type="button"
-                      onClick={() => { setProfileOpen(false); handleLogout(); }}
-                      className="flex items-center gap-3 w-full px-4 py-2.5 text-sm font-medium text-red-500 hover:bg-red-50"
-                    >
-                      <SignOut size={18} weight="regular" />
-                      Log out
-                    </button>
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-        </div>
+      <header className="px-4 py-3 shrink-0">
+        <h1 className="text-lg font-bold tracking-tight">
+          Hello, {user?.name?.split(" ")[0] ?? "there"}
+        </h1>
       </header>
 
       <main className="p-6 pb-32 space-y-8">
+        {/* Services quick access */}
         <section>
-          <h2 className="text-lg font-bold tracking-tight mb-6 md:hidden">
-            Hello, {user.name.split(" ")[0]}
-          </h2>
-
-          {/* Services quick access */}
           <h3 className="text-sm font-bold text-slate-500 uppercase tracking-wider mb-3">
             Services
           </h3>
-          <div className="grid grid-cols-3 gap-3 mb-6">
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
             {SERVICES.map((s) =>
               s.available ? (
                 <Link
                   key={s.slug}
                   href={`/services/${s.slug}`}
-                  className="flex flex-col items-center p-3 border border-slate-100 rounded-none hover:bg-slate-50 transition-colors"
+                  className="group flex flex-col overflow-hidden border border-slate-100 rounded-md hover:border-slate-200 transition-colors min-w-0 p-0"
                 >
-                  <div className="w-10 h-10 rounded-none bg-primary/10 flex items-center justify-center mb-2">
-                    <s.Icon size={20} weight="regular" className="text-primary" />
+                  <div className="relative aspect-[4/3] w-full overflow-hidden">
+                    <Image
+                      src={s.image}
+                      alt={s.name}
+                      fill
+                      className="object-cover group-hover:scale-105 transition-transform duration-300"
+                      sizes="(max-width: 640px) 50vw, 33vw"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                    <span className="absolute bottom-2 left-2 right-2 text-sm font-semibold text-white drop-shadow-sm">
+                      {s.name}
+                    </span>
+                    <span className="absolute top-2 right-2 px-2 py-0.5 rounded-md text-[10px] font-bold uppercase bg-confirmed/90 text-white">
+                      Available
+                    </span>
                   </div>
-                  <span className="text-xs font-semibold text-center truncate w-full">
-                    {s.name}
-                  </span>
-                  <span className="text-[9px] font-bold uppercase text-confirmed">
-                    Available
-                  </span>
                 </Link>
               ) : (
                 <Link
                   key={s.slug}
                   href={`/services/coming-soon/${s.slug}`}
-                  className="flex flex-col items-center p-3 border border-slate-100 rounded-none opacity-75"
+                  className="group flex flex-col overflow-hidden border border-slate-100 rounded-md opacity-90 hover:opacity-100 transition-opacity min-w-0 p-0"
                 >
-                  <div className="w-10 h-10 rounded-none bg-slate-100 flex items-center justify-center mb-2">
-                    <s.Icon size={20} weight="regular" className="text-slate-400" />
+                  <div className="relative aspect-[4/3] w-full overflow-hidden">
+                    <Image
+                      src={s.image}
+                      alt={s.name}
+                      fill
+                      className="object-cover opacity-70 group-hover:scale-105 transition-transform duration-300"
+                      sizes="(max-width: 640px) 50vw, 33vw"
+                    />
+                    <div className="absolute inset-0 bg-slate-900/40" />
+                    <span className="absolute bottom-2 left-2 right-2 text-sm font-semibold text-white drop-shadow-sm">
+                      {s.name}
+                    </span>
+                    <span className="absolute top-2 right-2 px-2 py-0.5 rounded-md text-[10px] font-bold uppercase bg-slate-700/90 text-white">
+                      Soon
+                    </span>
                   </div>
-                  <span className="text-xs font-semibold text-center truncate w-full">
-                    {s.name}
-                  </span>
-                  <span className="text-[9px] font-bold uppercase text-slate-400">
-                    Soon
-                  </span>
                 </Link>
               )
             )}
           </div>
+        </section>
 
-          {/* Quick actions */}
-          <h3 className="text-sm font-bold text-slate-500 uppercase tracking-wider mb-3">
-            Quick actions
-          </h3>
-          <div className="space-y-3">
-            <Link
-              href="/events/create"
-              className="block p-4 border border-slate-100 rounded-none bg-primary/5 hover:bg-primary/10 transition-colors"
-            >
-              <span className="font-semibold">Create Event</span>
-              <p className="text-sm text-slate-500 mt-1">
-                Set up your event and find services
-              </p>
+        {/* Quick actions */}
+        <section>
+          <div className="flex flex-wrap items-center gap-4">
+            <Link href="/events/create" className="text-primary font-medium hover:underline">
+              Create Event
             </Link>
-            <Link
-              href="/events"
-              className="block p-4 border border-slate-100 rounded-none hover:bg-slate-50 transition-colors"
-            >
-              <span className="font-semibold">My Events</span>
-              <p className="text-sm text-slate-500 mt-1">
-                View and manage your events
-              </p>
+            <span className="text-slate-300">|</span>
+            <Link href="/bookings" className="text-primary font-medium hover:underline">
+              My Bookings
             </Link>
-            <Link
-              href="/bookings"
-              className="block p-4 border border-slate-100 rounded-none hover:bg-slate-50 transition-colors"
-            >
-              <span className="font-semibold">My Bookings</span>
-              <p className="text-sm text-slate-500 mt-1">
-                View and manage your bookings
-              </p>
+            <span className="text-slate-300">|</span>
+            <Link href="/events" className="text-primary font-medium hover:underline">
+              My Events
             </Link>
           </div>
         </section>
 
         {/* Upcoming events */}
-        <section>
-          <h3 className="text-sm font-bold text-slate-500 uppercase tracking-wider mb-3">
-            Upcoming events
-          </h3>
-          {loading ? (
-            <div className="space-y-3">
-              {[1, 2].map((i) => (
-                <div
-                  key={i}
-                  className="h-16 bg-slate-100 rounded-none animate-pulse"
-                />
-              ))}
-            </div>
-          ) : upcomingEvents.length === 0 ? (
-            <div className="p-6 border border-slate-100 rounded-none text-center">
-              <Calendar size={48} weight="regular" className="text-slate-300 mx-auto" />
-              <p className="text-slate-500 text-sm mt-2">No upcoming events</p>
+        {upcomingEvents.length > 0 && (
+          <section>
+            <div className="flex justify-between items-center mb-3">
+              <h3 className="text-sm font-bold text-slate-500 uppercase tracking-wider">
+                Upcoming events
+              </h3>
               <Link
-                href="/events/create"
-                className="inline-block mt-2 text-primary text-sm font-semibold"
+                href="/events"
+                className="text-sm font-medium text-primary hover:underline"
               >
-                Create one
+                View all
               </Link>
             </div>
-          ) : (
-            <div className="space-y-3">
-              {upcomingEvents.map((event) => (
+            <div className="space-y-2">
+              {upcomingEvents.map((e) => (
                 <Link
-                  key={event.id}
-                  href={`/events/${event.id}/guests`}
-                  className="block p-4 border border-slate-100 rounded-none hover:bg-slate-50 transition-colors"
+                  key={e.id}
+                  href={`/events/${e.id}`}
+                  className="flex items-center justify-between p-4 border border-slate-100 rounded-md hover:bg-slate-50 transition-colors"
                 >
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <h4 className="font-semibold">{event.name}</h4>
-                      <div className="flex items-center gap-2 mt-0.5">
-                        <span className="text-sm text-slate-500">
-                          {new Date(event.date).toLocaleDateString()}
-                        </span>
-                        <Tag value={event.eventType} variant="eventType" className="rounded-none">
-                          {event.eventType.replace(/_/g, " ")}
-                        </Tag>
-                      </div>
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-md bg-primary/10 flex items-center justify-center">
+                      <CalendarPlus size={20} className="text-primary" />
                     </div>
-                    <CaretRight size={20} weight="regular" className="text-slate-400 shrink-0" />
+                    <div>
+                      <span className="font-semibold">{e.name}</span>
+                      <p className="text-sm text-slate-500">
+                        {new Date(e.date).toLocaleDateString()} · {e.guestCount} guests
+                      </p>
+                    </div>
                   </div>
+                  <CaretRight size={18} className="text-slate-300" />
                 </Link>
               ))}
             </div>
-          )}
-        </section>
-
-        {/* Recent activity */}
-        <section>
-          <h3 className="text-sm font-bold text-slate-500 uppercase tracking-wider mb-3">
-            Recent activity
-          </h3>
-          {loading ? (
-            <div className="h-20 bg-slate-100 rounded-none animate-pulse" />
-          ) : !latestBooking ? (
-            <div className="p-6 border border-slate-100 rounded-none text-center">
-              <CalendarCheck size={48} weight="regular" className="text-slate-300 mx-auto" />
-              <p className="text-slate-500 text-sm mt-2">No recent bookings</p>
-              <Link
-                href="/services/catering"
-                className="inline-block mt-2 text-primary text-sm font-semibold"
-              >
-                Browse catering
-              </Link>
-            </div>
-          ) : (
-            <Link
-              href="/bookings"
-              className="block p-4 border border-slate-100 rounded-none hover:bg-slate-50 transition-colors"
-            >
-              <div className="flex justify-between items-start">
-                <div>
-                  <h4 className="font-semibold">{latestBooking.vendor.businessName}</h4>
-                  <p className="text-sm text-slate-500">
-                    {latestBooking.package.name} · {latestBooking.event.name}
-                  </p>
-                  <span
-                    className={`inline-block mt-2 px-2 py-0.5 rounded-none text-[10px] font-bold uppercase ${getBookingStatusStyle(
-                      latestBooking.status
-                    )}`}
-                  >
-                    {latestBooking.status}
-                  </span>
-                </div>
-                <CaretRight size={20} weight="regular" className="text-slate-400 shrink-0" />
-              </div>
-            </Link>
-          )}
-        </section>
+          </section>
+        )}
       </main>
     </AppLayout>
   );

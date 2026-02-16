@@ -141,7 +141,7 @@ export default function VendorProfilePage() {
 
   if (loading) {
     return (
-      <VendorLayout businessName={vendor?.businessName}>
+      <VendorLayout>
         <div className="animate-pulse space-y-4">
           <div className="h-8 bg-slate-100 rounded-lg w-48" />
           <div className="h-64 bg-slate-100 rounded-xl" />
@@ -154,7 +154,7 @@ export default function VendorProfilePage() {
     "w-full h-12 px-4 bg-white border border-slate-200 rounded-xl text-slate-900 placeholder:text-slate-400 form-input-focus";
 
   return (
-    <VendorLayout businessName={vendor?.businessName}>
+    <VendorLayout>
       <header className="mb-8">
         <h1 className="text-3xl font-bold tracking-tight text-slate-900">Profile</h1>
         <p className="text-slate-500 mt-1">Edit your business information</p>

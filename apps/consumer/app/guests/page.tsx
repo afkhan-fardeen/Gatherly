@@ -48,7 +48,7 @@ export default function GuestsPage() {
             {[1, 2, 3].map((i) => (
               <div
                 key={i}
-                className="h-20 bg-slate-100 rounded-none animate-pulse"
+                className="h-20 bg-slate-100 rounded-md animate-pulse"
               />
             ))}
           </div>
@@ -69,7 +69,7 @@ export default function GuestsPage() {
               <Link
                 key={event.id}
                 href={`/events/${event.id}/guests`}
-                className="block p-4 border border-slate-100 rounded-none hover:bg-slate-50 transition-colors"
+                className="block p-4 border border-slate-100 rounded-md hover:bg-slate-50 transition-colors"
               >
                 <div className="flex justify-between items-center">
                   <div>

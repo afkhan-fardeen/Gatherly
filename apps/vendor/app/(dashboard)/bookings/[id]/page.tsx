@@ -18,6 +18,7 @@ import {
   Truck,
   CheckCircle,
 } from "@phosphor-icons/react";
+import { StepIndicator } from "@/components/ui/StepIndicator";
 import { VendorLayout } from "@/components/VendorLayout";
 import { PageHeader } from "@/components/PageHeader";
 
@@ -26,6 +27,7 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 interface BookingDetail {
   id: string;
   status: string;
+  paymentStatus: string | null;
   guestCount: number;
   totalAmount: string;
   specialRequirements: string | null;
@@ -44,6 +46,7 @@ interface BookingDetail {
   package: {
     name: string;
     basePrice: string;
+    imageUrl: string | null;
     packageItems: { name: string; description: string | null; category: string | null }[];
   };
 }
@@ -98,9 +101,9 @@ export default function BookingDetailPage() {
       const messages: Record<StatusAction, string> = {
         confirmed: "Booking confirmed",
         cancelled: "Booking declined",
-        in_preparation: "Marked as in preparation",
+        in_preparation: "Order is being prepared",
         delivered: "Marked as delivered",
-        completed: "Marked as completed",
+        completed: "Booking completed",
       };
       toast.success(messages[status]);
       if (status === "confirmed") router.refresh();
@@ -139,6 +142,22 @@ export default function BookingDetailPage() {
       </VendorLayout>
     );
   }
+
+  const BOOKING_STEPS = [
+    { label: "Pending" },
+    { label: "Confirmed" },
+    { label: "Preparing" },
+    { label: "Delivered" },
+    { label: "Completed" },
+  ];
+  const statusToStep: Record<string, number> = {
+    pending: 1,
+    confirmed: 2,
+    in_preparation: 3,
+    delivered: 4,
+    completed: 5,
+  };
+  const currentStep = statusToStep[booking.status] ?? 1;
 
   const specialReqs =
     booking.specialRequirements || booking.event.specialRequirements || null;
@@ -180,9 +199,10 @@ export default function BookingDetailPage() {
             onClick={() => updateStatus("in_preparation")}
             disabled={updating}
             className="flex items-center gap-2 px-4 py-2 rounded-xl bg-amber-100 text-amber-800 font-semibold hover:bg-amber-200 disabled:opacity-50"
+            title="You're starting to prepare the order"
           >
             <CookingPot size={18} weight="bold" />
-            In preparation
+            Preparing order
           </button>
           <button
             type="button"
@@ -204,9 +224,10 @@ export default function BookingDetailPage() {
             onClick={() => updateStatus("delivered")}
             disabled={updating}
             className="flex items-center gap-2 px-4 py-2 rounded-xl bg-blue-100 text-blue-800 font-semibold hover:bg-blue-200 disabled:opacity-50"
+            title="Food has been delivered to the event"
           >
             <Truck size={18} weight="bold" />
-            Mark delivered
+            Delivered to customer
           </button>
         </div>
       );
@@ -218,9 +239,10 @@ export default function BookingDetailPage() {
           onClick={() => updateStatus("completed")}
           disabled={updating}
           className="flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-100 text-emerald-800 font-semibold hover:bg-emerald-200 disabled:opacity-50"
+          title="Close this booking and allow the customer to leave a review"
         >
           <CheckCircle size={18} weight="bold" />
-          Mark completed
+          Complete & close
         </button>
       );
     }
@@ -229,13 +251,34 @@ export default function BookingDetailPage() {
 
   return (
     <VendorLayout>
-      <div className="max-w-3xl mx-auto">
+      <div className="max-w-5xl mx-auto w-full">
         <PageHeader
           title={booking.event.name}
-          subtitle={`Booking #${booking.id.slice(0, 8)} · ${booking.status.replace(/_/g, " ")}`}
+          subtitle={
+            <span className="flex items-center gap-2">
+              <span>Booking #{booking.id.slice(0, 8)} · {booking.status.replace(/_/g, " ")}</span>
+              {booking.status === "confirmed" && (
+                <span
+                  className={`px-2.5 py-0.5 rounded-lg text-[10px] font-bold ${
+                    (booking.paymentStatus || "unpaid") === "paid"
+                      ? "bg-emerald-100 text-emerald-700"
+                      : "bg-amber-100 text-amber-700"
+                  }`}
+                >
+                  {(booking.paymentStatus || "unpaid") === "paid" ? "Paid" : "Awaiting payment"}
+                </span>
+              )}
+            </span>
+          }
           backLink={{ href: "/bookings", label: "Back to bookings" }}
           action={<StatusActions />}
         />
+
+        {booking.status !== "cancelled" && (
+          <div className="mb-6">
+            <StepIndicator steps={BOOKING_STEPS} currentStep={currentStep} />
+          </div>
+        )}
 
         <div className="space-y-6">
           <section className="p-6 rounded-xl border border-slate-200 bg-white">
@@ -320,10 +363,23 @@ export default function BookingDetailPage() {
               <Package size={20} weight="regular" />
               Package
             </h2>
-            <p className="font-medium text-slate-900">{booking.package.name}</p>
-            <p className="mt-1 text-lg font-semibold text-slate-900">
-              ${parseFloat(booking.totalAmount).toLocaleString()} total
-            </p>
+            <div className="flex items-start gap-4">
+              {booking.package.imageUrl && (
+                <div className="w-20 h-20 rounded-xl overflow-hidden bg-slate-100 shrink-0">
+                  <img
+                    src={booking.package.imageUrl}
+                    alt=""
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+              )}
+              <div>
+                <p className="font-medium text-slate-900">{booking.package.name}</p>
+                <p className="mt-1 text-lg font-semibold text-slate-900">
+                  ${parseFloat(booking.totalAmount).toLocaleString()} total
+                </p>
+              </div>
+            </div>
             {booking.package.packageItems.length > 0 && (
               <div className="mt-4">
                 <h3 className="text-sm font-medium text-slate-600 mb-2">Menu items</h3>

@@ -194,7 +194,7 @@ export default function BookVendorPage() {
         <div className="flex items-center gap-4">
           <Link
             href={`/vendor/${vendorId}`}
-            className="w-10 h-10 rounded-none bg-slate-100 flex items-center justify-center"
+            className="w-10 h-10 rounded-md bg-slate-100 flex items-center justify-center"
           >
             <ArrowLeft size={20} weight="regular" className="text-slate-600" />
           </Link>
@@ -208,18 +208,18 @@ export default function BookVendorPage() {
       <main className="p-6 pb-32">
         <form onSubmit={handleSubmit} className="space-y-6">
           {error && (
-            <div className="p-3 rounded-none bg-red-50 text-red-600 text-sm border border-red-100">
+            <div className="p-3 rounded-md bg-red-50 text-red-600 text-sm border border-red-100">
               {error}
             </div>
           )}
 
           {events.length === 0 ? (
-            <div className="p-6 rounded-none border border-slate-200 bg-slate-50 text-center">
+            <div className="p-6 rounded-md border border-slate-200 bg-slate-50 text-center">
               <p className="text-slate-600 font-medium">Create an event first</p>
               <p className="text-slate-500 text-sm mt-1">You need an event to book catering for.</p>
               <Link
                 href="/events/create"
-                className="inline-block mt-4 px-5 py-2.5 bg-primary text-white font-semibold rounded-none"
+                className="inline-block mt-4 px-5 py-2.5 bg-primary text-white font-semibold rounded-md"
               >
                 Create Event
               </Link>
@@ -231,7 +231,7 @@ export default function BookVendorPage() {
                 <select
                   value={eventId}
                   onChange={(e) => setEventId(e.target.value)}
-                  className="w-full h-12 px-4 rounded-none border border-slate-200 bg-white text-slate-900"
+                  className="w-full h-12 px-4 rounded-md border border-slate-200 bg-white text-slate-900"
                   required
                 >
                   {events.map((ev) => (
@@ -250,7 +250,7 @@ export default function BookVendorPage() {
                   max={pkg.maxGuests ?? undefined}
                   value={guestCount}
                   onChange={(e) => setGuestCount(e.target.value)}
-                  className="w-full h-12 px-4 rounded-none border border-slate-200 bg-white text-slate-900"
+                  className="w-full h-12 px-4 rounded-md border border-slate-200 bg-white text-slate-900"
                   required
                 />
                 {(pkg.minGuests || pkg.maxGuests) && (
@@ -270,7 +270,7 @@ export default function BookVendorPage() {
                   value={specialRequirements}
                   onChange={(e) => setSpecialRequirements(e.target.value)}
                   rows={3}
-                  className="w-full px-4 py-3 rounded-none border border-slate-200 bg-white text-slate-900 resize-none"
+                  className="w-full px-4 py-3 rounded-md border border-slate-200 bg-white text-slate-900 resize-none"
                   placeholder="Dietary needs, allergies, setup preferences..."
                 />
               </div>
@@ -278,7 +278,7 @@ export default function BookVendorPage() {
               <button
                 type="submit"
                 disabled={submitting}
-                className="w-full py-3 rounded-none bg-primary text-white font-semibold hover:bg-primary/90 disabled:opacity-50"
+                className="w-full py-3 rounded-md bg-primary text-white font-semibold hover:bg-primary/90 disabled:opacity-50"
               >
                 {submitting ? "Submitting..." : "Request Booking"}
               </button>

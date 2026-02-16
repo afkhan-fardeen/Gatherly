@@ -109,7 +109,7 @@ export default function CreateEventPage() {
           {step === 0 ? (
             <Link
               href="/events"
-              className="w-10 h-10 rounded-none bg-slate-100 flex items-center justify-center"
+              className="w-10 h-10 rounded-md bg-slate-100 flex items-center justify-center"
             >
               <ArrowLeft size={20} weight="regular" className="text-slate-600" />
             </Link>
@@ -117,7 +117,7 @@ export default function CreateEventPage() {
             <button
               type="button"
               onClick={() => setStep((s) => s - 1)}
-              className="w-10 h-10 rounded-none bg-slate-100 flex items-center justify-center"
+              className="w-10 h-10 rounded-md bg-slate-100 flex items-center justify-center"
             >
               <ArrowLeft size={20} weight="regular" className="text-slate-600" />
             </button>
@@ -135,7 +135,7 @@ export default function CreateEventPage() {
           {STEPS.map((_, i) => (
             <div
               key={i}
-              className={`h-1 flex-1 rounded-none ${
+              className={`h-1 flex-1 rounded-md ${
                 i <= step ? "bg-primary" : "bg-slate-200"
               }`}
             />
@@ -156,7 +156,7 @@ export default function CreateEventPage() {
                   type="text"
                   value={form.name}
                   onChange={(e) => update({ name: e.target.value })}
-                  className="w-full px-4 py-3 border border-slate-200 rounded-none focus:ring-2 focus:ring-primary/20 outline-none"
+                  className="w-full px-4 py-3 border border-slate-200 rounded-md focus:ring-2 focus:ring-primary/20 outline-none"
                   placeholder="e.g. Smith Wedding Reception"
                   required
                 />
@@ -168,7 +168,7 @@ export default function CreateEventPage() {
                 <select
                   value={form.eventType}
                   onChange={(e) => update({ eventType: e.target.value })}
-                  className="w-full px-4 py-3 border border-slate-200 rounded-none focus:ring-2 focus:ring-primary/20 outline-none"
+                  className="w-full px-4 py-3 border border-slate-200 rounded-md focus:ring-2 focus:ring-primary/20 outline-none"
                   required
                 >
                   <option value="">Select type</option>
@@ -187,7 +187,7 @@ export default function CreateEventPage() {
                   type="date"
                   value={form.date}
                   onChange={(e) => update({ date: e.target.value })}
-                  className="w-full px-4 py-3 border border-slate-200 rounded-none focus:ring-2 focus:ring-primary/20 outline-none min-h-[44px]"
+                  className="w-full px-4 py-3 border border-slate-200 rounded-md focus:ring-2 focus:ring-primary/20 outline-none min-h-[44px]"
                   required
                 />
               </div>
@@ -200,7 +200,7 @@ export default function CreateEventPage() {
                     type="time"
                     value={form.timeStart}
                     onChange={(e) => update({ timeStart: e.target.value })}
-                    className="w-full px-4 py-3 border border-slate-200 rounded-none focus:ring-2 focus:ring-primary/20 outline-none min-h-[44px]"
+                    className="w-full px-4 py-3 border border-slate-200 rounded-md focus:ring-2 focus:ring-primary/20 outline-none min-h-[44px]"
                   />
                 </div>
                 <div>
@@ -211,7 +211,7 @@ export default function CreateEventPage() {
                     type="time"
                     value={form.timeEnd}
                     onChange={(e) => update({ timeEnd: e.target.value })}
-                    className="w-full px-4 py-3 border border-slate-200 rounded-none focus:ring-2 focus:ring-primary/20 outline-none min-h-[44px]"
+                    className="w-full px-4 py-3 border border-slate-200 rounded-md focus:ring-2 focus:ring-primary/20 outline-none min-h-[44px]"
                   />
                 </div>
               </div>
@@ -228,7 +228,7 @@ export default function CreateEventPage() {
                   type="text"
                   value={form.location}
                   onChange={(e) => update({ location: e.target.value })}
-                  className="w-full px-4 py-3 border border-slate-200 rounded-none focus:ring-2 focus:ring-primary/20 outline-none"
+                  className="w-full px-4 py-3 border border-slate-200 rounded-md focus:ring-2 focus:ring-primary/20 outline-none"
                   placeholder="Address or venue"
                   required
                 />
@@ -240,7 +240,7 @@ export default function CreateEventPage() {
                 <select
                   value={form.venueType}
                   onChange={(e) => update({ venueType: e.target.value })}
-                  className="w-full px-4 py-3 border border-slate-200 rounded-none focus:ring-2 focus:ring-primary/20 outline-none"
+                  className="w-full px-4 py-3 border border-slate-200 rounded-md focus:ring-2 focus:ring-primary/20 outline-none"
                 >
                   <option value="">Select</option>
                   <option value="home">Home</option>
@@ -255,7 +255,7 @@ export default function CreateEventPage() {
                   type="text"
                   value={form.venueName}
                   onChange={(e) => update({ venueName: e.target.value })}
-                  className="w-full px-4 py-3 border border-slate-200 rounded-none focus:ring-2 focus:ring-primary/20 outline-none"
+                  className="w-full px-4 py-3 border border-slate-200 rounded-md focus:ring-2 focus:ring-primary/20 outline-none"
                   placeholder="e.g. Grand Ballroom"
                 />
               </div>
@@ -275,7 +275,7 @@ export default function CreateEventPage() {
                   onChange={(e) =>
                     update({ guestCount: parseInt(e.target.value) || 1 })
                   }
-                  className="w-full px-4 py-3 border border-slate-200 rounded-none focus:ring-2 focus:ring-primary/20 outline-none"
+                  className="w-full px-4 py-3 border border-slate-200 rounded-md focus:ring-2 focus:ring-primary/20 outline-none"
                   required
                 />
               </div>
@@ -320,7 +320,7 @@ export default function CreateEventPage() {
                 onChange={(e) =>
                   update({ specialRequirements: e.target.value })
                 }
-                className="w-full px-4 py-3 border border-slate-200 rounded-none focus:ring-2 focus:ring-primary/20 outline-none min-h-[100px]"
+                className="w-full px-4 py-3 border border-slate-200 rounded-md focus:ring-2 focus:ring-primary/20 outline-none min-h-[100px]"
                 placeholder="Dietary needs, setup preferences..."
               />
             </div>
@@ -331,7 +331,7 @@ export default function CreateEventPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-3 bg-primary text-white font-semibold rounded-none hover:bg-primary/90 disabled:opacity-50"
+            className="w-full py-3 bg-primary text-white font-semibold rounded-md hover:bg-primary/90 disabled:opacity-50"
           >
             {loading
               ? "Creating..."

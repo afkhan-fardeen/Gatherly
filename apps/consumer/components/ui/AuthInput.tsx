@@ -7,6 +7,7 @@ interface AuthInputProps {
   error?: string;
   required?: boolean;
   minLength?: number;
+  icon?: React.ReactNode;
 }
 
 export function AuthInput({
@@ -18,25 +19,36 @@ export function AuthInput({
   error,
   required,
   minLength,
+  icon,
 }: AuthInputProps) {
+  const inputId = `auth-${label.replace(/\s/g, "-").toLowerCase()}`;
   return (
     <div>
       <label
         className="block text-sm font-medium text-slate-600 mb-2 ml-1"
-        htmlFor={label}
+        htmlFor={inputId}
       >
         {label}
       </label>
-      <input
-        id={label}
-        type={type}
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        placeholder={placeholder}
-        required={required}
-        minLength={minLength}
-        className="w-full h-12 px-5 bg-slate-50 border-none rounded-none text-slate-900 placeholder:text-slate-400 focus:ring-2 focus:ring-primary/20 focus:bg-white transition-all outline-none"
-      />
+      <div className="flex items-center h-12 bg-slate-50 rounded-md focus-within:ring-2 focus-within:ring-primary/20 focus-within:bg-white transition-all">
+        {icon && (
+          <div className="pl-4 shrink-0 text-slate-400 [&>svg]:w-[18px] [&>svg]:h-[18px]">
+            {icon}
+          </div>
+        )}
+        <input
+          id={inputId}
+          type={type}
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          placeholder={placeholder}
+          required={required}
+          minLength={minLength}
+          className={`flex-1 min-w-0 h-full bg-transparent text-slate-900 placeholder:text-slate-400 outline-none ${
+            icon ? "pl-3 pr-5" : "px-5"
+          }`}
+        />
+      </div>
       {error && <p className="mt-1 text-sm text-red-600 ml-1">{error}</p>}
     </div>
   );

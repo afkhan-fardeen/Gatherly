@@ -61,7 +61,7 @@ export default function AddGuestPage() {
         <div className="flex items-center gap-4">
           <Link
             href={`/events/${eventId}/guests`}
-            className="w-10 h-10 rounded-none bg-slate-100 flex items-center justify-center"
+            className="w-10 h-10 rounded-md bg-slate-100 flex items-center justify-center"
           >
             <ArrowLeft size={20} weight="regular" className="text-slate-600" />
           </Link>
@@ -79,7 +79,7 @@ export default function AddGuestPage() {
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="w-full px-4 py-3 border border-slate-200 rounded-none focus:ring-2 focus:ring-primary/20 outline-none"
+              className="w-full px-4 py-3 border border-slate-200 rounded-md focus:ring-2 focus:ring-primary/20 outline-none"
               placeholder="Guest name"
               required
             />
@@ -92,7 +92,7 @@ export default function AddGuestPage() {
               type="tel"
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
-              className="w-full px-4 py-3 border border-slate-200 rounded-none focus:ring-2 focus:ring-primary/20 outline-none"
+              className="w-full px-4 py-3 border border-slate-200 rounded-md focus:ring-2 focus:ring-primary/20 outline-none"
               placeholder="+1 555-0123"
             />
           </div>
@@ -104,7 +104,7 @@ export default function AddGuestPage() {
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-4 py-3 border border-slate-200 rounded-none focus:ring-2 focus:ring-primary/20 outline-none"
+              className="w-full px-4 py-3 border border-slate-200 rounded-md focus:ring-2 focus:ring-primary/20 outline-none"
               placeholder="guest@example.com"
             />
           </div>
@@ -118,7 +118,7 @@ export default function AddGuestPage() {
                   key={status}
                   type="button"
                   onClick={() => setRsvpStatus(status)}
-                  className={`flex-1 py-2 rounded-none text-sm font-semibold capitalize ${
+                  className={`flex-1 py-2 rounded-md text-sm font-semibold capitalize ${
                     rsvpStatus === status
                       ? status === "confirmed"
                         ? "bg-confirmed/20 text-confirmed"
@@ -138,7 +138,7 @@ export default function AddGuestPage() {
               type="checkbox"
               checked={plusOneAllowed}
               onChange={(e) => setPlusOneAllowed(e.target.checked)}
-              className="w-5 h-5 rounded-none border-slate-300 text-primary focus:ring-primary/20"
+              className="w-5 h-5 rounded-md border-slate-300 text-primary focus:ring-primary/20"
             />
             <span className="text-sm font-medium text-slate-700">
               Plus one allowed
@@ -148,7 +148,7 @@ export default function AddGuestPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-3 bg-primary text-white font-semibold rounded-none hover:bg-primary/90 disabled:opacity-50"
+            className="w-full py-3 bg-primary text-white font-semibold rounded-md hover:bg-primary/90 disabled:opacity-50"
           >
             {loading ? "Adding..." : "Add Guest"}
           </button>

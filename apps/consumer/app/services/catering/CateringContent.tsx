@@ -44,7 +44,7 @@ export function CateringContent() {
         <div className="flex items-center gap-4 mb-4">
           <Link
             href="/services"
-            className="w-10 h-10 rounded-none bg-slate-100 flex items-center justify-center"
+            className="w-10 h-10 rounded-md bg-slate-100 flex items-center justify-center"
           >
             <ArrowLeft size={20} weight="regular" className="text-slate-600" />
           </Link>
@@ -59,7 +59,7 @@ export function CateringContent() {
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full bg-slate-100 border-none rounded-none py-2.5 pl-10 pr-4 text-sm focus:ring-1 focus:ring-primary/20 outline-none"
+            className="w-full bg-slate-100 border-none rounded-md py-2.5 pl-10 pr-4 text-sm focus:ring-1 focus:ring-primary/20 outline-none"
             placeholder="Search vendors..."
           />
         </div>
@@ -71,7 +71,7 @@ export function CateringContent() {
             {[1, 2, 3, 4].map((i) => (
               <div
                 key={i}
-                className="h-16 bg-slate-100 rounded-none animate-pulse"
+                className="h-16 bg-slate-100 rounded-md animate-pulse"
               />
             ))}
           </div>
@@ -89,9 +89,9 @@ export function CateringContent() {
               <Link
                 key={vendor.id}
                 href={eventId ? `/vendor/${vendor.id}?eventId=${eventId}` : `/vendor/${vendor.id}`}
-                className="flex items-center gap-3 p-3 border border-slate-100 rounded-none hover:bg-slate-50 transition-colors min-w-0 overflow-hidden"
+                className="flex items-center gap-3 p-3 border border-slate-100 rounded-md hover:bg-slate-50 transition-colors min-w-0 overflow-hidden"
               >
-                <div className="w-14 h-14 rounded-none bg-slate-100 flex items-center justify-center shrink-0 overflow-hidden">
+                <div className="w-14 h-14 rounded-md bg-slate-100 flex items-center justify-center shrink-0 overflow-hidden">
                   {(vendor.featuredImageUrl || vendor.logoUrl) ? (
                     <img
                       src={vendor.featuredImageUrl || vendor.logoUrl || ""}
