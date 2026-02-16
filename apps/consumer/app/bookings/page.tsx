@@ -170,7 +170,7 @@ export default function BookingsPage() {
 
   return (
     <AppLayout>
-      <header className="sticky top-0 z-40 bg-white/80 ios-blur px-4 py-3 border-b border-slate-100 shrink-0">
+      <header className="sticky top-0 z-40 bg-white/80 ios-blur px-6 py-3 border-b border-slate-100 shrink-0">
         <h1 className="text-lg font-bold tracking-tight">My Bookings</h1>
         <div className="flex gap-2 mt-4">
           {(["active", "past", "cancelled"] as Tab[]).map((t) => {

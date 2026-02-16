@@ -2,13 +2,14 @@
 
 import { useEffect, useState, useRef } from "react";
 import Link from "next/link";
-import { User, SignOut } from "@phosphor-icons/react";
+import { Bell, User, SignOut } from "@phosphor-icons/react";
 import { Logo } from "./Logo";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 
 export function ConsumerTopBar() {
   const [user, setUser] = useState<{ name: string; profilePictureUrl?: string | null } | null>(null);
+  const [unreadCount, setUnreadCount] = useState(0);
   const [profileOpen, setProfileOpen] = useState(false);
   const profileRef = useRef<HTMLDivElement>(null);
 
@@ -21,6 +22,22 @@ export function ConsumerTopBar() {
         if (data) setUser(data);
       })
       .catch(() => {});
+  }, []);
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) return;
+    function fetchUnread() {
+      fetch(`${API_URL}/api/notifications/unread-count`, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+        .then((r) => (r.ok ? r.json() : { count: 0 }))
+        .then((d) => setUnreadCount(d.count ?? 0))
+        .catch(() => setUnreadCount(0));
+    }
+    fetchUnread();
+    const interval = setInterval(fetchUnread, 30000);
+    return () => clearInterval(interval);
   }, []);
 
   useEffect(() => {
@@ -41,9 +58,21 @@ export function ConsumerTopBar() {
 
   return (
     <div className="sticky top-0 z-40 bg-white/90 ios-blur border-b border-slate-100 shrink-0">
-      <div className="flex justify-between items-center px-4 py-2">
-        <Logo href="/dashboard" compact />
-        <div className="relative" ref={profileRef}>
+      <div className="flex justify-between items-center px-6 py-2">
+        <Logo href="/dashboard" className="text-2xl md:text-3xl" />
+        <div className="flex items-center gap-2">
+          <Link
+            href="/notifications"
+            className="relative p-2 rounded-md hover:bg-slate-100 transition-colors"
+          >
+            <Bell size={22} weight="regular" className="text-slate-600" />
+            {unreadCount > 0 && (
+              <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] rounded-full bg-rose-500 text-white text-[10px] font-bold flex items-center justify-center px-1">
+                {unreadCount > 99 ? "99+" : unreadCount}
+              </span>
+            )}
+          </Link>
+          <div className="relative" ref={profileRef}>
           <button
             type="button"
             onClick={() => setProfileOpen(!profileOpen)}
@@ -86,6 +115,7 @@ export function ConsumerTopBar() {
               </button>
             </div>
           )}
+          </div>
         </div>
       </div>
     </div>

@@ -1,6 +1,5 @@
 "use client";
 
-import { Check } from "@phosphor-icons/react";
 import { ORDER_STEPS, getCurrentStepIndex } from "@/lib/bookingStatus";
 
 interface OrderProgressProps {
@@ -23,20 +22,18 @@ export function OrderProgress({ status, paymentStatus }: OrderProgressProps) {
           const isCurrent = i === currentIndex;
           return (
             <div key={i} className="flex items-center shrink-0">
-              <div className="flex flex-col items-center min-w-[3rem]">
+              <div className="flex flex-col items-center min-w-[2.5rem]">
                 <div
-                  className={`w-5 h-5 rounded-full flex items-center justify-center ${
+                  className={`rounded-full ${
                     isCompleted
-                      ? "bg-primary text-white"
+                      ? "w-2 h-2 bg-primary"
                       : isCurrent
-                      ? "bg-primary text-white ring-2 ring-primary ring-offset-1"
-                      : "bg-slate-200"
+                      ? "w-2.5 h-2.5 bg-primary ring-2 ring-primary ring-offset-1"
+                      : "w-2 h-2 bg-slate-200"
                   }`}
-                >
-                  {isCompleted ? <Check size={12} weight="bold" /> : null}
-                </div>
+                />
                 <span
-                  className={`mt-1 text-[9px] font-semibold text-center leading-tight ${
+                  className={`mt-1 text-[9px] font-semibold text-center leading-tight truncate max-w-[3rem] ${
                     isCurrent ? "text-primary" : isCompleted ? "text-slate-600" : "text-slate-400"
                   }`}
                 >

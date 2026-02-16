@@ -70,7 +70,7 @@ export default function DashboardPage() {
 
   return (
     <AppLayout>
-      <header className="px-4 py-3 shrink-0">
+      <header className="px-6 py-3 shrink-0">
         <h1 className="text-lg font-bold tracking-tight">
           Hello, {user?.name?.split(" ")[0] ?? "there"}
         </h1>
@@ -90,7 +90,7 @@ export default function DashboardPage() {
                   href={`/services/${s.slug}`}
                   className="group flex flex-col overflow-hidden border border-slate-100 rounded-md hover:border-slate-200 transition-colors min-w-0 p-0"
                 >
-                  <div className="relative aspect-[4/3] w-full overflow-hidden">
+                  <div className="relative aspect-[16/9] w-full overflow-hidden">
                     <Image
                       src={s.image}
                       alt={s.name}
@@ -114,7 +114,7 @@ export default function DashboardPage() {
                   href={`/services/coming-soon/${s.slug}`}
                   className="group flex flex-col overflow-hidden border border-slate-100 rounded-md opacity-90 hover:opacity-100 transition-opacity min-w-0 p-0"
                 >
-                  <div className="relative aspect-[4/3] w-full overflow-hidden">
+                  <div className="relative aspect-[16/9] w-full overflow-hidden">
                     <Image
                       src={s.image}
                       alt={s.name}

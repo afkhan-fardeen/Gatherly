@@ -125,7 +125,7 @@ export default function NotificationsPage() {
 
   return (
     <AppLayout>
-      <header className="sticky top-0 z-40 bg-white/80 ios-blur px-4 py-3 border-b border-slate-100 shrink-0">
+      <header className="sticky top-0 z-40 bg-white/80 ios-blur px-6 py-3 border-b border-slate-100 shrink-0">
         <div className="flex justify-between items-center">
           <h1 className="text-lg font-bold tracking-tight">
             Notifications

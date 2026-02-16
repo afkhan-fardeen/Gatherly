@@ -92,7 +92,7 @@ export default function PackageDetailPage() {
 
   return (
     <AppLayout>
-      <header className="sticky top-0 z-40 bg-white/80 ios-blur px-4 py-3 border-b border-slate-100 shrink-0">
+      <header className="sticky top-0 z-40 bg-white/80 ios-blur px-6 py-3 border-b border-slate-100 shrink-0">
         <div className="flex items-center gap-3">
           <Link
             href={eventId ? `/vendor/${id}?eventId=${eventId}` : `/vendor/${id}`}
@@ -108,9 +108,9 @@ export default function PackageDetailPage() {
       </header>
 
       <main className="flex-1 overflow-y-auto overflow-x-hidden pb-24 min-h-0">
-        <div className="p-4 space-y-6">
+        <div className="p-6 space-y-6">
           {pkg.imageUrl && (
-            <div className="w-full h-48 overflow-hidden bg-slate-100 rounded-md -mx-4 mt-0">
+            <div className="w-full h-48 overflow-hidden bg-slate-100 rounded-md -mx-6 mt-0">
               <img src={pkg.imageUrl} alt="" className="w-full h-full object-cover" />
             </div>
           )}

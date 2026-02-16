@@ -16,7 +16,7 @@ const SERVICES = [
 export default function ServicesPage() {
   return (
     <AppLayout>
-      <header className="sticky top-0 z-40 bg-white/80 ios-blur px-4 py-3 border-b border-slate-100 shrink-0">
+      <header className="sticky top-0 z-40 bg-white/80 ios-blur px-6 py-3 border-b border-slate-100 shrink-0">
         <h1 className="text-lg font-bold tracking-tight">Services</h1>
         <p className="text-slate-500 text-xs mt-0.5">
           Everything you need for your event
@@ -32,7 +32,7 @@ export default function ServicesPage() {
                 href={`/services/${service.slug}`}
                 className="group flex flex-col overflow-hidden border border-slate-100 rounded-md hover:border-slate-200 transition-colors min-w-0 p-0"
               >
-                <div className="relative aspect-[4/3] w-full overflow-hidden">
+                <div className="relative aspect-[16/9] w-full overflow-hidden">
                   <Image
                     src={service.image}
                     alt={service.name}
@@ -55,7 +55,7 @@ export default function ServicesPage() {
                 href={`/services/coming-soon/${service.slug}`}
                 className="group flex flex-col overflow-hidden border border-slate-100 rounded-md opacity-90 hover:opacity-100 transition-opacity min-w-0 p-0"
               >
-                <div className="relative aspect-[4/3] w-full overflow-hidden">
+                <div className="relative aspect-[16/9] w-full overflow-hidden">
                   <Image
                     src={service.image}
                     alt={service.name}

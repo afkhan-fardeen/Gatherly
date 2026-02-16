@@ -130,7 +130,7 @@ export default function EditEventPage() {
 
   return (
     <AppLayout>
-      <header className="sticky top-0 z-40 bg-white/80 ios-blur px-4 py-3 border-b border-slate-100 shrink-0">
+      <header className="sticky top-0 z-40 bg-white/80 ios-blur px-6 py-3 border-b border-slate-100 shrink-0">
         <div className="flex items-center gap-3">
           <Link
             href={`/events/${eventId}`}
@@ -142,7 +142,7 @@ export default function EditEventPage() {
         </div>
       </header>
 
-      <main className="p-4 pb-32">
+      <main className="p-6 pb-32">
         <form onSubmit={handleSubmit} className="space-y-4">
           {error && (
             <p className="text-sm text-red-600 p-3 bg-red-50 border border-red-100">{error}</p>

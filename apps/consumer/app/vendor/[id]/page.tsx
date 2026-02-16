@@ -120,7 +120,7 @@ export default function VendorProfilePage() {
 
   return (
     <AppLayout>
-      <header className="sticky top-0 z-40 bg-white/80 ios-blur px-4 py-3 border-b border-slate-100 shrink-0">
+      <header className="sticky top-0 z-40 bg-white/80 ios-blur px-6 py-3 border-b border-slate-100 shrink-0">
         <div className="flex items-center gap-3">
           <Link
             href="/services/catering"
@@ -174,7 +174,7 @@ export default function VendorProfilePage() {
 
         {/* Cuisine tags */}
         {(vendor.cuisineTypes?.length ?? 0) > 0 && (
-          <div className="px-4 pt-3 pb-2 flex flex-wrap gap-2">
+          <div className="px-6 pt-3 pb-2 flex flex-wrap gap-2">
             {vendor.cuisineTypes.map((c) => (
               <Tag key={c} value={c} variant="cuisine" className="rounded-md">
                 {c}
@@ -184,7 +184,7 @@ export default function VendorProfilePage() {
         )}
 
         {/* Packages (primary) */}
-        <section className="px-4 pt-4 pb-6">
+        <section className="px-6 pt-4 pb-6">
           <h3 className="text-sm font-bold text-slate-500 uppercase tracking-wider mb-4">
             Choose a package
           </h3>
@@ -256,7 +256,7 @@ export default function VendorProfilePage() {
         </section>
 
         {/* About (compact) */}
-        <section className="px-4 pt-4 pb-6 border-t border-slate-100">
+        <section className="px-6 pt-4 pb-6 border-t border-slate-100">
           <h3 className="text-sm font-bold text-slate-500 uppercase tracking-wider mb-4">
             About
           </h3>
@@ -318,7 +318,7 @@ export default function VendorProfilePage() {
         </section>
 
         {/* Reviews */}
-        <section className="px-4 pt-4 pb-8 border-t border-slate-100">
+        <section className="px-6 pt-4 pb-8 border-t border-slate-100">
           <button
             type="button"
             onClick={() => setReviewsOpen((o) => !o)}

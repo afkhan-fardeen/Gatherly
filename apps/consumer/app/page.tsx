@@ -13,7 +13,7 @@ const FEATURES = [
 export default function HomePage() {
   return (
     <div className="min-h-screen flex flex-col overflow-hidden">
-      <header className="p-4 flex justify-between items-center border-b border-slate-100">
+      <header className="px-6 py-4 flex justify-between items-center border-b border-slate-100">
         <Logo />
         <div className="flex gap-3">
           <Link
@@ -31,7 +31,7 @@ export default function HomePage() {
         </div>
       </header>
 
-      <main className="flex-1 flex flex-col items-center px-4 py-12 max-w-md md:max-w-4xl mx-auto w-full">
+      <main className="flex-1 flex flex-col items-center px-6 py-12 max-w-md md:max-w-4xl mx-auto w-full">
         <section className="flex flex-col items-center text-center mb-12">
           <h1 className="text-4xl font-bold text-center mb-4">
             Plan your event.

@@ -57,7 +57,7 @@ export default function AddGuestPage() {
 
   return (
     <AppLayout showNav={false}>
-      <header className="sticky top-0 z-40 bg-white/80 ios-blur px-4 py-3 border-b border-slate-100 shrink-0">
+      <header className="sticky top-0 z-40 bg-white/80 ios-blur px-6 py-3 border-b border-slate-100 shrink-0">
         <div className="flex items-center gap-4">
           <Link
             href={`/events/${eventId}/guests`}
@@ -69,7 +69,7 @@ export default function AddGuestPage() {
         </div>
       </header>
 
-      <main className="p-6 flex-1">
+      <main className="p-6 pb-32 flex-1">
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label className="block text-sm font-semibold text-slate-700 mb-1">

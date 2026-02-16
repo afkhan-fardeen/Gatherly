@@ -105,7 +105,7 @@ export default function CreateEventPage() {
 
   return (
     <AppLayout showNav={true}>
-      <header className="sticky top-0 z-40 bg-white/80 ios-blur px-4 py-3 border-b border-slate-100 shrink-0">
+      <header className="sticky top-0 z-40 bg-white/80 ios-blur px-6 py-3 border-b border-slate-100 shrink-0">
         <div className="flex items-center gap-4">
           {step === 0 ? (
             <Link
@@ -144,7 +144,7 @@ export default function CreateEventPage() {
         </div>
       </header>
 
-      <main ref={mainRef} className="p-6 flex-1 overflow-y-auto">
+      <main ref={mainRef} className="p-6 pb-32 flex-1 overflow-y-auto">
         <form onSubmit={handleSubmit} className="space-y-6">
           {step === 0 && (
             <>
