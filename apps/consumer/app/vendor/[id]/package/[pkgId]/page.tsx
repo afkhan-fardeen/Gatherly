@@ -110,7 +110,7 @@ export default function PackageDetailPage() {
       <main className="flex-1 overflow-y-auto overflow-x-hidden pb-24 min-h-0">
         <div className="p-6 space-y-6">
           {pkg.imageUrl && (
-            <div className="w-full h-48 overflow-hidden bg-slate-100 rounded-md -mx-6 mt-0">
+            <div className="w-full h-48 overflow-hidden bg-slate-100 rounded-md">
               <img src={pkg.imageUrl} alt="" className="w-full h-full object-cover" />
             </div>
           )}

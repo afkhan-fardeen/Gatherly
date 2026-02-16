@@ -15,7 +15,6 @@ import {
 } from "@phosphor-icons/react";
 import { AppLayout } from "@/components/AppLayout";
 import { OrderProgress } from "@/components/OrderProgress";
-import { getBookingStatusStyle } from "@/components/ui/Tag";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 
@@ -264,20 +263,6 @@ export default function BookingDetailPage() {
         {booking.status !== "cancelled" && (
           <OrderProgress status={booking.status} paymentStatus={booking.paymentStatus} />
         )}
-
-        {/* Status badge */}
-        <div className="flex items-center justify-between">
-          <span
-            className={`px-3 py-1.5 rounded-md text-xs font-extrabold uppercase ${getBookingStatusStyle(
-              booking.status
-            )}`}
-          >
-            {booking.status.replace(/_/g, " ")}
-          </span>
-          {(booking.paymentStatus || "unpaid") === "paid" && (
-            <span className="text-xs font-semibold text-confirmed">Paid</span>
-          )}
-        </div>
 
         {/* Vendor */}
         <div className="flex items-center gap-4 p-4 border border-slate-100 rounded-md">

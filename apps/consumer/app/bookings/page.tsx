@@ -218,15 +218,15 @@ export default function BookingsPage() {
             )}
           </div>
         ) : (
-          <div className="space-y-2">
+          <div className="rounded-md border border-slate-100 bg-white overflow-hidden divide-y divide-slate-100">
             {filtered.map((booking) => (
               <div
                 key={booking.id}
-                className="flex items-center gap-4 py-3 border-b border-slate-100 last:border-0"
+                className="flex flex-col sm:flex-row sm:items-center gap-3 py-4 px-4"
               >
                 <Link
                   href={`/bookings/${booking.id}`}
-                  className="flex items-center gap-4 flex-1 min-w-0"
+                  className="flex items-start gap-4 flex-1 min-w-0"
                 >
                   <div className="w-12 h-12 rounded-md bg-slate-100 flex items-center justify-center shrink-0 overflow-hidden">
                     {booking.package.imageUrl ? (
@@ -248,10 +248,10 @@ export default function BookingsPage() {
                     )}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="font-semibold text-sm truncate">
+                    <p className="font-semibold text-sm line-clamp-2">
                       {booking.event.name} · {booking.vendor.businessName} · {booking.package.name}
                     </p>
-                    <p className="text-slate-500 text-xs">
+                    <p className="text-slate-500 text-xs mt-0.5">
                       {booking.bookingReference} · {new Date(booking.event.date).toLocaleDateString()} · {Number(booking.totalAmount).toFixed(2)} BD
                     </p>
                     <p className="text-slate-500 text-xs mt-0.5">
@@ -259,7 +259,13 @@ export default function BookingsPage() {
                     </p>
                   </div>
                 </Link>
-                <div className="flex items-center gap-2 shrink-0">
+                <div
+                  className={`flex shrink-0 gap-1.5 ${
+                    (booking.status === "completed" || booking.status === "delivered")
+                      ? "flex-col items-end"
+                      : "flex-row items-center gap-2"
+                  }`}
+                >
                   {booking.status === "confirmed" &&
                     (booking.paymentStatus || "unpaid") === "unpaid" && (
                     <button
@@ -270,7 +276,7 @@ export default function BookingsPage() {
                         openPayModal(booking);
                       }}
                       disabled={payingId === booking.id}
-                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-primary text-white text-xs font-semibold hover:bg-primary/90 disabled:opacity-50"
+                      className="flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-md bg-primary text-white text-xs font-semibold hover:bg-primary/90 disabled:opacity-50"
                     >
                       <CreditCard size={14} weight="bold" />
                       Pay

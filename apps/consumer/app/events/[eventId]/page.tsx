@@ -193,7 +193,7 @@ export default function EventDetailPage() {
         <div className="space-y-3 pt-4 border-t border-slate-100">
           <Link
             href={`/events/${eventId}/guests`}
-            className="flex items-center justify-between p-4 border border-slate-200 bg-white hover:bg-slate-50 transition-colors"
+            className="flex items-center justify-between p-4 border border-slate-200 rounded-md bg-white hover:bg-slate-50 transition-colors"
           >
             <div className="flex items-center gap-3">
               <Users size={24} weight="regular" className="text-primary" />
@@ -208,7 +208,7 @@ export default function EventDetailPage() {
           {!isPast && (
             <Link
               href={`/services/catering?eventId=${eventId}`}
-              className="flex items-center justify-between p-4 border border-slate-200 bg-primary/5 hover:bg-primary/10 transition-colors"
+              className="flex items-center justify-between p-4 border border-slate-200 rounded-md bg-primary/5 hover:bg-primary/10 transition-colors"
             >
               <div className="flex items-center gap-3">
                 <ForkKnife size={24} weight="regular" className="text-primary" />
@@ -225,7 +225,7 @@ export default function EventDetailPage() {
         <div className="flex gap-3 pt-4">
           <Link
             href={`/events/${eventId}/edit`}
-            className="flex-1 flex items-center justify-center gap-2 py-3 border border-slate-200 font-semibold text-slate-700 hover:bg-slate-50 transition-colors"
+            className="flex-1 flex items-center justify-center gap-2 py-3 border border-slate-200 rounded-md font-semibold text-slate-700 hover:bg-slate-50 transition-colors"
           >
             <Pencil size={18} weight="regular" />
             Edit
@@ -234,7 +234,7 @@ export default function EventDetailPage() {
             type="button"
             onClick={handleDelete}
             disabled={deleting}
-            className="flex-1 flex items-center justify-center gap-2 py-3 border border-red-200 font-semibold text-red-600 hover:bg-red-50 transition-colors disabled:opacity-50"
+            className="flex-1 flex items-center justify-center gap-2 py-3 border border-red-200 rounded-md font-semibold text-red-600 hover:bg-red-50 transition-colors disabled:opacity-50"
           >
             <Trash size={18} weight="regular" />
             {deleting ? "Deleting…" : "Delete"}
