@@ -22,7 +22,6 @@ export function BottomNav() {
           pathname === href ||
           (href !== "/" &&
             pathname.startsWith(href) &&
-            !pathname.startsWith("/events/create") &&
             !pathname.startsWith("/services/catering") &&
             !pathname.startsWith("/services/coming-soon"));
         return (

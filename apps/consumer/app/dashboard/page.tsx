@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { CalendarPlus, CaretRight } from "@phosphor-icons/react";
+import { Calendar, CalendarCheck, CalendarPlus, CaretRight } from "@phosphor-icons/react";
 import { AppLayout } from "@/components/AppLayout";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
@@ -97,6 +97,7 @@ export default function DashboardPage() {
                       fill
                       className="object-cover group-hover:scale-105 transition-transform duration-300"
                       sizes="(max-width: 640px) 50vw, 33vw"
+                      loading="lazy"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
                     <span className="absolute bottom-2 left-2 right-2 text-sm font-semibold text-white drop-shadow-sm">
@@ -120,6 +121,7 @@ export default function DashboardPage() {
                       fill
                       className="object-cover opacity-70 group-hover:scale-105 transition-transform duration-300"
                       sizes="(max-width: 640px) 50vw, 33vw"
+                      loading="lazy"
                     />
                     <div className="absolute inset-0 bg-slate-900/40" />
                     <span className="absolute bottom-2 left-2 right-2 text-sm font-semibold text-white drop-shadow-sm">
@@ -137,17 +139,54 @@ export default function DashboardPage() {
 
         {/* Quick actions */}
         <section>
-          <div className="flex flex-wrap items-center gap-4">
-            <Link href="/events/create" className="text-primary font-medium hover:underline">
-              Create Event
+          <h3 className="text-sm font-bold text-slate-500 uppercase tracking-wider mb-3">
+            Quick links
+          </h3>
+          <div className="space-y-2">
+            <Link
+              href="/events/create"
+              className="flex items-center justify-between gap-4 p-4 border border-slate-100 rounded-md hover:bg-slate-50 transition-colors"
+            >
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-md bg-primary/10 flex items-center justify-center">
+                  <CalendarPlus size={20} className="text-primary" />
+                </div>
+                <div>
+                  <span className="font-semibold">Create Event</span>
+                  <p className="text-sm text-slate-500">Plan a new event</p>
+                </div>
+              </div>
+              <CaretRight size={18} className="text-slate-300" />
             </Link>
-            <span className="text-slate-300">|</span>
-            <Link href="/bookings" className="text-primary font-medium hover:underline">
-              My Bookings
+            <Link
+              href="/bookings"
+              className="flex items-center justify-between gap-4 p-4 border border-slate-100 rounded-md hover:bg-slate-50 transition-colors"
+            >
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-md bg-primary/10 flex items-center justify-center">
+                  <CalendarCheck size={20} className="text-primary" />
+                </div>
+                <div>
+                  <span className="font-semibold">My Bookings</span>
+                  <p className="text-sm text-slate-500">View and manage</p>
+                </div>
+              </div>
+              <CaretRight size={18} className="text-slate-300" />
             </Link>
-            <span className="text-slate-300">|</span>
-            <Link href="/events" className="text-primary font-medium hover:underline">
-              My Events
+            <Link
+              href="/events"
+              className="flex items-center justify-between gap-4 p-4 border border-slate-100 rounded-md hover:bg-slate-50 transition-colors"
+            >
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-md bg-primary/10 flex items-center justify-center">
+                  <Calendar size={20} className="text-primary" />
+                </div>
+                <div>
+                  <span className="font-semibold">My Events</span>
+                  <p className="text-sm text-slate-500">All your events</p>
+                </div>
+              </div>
+              <CaretRight size={18} className="text-slate-300" />
             </Link>
           </div>
         </section>

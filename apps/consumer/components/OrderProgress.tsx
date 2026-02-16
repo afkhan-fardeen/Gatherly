@@ -17,26 +17,26 @@ export function OrderProgress({ status, paymentStatus }: OrderProgressProps) {
       <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">
         Order progress
       </h3>
-      <div className="flex items-center gap-1 overflow-x-auto pb-1">
+      <div className="flex items-center gap-0.5 overflow-x-auto pb-1">
         {ORDER_STEPS.map((step, i) => {
           const isCompleted = i < currentIndex;
           const isCurrent = i === currentIndex;
           return (
             <div key={i} className="flex items-center shrink-0">
-              <div className="flex flex-col items-center min-w-[4rem]">
+              <div className="flex flex-col items-center min-w-[3rem]">
                 <div
-                  className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold transition-colors ${
+                  className={`w-5 h-5 rounded-full flex items-center justify-center ${
                     isCompleted
                       ? "bg-primary text-white"
                       : isCurrent
-                      ? "bg-primary text-white ring-2 ring-primary ring-offset-2"
-                      : "bg-slate-200 text-slate-500"
+                      ? "bg-primary text-white ring-2 ring-primary ring-offset-1"
+                      : "bg-slate-200"
                   }`}
                 >
-                  {isCompleted ? <Check size={16} weight="bold" /> : i + 1}
+                  {isCompleted ? <Check size={12} weight="bold" /> : null}
                 </div>
                 <span
-                  className={`mt-1.5 text-[10px] font-semibold text-center leading-tight ${
+                  className={`mt-1 text-[9px] font-semibold text-center leading-tight ${
                     isCurrent ? "text-primary" : isCompleted ? "text-slate-600" : "text-slate-400"
                   }`}
                 >
@@ -45,7 +45,7 @@ export function OrderProgress({ status, paymentStatus }: OrderProgressProps) {
               </div>
               {i < ORDER_STEPS.length - 1 && (
                 <div
-                  className={`w-4 sm:w-6 h-0.5 mx-0.5 ${
+                  className={`w-3 sm:w-4 h-0.5 mx-0.5 ${
                     isCompleted ? "bg-primary" : "bg-slate-200"
                   }`}
                 />

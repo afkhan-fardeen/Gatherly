@@ -26,6 +26,7 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 
 interface BookingDetail {
   id: string;
+  bookingReference: string;
   status: string;
   paymentStatus: string | null;
   guestCount: number;
@@ -256,7 +257,7 @@ export default function BookingDetailPage() {
           title={booking.event.name}
           subtitle={
             <span className="flex items-center gap-2">
-              <span>Booking #{booking.id.slice(0, 8)} · {booking.status.replace(/_/g, " ")}</span>
+              <span>Booking {booking.bookingReference} · {booking.status.replace(/_/g, " ")}</span>
               {booking.status === "confirmed" && (
                 <span
                   className={`px-2.5 py-0.5 rounded-lg text-[10px] font-bold ${

@@ -22,6 +22,7 @@ type Tab = "pending" | "confirmed" | "in_progress" | "completed" | "cancelled";
 
 interface Booking {
   id: string;
+  bookingReference: string;
   status: string;
   paymentStatus: string | null;
   totalAmount: string;
@@ -173,7 +174,10 @@ export default function BookingsPage() {
                   )}
                 </div>
                 <div className="min-w-0 flex-1">
-                  <h3 className="font-semibold text-slate-900">{b.event.name}</h3>
+                  <div className="flex items-center gap-2">
+                    <h3 className="font-semibold text-slate-900">{b.event.name}</h3>
+                    <span className="text-xs font-medium text-slate-400">{b.bookingReference}</span>
+                  </div>
                   <div className="flex flex-wrap gap-x-4 gap-y-1 mt-1 text-sm text-slate-500">
                     <span className="flex items-center gap-1">
                       <User size={14} weight="regular" />

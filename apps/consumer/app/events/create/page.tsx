@@ -22,11 +22,11 @@ const STEPS = ["Basic", "Location", "Guests", "Review"];
 
 export default function CreateEventPage() {
   const router = useRouter();
-  const formTopRef = useRef<HTMLDivElement>(null);
+  const mainRef = useRef<HTMLDivElement>(null);
   const [step, setStep] = useState(0);
 
   useEffect(() => {
-    formTopRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    if (mainRef.current) mainRef.current.scrollTop = 0;
   }, [step]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -51,6 +51,7 @@ export default function CreateEventPage() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (step < STEPS.length - 1) {
+      (e.target as HTMLButtonElement)?.blur();
       setStep((s) => s + 1);
       return;
     }
@@ -103,7 +104,7 @@ export default function CreateEventPage() {
   }
 
   return (
-    <AppLayout showNav={false}>
+    <AppLayout showNav={true}>
       <header className="sticky top-0 z-40 bg-white/80 ios-blur px-4 py-3 border-b border-slate-100 shrink-0">
         <div className="flex items-center gap-4">
           {step === 0 ? (
@@ -143,8 +144,7 @@ export default function CreateEventPage() {
         </div>
       </header>
 
-      <main className="p-6 flex-1 overflow-y-auto">
-        <div ref={formTopRef} />
+      <main ref={mainRef} className="p-6 flex-1 overflow-y-auto">
         <form onSubmit={handleSubmit} className="space-y-6">
           {step === 0 && (
             <>

@@ -85,45 +85,39 @@ export default function NotificationsPage() {
           {title}
         </h3>
         <div className="space-y-0 divide-y divide-slate-100 rounded-md border border-slate-200 bg-white overflow-hidden">
-          {items.map((notification) => (
-            <div
-              key={notification.id}
-              className={`py-4 px-4 flex items-start gap-4 ${
-                !notification.isRead ? "bg-primary/5" : ""
-              }`}
-            >
-              <div className="flex-1 min-w-0">
-                <h4 className="font-semibold text-base text-slate-900">
-                  {notification.title}
-                </h4>
-                <p className="text-sm text-slate-500 mt-0.5">
-                  {notification.message}
-                </p>
-                <p className="text-xs text-slate-400 mt-2">
-                  {new Date(notification.createdAt).toLocaleDateString()}
-                </p>
-              </div>
-              <div className="flex items-center gap-2 shrink-0">
+          {items.map((notification) => {
+            const inner = (
+              <>
                 {!notification.isRead && (
-                  <button
-                    type="button"
-                    onClick={() => markAsRead(notification.id)}
-                    className="text-xs font-semibold text-primary hover:underline"
-                  >
-                    Mark read
-                  </button>
+                  <div className="w-2 h-2 rounded-full bg-primary shrink-0" />
                 )}
+                <div className="flex-1 min-w-0">
+                  <p className="font-medium text-sm text-slate-900 truncate">
+                    {notification.title}
+                  </p>
+                  <p className="text-xs text-slate-500 mt-0.5">
+                    {new Date(notification.createdAt).toLocaleDateString()}
+                  </p>
+                </div>
                 {notification.link && (
-                  <Link
-                    href={notification.link}
-                    className="w-8 h-8 rounded-md bg-slate-100 flex items-center justify-center hover:bg-slate-200 transition-colors"
-                  >
-                    <CaretRight size={20} weight="regular" className="text-slate-600" />
-                  </Link>
+                  <CaretRight size={16} weight="regular" className="text-slate-400 shrink-0" />
                 )}
+              </>
+            );
+            const baseClass = `flex items-center gap-4 py-3 px-4 ${
+              !notification.isRead ? "bg-primary/5" : ""
+            }`;
+            const onClick = () => !notification.isRead && markAsRead(notification.id);
+            return notification.link ? (
+              <Link key={notification.id} href={notification.link} onClick={onClick} className={baseClass}>
+                {inner}
+              </Link>
+            ) : (
+              <div key={notification.id} onClick={onClick} role="button" tabIndex={0} onKeyDown={(e) => e.key === "Enter" && onClick()} className={baseClass}>
+                {inner}
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </section>
     );

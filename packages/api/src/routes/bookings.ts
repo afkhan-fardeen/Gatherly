@@ -14,10 +14,13 @@ const createBookingSchema = z.object({
   specialRequirements: z.string().optional(),
 });
 
+const BKG_CHARS = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+
 function generateBookingReference(): string {
-  const year = new Date().getFullYear();
-  const random = Math.random().toString(36).slice(2, 8).toUpperCase();
-  return `GH-${year}-${random}`;
+  const random = [...Array(6)]
+    .map(() => BKG_CHARS[Math.floor(Math.random() * BKG_CHARS.length)])
+    .join("");
+  return `BKG-${random}`;
 }
 
 bookingsRouter.post("/", async (req, res) => {
@@ -123,9 +126,9 @@ bookingsRouter.post("/", async (req, res) => {
 
 bookingsRouter.get("/", async (req, res) => {
   const userId = req.user!.userId;
-  const { status } = req.query;
+  const { status, paymentStatus } = req.query;
 
-  const where: { userId: string; status?: string | { in: string[] } } = { userId };
+  const where: { userId: string; status?: string | { in: string[] }; paymentStatus?: string } = { userId };
   if (typeof status === "string" && status) {
     const statuses = status.split(",").map((s) => s.trim()).filter(Boolean);
     if (statuses.length === 1) {
@@ -133,6 +136,9 @@ bookingsRouter.get("/", async (req, res) => {
     } else if (statuses.length > 1) {
       where.status = { in: statuses };
     }
+  }
+  if (typeof paymentStatus === "string" && paymentStatus) {
+    where.paymentStatus = paymentStatus;
   }
 
   const bookings = await prisma.booking.findMany({

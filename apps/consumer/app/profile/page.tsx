@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { CalendarCheck, Bell, CreditCard, SignOut, PencilSimple, Phone } from "@phosphor-icons/react";
+import { CalendarCheck, Bell, CreditCard, SignOut, PencilSimple, Phone, Receipt } from "@phosphor-icons/react";
 import { AppLayout } from "@/components/AppLayout";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
@@ -124,6 +124,18 @@ export default function ProfilePage() {
               <span className="font-medium text-sm">My Bookings</span>
             </div>
             <span className="text-slate-400 text-xs">View and manage</span>
+          </Link>
+          <Link
+            href="/profile/payment-history"
+            className="flex items-center justify-between p-3 active:bg-slate-50 transition-colors"
+          >
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 rounded-md bg-primary/10 flex items-center justify-center">
+                <Receipt size={18} weight="regular" className="text-primary" />
+              </div>
+              <span className="font-medium text-sm">Payment history</span>
+            </div>
+            <span className="text-slate-400 text-xs">What you paid for</span>
           </Link>
           <Link
             href="/notifications"

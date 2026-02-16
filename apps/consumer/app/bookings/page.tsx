@@ -234,12 +234,14 @@ export default function BookingsPage() {
                         src={booking.package.imageUrl}
                         alt=""
                         className="w-full h-full object-cover"
+                        loading="lazy"
                       />
                     ) : booking.vendor.logoUrl ? (
                       <img
                         src={booking.vendor.logoUrl}
                         alt=""
                         className="w-full h-full object-cover"
+                        loading="lazy"
                       />
                     ) : (
                       <ForkKnife size={20} weight="regular" className="text-slate-400" />
@@ -250,7 +252,7 @@ export default function BookingsPage() {
                       {booking.event.name} · {booking.vendor.businessName} · {booking.package.name}
                     </p>
                     <p className="text-slate-500 text-xs">
-                      {new Date(booking.event.date).toLocaleDateString()} · {Number(booking.totalAmount).toFixed(2)} BD
+                      {booking.bookingReference} · {new Date(booking.event.date).toLocaleDateString()} · {Number(booking.totalAmount).toFixed(2)} BD
                     </p>
                     <p className="text-slate-500 text-xs mt-0.5">
                       {getBookingStatusLine(booking.status, booking.paymentStatus)}
