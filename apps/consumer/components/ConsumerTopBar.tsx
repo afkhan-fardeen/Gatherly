@@ -58,7 +58,7 @@ export function ConsumerTopBar() {
 
   return (
     <div className="sticky top-0 z-50 bg-white/90 ios-blur border-b border-slate-100 rounded-b-lg shadow-sm shrink-0">
-      <div className="flex justify-between items-center px-6 py-2">
+      <div className="flex justify-between items-center px-6 py-4 min-h-[56px]">
         <Logo href="/dashboard" className="text-4xl md:text-5xl" />
         <div className="flex items-center gap-2">
           <Link
