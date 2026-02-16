@@ -2,21 +2,20 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { House, Calendar, CalendarCheck, SquaresFour, User } from "@phosphor-icons/react";
+import { House, Calendar, CalendarCheck, SquaresFour } from "@phosphor-icons/react";
 
 const navItems = [
   { href: "/dashboard", Icon: House, label: "Home" },
   { href: "/events", Icon: Calendar, label: "Events" },
   { href: "/bookings", Icon: CalendarCheck, label: "Bookings" },
   { href: "/services", Icon: SquaresFour, label: "Services" },
-  { href: "/profile", Icon: User, label: "Profile" },
 ];
 
 export function BottomNav() {
   const pathname = usePathname();
 
   return (
-    <nav className="fixed bottom-6 left-1/2 -translate-x-1/2 w-[calc(100%-2rem)] max-w-[400px] bg-white/95 ios-blur border border-slate-100 rounded-2xl shadow-lg px-6 py-3 flex justify-between items-center z-50 md:hidden">
+    <nav className="fixed bottom-0 left-0 right-0 bg-white/90 ios-blur border-t border-slate-100 rounded-t-lg shadow-sm px-6 py-3 flex justify-between items-center z-50 md:hidden">
       {navItems.map(({ href, Icon, label }) => {
         const isActive =
           pathname === href ||
@@ -33,7 +32,7 @@ export function BottomNav() {
             }`}
           >
             <Icon
-              size={22}
+              size={26}
               weight={isActive ? "bold" : "regular"}
               className={isActive ? "text-primary" : ""}
             />

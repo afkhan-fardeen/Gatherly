@@ -19,7 +19,7 @@ export function AppLayout({ children, showNav = true }: AppLayoutProps) {
           {children}
           {showNav && (
             <>
-              <div className="h-24 md:hidden shrink-0" aria-hidden />
+              <div className="h-20 md:hidden shrink-0" aria-hidden />
               <BottomNav />
             </>
           )}

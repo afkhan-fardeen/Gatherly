@@ -7,6 +7,63 @@ import { useRouter } from "next/navigation";
 import { Calendar, CalendarCheck, CalendarPlus, CaretRight } from "@phosphor-icons/react";
 import { AppLayout } from "@/components/AppLayout";
 
+const TYPING_DELAY = 180;
+const MESSAGE_TYPING_DELAY = 160;
+
+function TypingGreeting({ name }: { name: string }) {
+  const [phase, setPhase] = useState<"typing" | "name" | "typingMessage" | "done">("typing");
+  const [typed, setTyped] = useState("");
+  const [typedMessage, setTypedMessage] = useState("");
+  const prefix = "Hello, ";
+  const message = "Choose a service below to get started.";
+
+  useEffect(() => {
+    if (phase === "typing") {
+      if (typed.length < prefix.length) {
+        const t = setTimeout(() => setTyped(prefix.slice(0, typed.length + 1)), TYPING_DELAY);
+        return () => clearTimeout(t);
+      }
+      setPhase("name");
+    }
+  }, [phase, typed]);
+
+  useEffect(() => {
+    if (phase === "name") {
+      const t = setTimeout(() => setPhase("typingMessage"), 500);
+      return () => clearTimeout(t);
+    }
+  }, [phase]);
+
+  useEffect(() => {
+    if (phase === "typingMessage") {
+      if (typedMessage.length < message.length) {
+        const t = setTimeout(
+          () => setTypedMessage(message.slice(0, typedMessage.length + 1)),
+          MESSAGE_TYPING_DELAY
+        );
+        return () => clearTimeout(t);
+      }
+      setPhase("done");
+    }
+  }, [phase, typedMessage]);
+
+  return (
+    <div className="space-y-1">
+      <h1 className="text-xl font-bold tracking-tight min-h-[1.75rem]">
+        {typed}
+        {phase === "typing" && <span className="animate-pulse">|</span>}
+        {phase !== "typing" && name}
+      </h1>
+      {(phase === "typingMessage" || phase === "done") && (
+        <p className="text-slate-500 font-normal text-base min-h-[1.25rem]">
+          {typedMessage}
+          {phase === "typingMessage" && <span className="animate-pulse">|</span>}
+        </p>
+      )}
+    </div>
+  );
+}
+
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 
 const SERVICES = [
@@ -71,9 +128,7 @@ export default function DashboardPage() {
   return (
     <AppLayout>
       <header className="px-6 py-3 shrink-0">
-        <h1 className="text-xl font-bold tracking-tight">
-          Hello, {user?.name?.split(" ")[0] ?? "there"}
-        </h1>
+        <TypingGreeting name={user?.name?.split(" ")[0] ?? "there"} />
       </header>
 
       <main className="p-6 pb-32 space-y-8">
