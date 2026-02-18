@@ -4,76 +4,19 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { Calendar, CalendarCheck, CalendarPlus, CaretRight } from "@phosphor-icons/react";
+import { CalendarPlus, CaretRight } from "@phosphor-icons/react";
 import { AppLayout } from "@/components/AppLayout";
+import { API_URL } from "@/lib/api";
+import { CHERRY, MINTY_LIME_DARK, WARM_PEACH_DARK, TYPO } from "@/lib/events-ui";
 
-const TYPING_DELAY = 180;
-const MESSAGE_TYPING_DELAY = 160;
+const BODY_COLOR = "#4B5563";
 
-function TypingGreeting({ name }: { name: string }) {
-  const [phase, setPhase] = useState<"typing" | "name" | "typingMessage" | "done">("typing");
-  const [typed, setTyped] = useState("");
-  const [typedMessage, setTypedMessage] = useState("");
-  const prefix = "Hello, ";
-  const message = "Choose a service below to get started.";
-
-  useEffect(() => {
-    if (phase === "typing") {
-      if (typed.length < prefix.length) {
-        const t = setTimeout(() => setTyped(prefix.slice(0, typed.length + 1)), TYPING_DELAY);
-        return () => clearTimeout(t);
-      }
-      setPhase("name");
-    }
-  }, [phase, typed]);
-
-  useEffect(() => {
-    if (phase === "name") {
-      const t = setTimeout(() => setPhase("typingMessage"), 500);
-      return () => clearTimeout(t);
-    }
-  }, [phase]);
-
-  useEffect(() => {
-    if (phase === "typingMessage") {
-      if (typedMessage.length < message.length) {
-        const t = setTimeout(
-          () => setTypedMessage(message.slice(0, typedMessage.length + 1)),
-          MESSAGE_TYPING_DELAY
-        );
-        return () => clearTimeout(t);
-      }
-      setPhase("done");
-    }
-  }, [phase, typedMessage]);
-
-  return (
-    <div className="space-y-1">
-      <h1 className="text-xl font-bold tracking-tight min-h-[1.75rem]">
-        {typed}
-        {phase === "typing" && <span className="animate-pulse">|</span>}
-        {phase !== "typing" && name}
-      </h1>
-      {(phase === "typingMessage" || phase === "done") && (
-        <p className="text-slate-500 font-normal text-base min-h-[1.25rem]">
-          {typedMessage}
-          {phase === "typingMessage" && <span className="animate-pulse">|</span>}
-        </p>
-      )}
-    </div>
-  );
+function getGreeting(): string {
+  const h = new Date().getHours();
+  if (h >= 5 && h < 12) return "Good Morning";
+  if (h >= 12 && h < 17) return "Good Afternoon";
+  return "Good Evening";
 }
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
-
-const SERVICES = [
-  { slug: "catering", name: "Catering", image: "/images/services/catering.jpg", available: true },
-  { slug: "decor", name: "Decor", image: "/images/services/decor.jpg", available: false },
-  { slug: "rentals", name: "Rentals", image: "/images/services/rentals.jpg", available: false },
-  { slug: "entertainment", name: "Entertainment", image: "/images/services/entertainment.jpg", available: false },
-  { slug: "photography", name: "Photography", image: "/images/services/photography.jpg", available: false },
-  { slug: "misc", name: "Miscellaneous", image: "/images/services/pexels-gcman105-916416.jpg", available: false },
-];
 
 interface Event {
   id: string;
@@ -83,10 +26,23 @@ interface Event {
   guestCount: number;
 }
 
+interface Vendor {
+  id: string;
+  businessName: string;
+  description: string | null;
+  cuisineTypes: string[];
+  ratingAvg: number;
+  ratingCount: number;
+  logoUrl: string | null;
+  featuredImageUrl: string | null;
+  packages: { basePrice: number }[];
+}
+
 export default function DashboardPage() {
   const router = useRouter();
   const [user, setUser] = useState<{ name: string } | null>(null);
   const [events, setEvents] = useState<Event[]>([]);
+  const [vendors, setVendors] = useState<Vendor[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -96,15 +52,31 @@ export default function DashboardPage() {
       return;
     }
     const headers = { Authorization: `Bearer ${token}` };
+    const params = new URLSearchParams();
+    params.set("businessType", "catering");
+    params.set("limit", "6");
     Promise.all([
       fetch(`${API_URL}/api/auth/me`, { headers }).then((r) => (r.ok ? r.json() : null)),
       fetch(`${API_URL}/api/events`, { headers }).then((r) => (r.ok ? r.json() : [])),
+      fetch(`${API_URL}/api/vendors?${params}`).then((r) => (r.ok ? r.json() : [])),
     ])
-      .then(([u, evts]) => {
-        setUser(u);
+      .then(([u, evts, v]) => {
+        if (u) {
+          setUser(u);
+          const stored = localStorage.getItem("user");
+          const merged = stored ? { ...JSON.parse(stored), ...u } : u;
+          localStorage.setItem("user", JSON.stringify(merged));
+        } else {
+          const stored = localStorage.getItem("user");
+          if (stored) setUser(JSON.parse(stored));
+        }
         setEvents(evts || []);
+        setVendors(v || []);
       })
-      .catch(() => {})
+      .catch(() => {
+        const stored = localStorage.getItem("user");
+        if (stored) try { setUser(JSON.parse(stored)); } catch { /* ignore */ }
+      })
       .finally(() => setLoading(false));
   }, [router]);
 
@@ -113,178 +85,141 @@ export default function DashboardPage() {
   const upcomingEvents = events
     .filter((e) => new Date(e.date) >= today)
     .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
-    .slice(0, 3);
+    .slice(0, 5);
+
+  const firstName = user?.name?.trim()?.split(" ")[0] || "there";
 
   if (loading) {
     return (
       <AppLayout>
-        <main className="p-6 pb-32 flex items-center justify-center min-h-[50vh]">
-          <div className="animate-pulse text-slate-400">Loading...</div>
-        </main>
+        <div className="p-6 pb-32 flex items-center justify-center min-h-[50vh]">
+          <div className="animate-pulse" style={{ color: BODY_COLOR }}>
+            Loading...
+          </div>
+        </div>
       </AppLayout>
     );
   }
 
   return (
     <AppLayout>
-      <header className="px-6 py-3 shrink-0">
-        <TypingGreeting name={user?.name?.split(" ")[0] ?? "there"} />
-      </header>
+      <div className="px-6 pt-8 pb-32 space-y-8 bg-white">
+        {/* Greeting */}
+        <h1 className={TYPO.H1_LARGE} style={{ color: CHERRY }}>
+          {getGreeting()}, {firstName}
+        </h1>
 
-      <main className="p-6 pb-32 space-y-8">
-        {/* Services quick access */}
+        {/* Upcoming Events */}
         <section>
-          <h3 className="text-sm font-bold text-slate-500 uppercase tracking-wider mb-3">
-            Services
-          </h3>
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-            {SERVICES.map((s) =>
-              s.available ? (
-                <Link
-                  key={s.slug}
-                  href={`/services/${s.slug}`}
-                  className="group flex flex-col overflow-hidden border border-slate-100 rounded-md hover:border-slate-200 transition-colors min-w-0 p-0"
-                >
-                  <div className="relative aspect-[16/9] w-full overflow-hidden">
-                    <Image
-                      src={s.image}
-                      alt={s.name}
-                      fill
-                      className="object-cover group-hover:scale-105 transition-transform duration-300"
-                      sizes="(max-width: 640px) 50vw, 33vw"
-                      loading="lazy"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-                    <span className="absolute bottom-2 left-2 right-2 text-sm font-semibold text-white drop-shadow-sm">
-                      {s.name}
-                    </span>
-                    <span className="absolute top-2 right-2 px-2 py-0.5 rounded-md text-[10px] font-bold uppercase bg-confirmed/90 text-white">
-                      Available
-                    </span>
-                  </div>
-                </Link>
-              ) : (
-                <Link
-                  key={s.slug}
-                  href={`/services/coming-soon/${s.slug}`}
-                  className="group flex flex-col overflow-hidden border border-slate-100 rounded-md opacity-90 hover:opacity-100 transition-opacity min-w-0 p-0"
-                >
-                  <div className="relative aspect-[16/9] w-full overflow-hidden">
-                    <Image
-                      src={s.image}
-                      alt={s.name}
-                      fill
-                      className="object-cover opacity-70 group-hover:scale-105 transition-transform duration-300"
-                      sizes="(max-width: 640px) 50vw, 33vw"
-                      loading="lazy"
-                    />
-                    <div className="absolute inset-0 bg-slate-900/40" />
-                    <span className="absolute bottom-2 left-2 right-2 text-sm font-semibold text-white drop-shadow-sm">
-                      {s.name}
-                    </span>
-                    <span className="absolute top-2 right-2 px-2 py-0.5 rounded-md text-[10px] font-bold uppercase bg-slate-700/90 text-white">
-                      Soon
-                    </span>
-                  </div>
-                </Link>
-              )
-            )}
-          </div>
-        </section>
-
-        {/* Quick actions */}
-        <section>
-          <h3 className="text-sm font-bold text-slate-500 uppercase tracking-wider mb-3">
-            Quick links
-          </h3>
-          <div className="space-y-2">
-            <Link
-              href="/events/create"
-              className="flex items-center justify-between gap-4 p-4 border border-slate-100 rounded-md hover:bg-slate-50 transition-colors"
-            >
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-md bg-primary/10 flex items-center justify-center">
-                  <CalendarPlus size={20} className="text-primary" />
-                </div>
-                <div>
-                  <span className="font-semibold">Create Event</span>
-                  <p className="text-sm text-slate-500">Plan a new event</p>
-                </div>
-              </div>
-              <CaretRight size={18} className="text-slate-300" />
-            </Link>
-            <Link
-              href="/bookings"
-              className="flex items-center justify-between gap-4 p-4 border border-slate-100 rounded-md hover:bg-slate-50 transition-colors"
-            >
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-md bg-primary/10 flex items-center justify-center">
-                  <CalendarCheck size={20} className="text-primary" />
-                </div>
-                <div>
-                  <span className="font-semibold">My Bookings</span>
-                  <p className="text-sm text-slate-500">View and manage</p>
-                </div>
-              </div>
-              <CaretRight size={18} className="text-slate-300" />
-            </Link>
+          <div className="flex justify-between items-center mb-3">
+            <h2 className={TYPO.H3} style={{ color: MINTY_LIME_DARK }}>
+              Upcoming Events
+            </h2>
             <Link
               href="/events"
-              className="flex items-center justify-between gap-4 p-4 border border-slate-100 rounded-md hover:bg-slate-50 transition-colors"
+              className={`${TYPO.LINK} hover:underline`}
+              style={{ color: CHERRY }}
             >
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-md bg-primary/10 flex items-center justify-center">
-                  <Calendar size={20} className="text-primary" />
-                </div>
-                <div>
-                  <span className="font-semibold">My Events</span>
-                  <p className="text-sm text-slate-500">All your events</p>
-                </div>
-              </div>
-              <CaretRight size={18} className="text-slate-300" />
+              View all
             </Link>
           </div>
-        </section>
-
-        {/* Upcoming events */}
-        {upcomingEvents.length > 0 && (
-          <section>
-            <div className="flex justify-between items-center mb-3">
-              <h3 className="text-sm font-bold text-slate-500 uppercase tracking-wider">
-                Upcoming events
-              </h3>
-              <Link
-                href="/events"
-                className="text-sm font-medium text-primary hover:underline"
-              >
-                View all
-              </Link>
-            </div>
+          {upcomingEvents.length > 0 ? (
             <div className="space-y-2">
               {upcomingEvents.map((e) => (
                 <Link
                   key={e.id}
                   href={`/events/${e.id}`}
-                  className="flex items-center justify-between p-4 border border-slate-100 rounded-md hover:bg-slate-50 transition-colors"
+                  className="flex items-center justify-between p-4 rounded-xl border transition-colors hover:bg-slate-50"
+                  style={{ borderColor: "rgba(0,0,0,0.06)" }}
                 >
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-md bg-primary/10 flex items-center justify-center">
-                      <CalendarPlus size={20} className="text-primary" />
+                    <div
+                      className="w-10 h-10 rounded-full flex items-center justify-center shrink-0"
+                      style={{ backgroundColor: `${CHERRY}15` }}
+                    >
+                      <CalendarPlus size={20} style={{ color: CHERRY }} />
                     </div>
                     <div>
-                      <span className="font-semibold">{e.name}</span>
-                      <p className="text-sm text-slate-500">
+                      <span className={TYPO.CARD_TITLE} style={{ color: "#171717" }}>
+                        {e.name}
+                      </span>
+                      <p className={TYPO.SUBTEXT} style={{ color: BODY_COLOR }}>
                         {new Date(e.date).toLocaleDateString()} · {e.guestCount} guests
                       </p>
                     </div>
                   </div>
-                  <CaretRight size={18} className="text-slate-300" />
+                  <CaretRight size={18} style={{ color: BODY_COLOR }} />
                 </Link>
               ))}
             </div>
-          </section>
-        )}
-      </main>
+          ) : (
+            <Link
+              href="/events/create"
+              className="flex items-center justify-center gap-2 p-6 rounded-xl border border-dashed transition-colors hover:bg-slate-50"
+              style={{ borderColor: "rgba(0,0,0,0.12)", color: BODY_COLOR }}
+            >
+              <CalendarPlus size={24} />
+              <span className={TYPO.LINK}>Create your first event</span>
+            </Link>
+          )}
+        </section>
+
+        {/* Featured Partners */}
+        <section>
+          <div className="flex justify-between items-center mb-3">
+            <h2 className={TYPO.H3} style={{ color: WARM_PEACH_DARK }}>
+              Featured Partners
+            </h2>
+            <Link
+              href="/services/catering"
+              className={`${TYPO.LINK} hover:underline`}
+              style={{ color: CHERRY }}
+            >
+              Discover all
+            </Link>
+          </div>
+          {vendors.length > 0 ? (
+            <div className="flex gap-3 overflow-x-auto pb-2 -mx-6 px-6 scrollbar-hide">
+              {vendors.slice(0, 6).map((vendor) => (
+                <Link
+                  key={vendor.id}
+                  href={`/vendor/${vendor.id}`}
+                  className="shrink-0 w-24 h-24 rounded-[10px] overflow-hidden border transition-colors hover:border-slate-200"
+                  style={{ borderColor: "rgba(0,0,0,0.06)" }}
+                >
+                  <div className="relative w-full h-full bg-slate-100">
+                    {(vendor.featuredImageUrl || vendor.logoUrl) ? (
+                      <Image
+                        src={vendor.featuredImageUrl || vendor.logoUrl || ""}
+                        alt={vendor.businessName}
+                        fill
+                        className="object-cover"
+                        sizes="96px"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center" style={{ backgroundColor: "#F9F2E7" }}>
+                        <span className="text-xl font-normal" style={{ color: CHERRY }}>
+                          {vendor.businessName.charAt(0)}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                </Link>
+              ))}
+            </div>
+          ) : (
+            <div
+              className="p-8 rounded-xl border text-center"
+              style={{ borderColor: "rgba(0,0,0,0.06)", color: BODY_COLOR }}
+            >
+              <p className={TYPO.SUBTEXT}>No partners yet</p>
+              <Link href="/services/catering" className={`${TYPO.LINK} mt-2 inline-block`} style={{ color: CHERRY }}>
+                Browse services
+              </Link>
+            </div>
+          )}
+        </section>
+      </div>
     </AppLayout>
   );
 }

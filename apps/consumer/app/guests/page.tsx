@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Users, CaretRight } from "@phosphor-icons/react";
 import { AppLayout } from "@/components/AppLayout";
+import { TYPO } from "@/lib/events-ui";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 
@@ -36,8 +37,8 @@ export default function GuestsPage() {
   return (
     <AppLayout>
       <header className="sticky top-0 z-40 bg-white/80 ios-blur px-6 py-3 border-b border-slate-100 shrink-0">
-        <h1 className="text-xl font-bold tracking-tight">Guests</h1>
-        <p className="text-slate-500 text-xs font-medium mt-0.5">
+        <h1 className={TYPO.H1}>Guests</h1>
+        <p className={`${TYPO.CAPTION} font-medium mt-0.5`}>
           Select an event to manage guests
         </p>
       </header>
@@ -55,10 +56,10 @@ export default function GuestsPage() {
         ) : events.length === 0 ? (
           <div className="text-center py-16">
             <Users size={64} weight="regular" className="text-slate-300 mx-auto" />
-            <p className="text-slate-500 mt-4 font-medium">No events yet</p>
+            <p className={`${TYPO.SUBTEXT} mt-4 font-medium`}>No events yet</p>
             <Link
               href="/events/create"
-              className="inline-block mt-4 text-primary font-semibold"
+              className={`inline-block mt-4 text-primary ${TYPO.LINK}`}
             >
               Create an event first
             </Link>
@@ -73,8 +74,8 @@ export default function GuestsPage() {
               >
                 <div className="flex justify-between items-center">
                   <div>
-                    <h3 className="font-bold text-[15px]">{event.name}</h3>
-                    <p className="text-slate-500 text-sm mt-0.5">
+                    <h3 className={TYPO.CARD_TITLE}>{event.name}</h3>
+                    <p className={`${TYPO.SUBTEXT} mt-0.5`}>
                       {new Date(event.date).toLocaleDateString()} ·{" "}
                       {event._count?.guests ?? 0} guests
                     </p>

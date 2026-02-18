@@ -1,3 +1,11 @@
+"use client";
+
+import { useState } from "react";
+import { Eye, EyeSlash } from "@phosphor-icons/react";
+
+const SOFT_LILAC = "#CFD7F2";
+const CHERRY = "#6D0D35";
+
 interface AuthInputProps {
   label: string;
   type?: string;
@@ -8,6 +16,7 @@ interface AuthInputProps {
   required?: boolean;
   minLength?: number;
   icon?: React.ReactNode;
+  forgotPasswordHref?: string;
 }
 
 export function AuthInput({
@@ -20,34 +29,76 @@ export function AuthInput({
   required,
   minLength,
   icon,
+  forgotPasswordHref,
 }: AuthInputProps) {
+  const [showPassword, setShowPassword] = useState(false);
+  const isPassword = type === "password";
+  const inputType = isPassword && showPassword ? "text" : type;
   const inputId = `auth-${label.replace(/\s/g, "-").toLowerCase()}`;
+
   return (
-    <div>
-      <label
-        className="block text-sm font-medium text-slate-600 mb-2 ml-1"
-        htmlFor={inputId}
-      >
-        {label}
-      </label>
-      <div className="flex items-center h-12 bg-slate-50 rounded-md focus-within:ring-2 focus-within:ring-primary/20 focus-within:bg-white transition-all">
+    <div className="space-y-1.5">
+      <div className="flex justify-between items-center ml-1">
+        <label
+          className="text-[12px] font-semibold uppercase tracking-wider"
+          htmlFor={inputId}
+          style={{ color: "#4B5563" }}
+        >
+          {label}
+        </label>
+        {isPassword && forgotPasswordHref && (
+          <a
+            href={forgotPasswordHref}
+            className="text-[11px] font-semibold hover:opacity-80 transition-opacity"
+            style={{ color: CHERRY }}
+          >
+            Forgot Password?
+          </a>
+        )}
+      </div>
+      <div className="relative group">
         {icon && (
-          <div className="pl-4 shrink-0 text-slate-400 [&>svg]:w-[18px] [&>svg]:h-[18px]">
-            {icon}
+          <div
+            className="absolute left-4 top-1/2 -translate-y-1/2 transition-colors group-focus-within:[&>svg]:opacity-100"
+            style={{ color: CHERRY }}
+          >
+            <div className="[&>svg]:opacity-60 group-focus-within:[&>svg]:opacity-100 [&>svg]:w-5 [&>svg]:h-5">
+              {icon}
+            </div>
           </div>
         )}
         <input
           id={inputId}
-          type={type}
+          type={inputType}
           value={value}
           onChange={(e) => onChange(e.target.value)}
           placeholder={placeholder}
           required={required}
           minLength={minLength}
-          className={`flex-1 min-w-0 h-full bg-transparent text-slate-900 placeholder:text-slate-400 outline-none ${
-            icon ? "pl-3 pr-5" : "px-5"
-          }`}
+          className={`w-full rounded-full py-4 text-base font-medium outline-none focus:ring-2 focus:ring-[#3F081026] focus:border-[#3F0810] transition-all placeholder:text-gray-500 ${
+            icon ? "pl-12" : "pl-4"
+          } ${isPassword ? "pr-12" : "pr-4"}`}
+          style={{
+            backgroundColor: "rgba(255, 255, 255, 0.6)",
+            border: `1px solid ${SOFT_LILAC}`,
+            color: "#4B5563",
+          }}
         />
+        {isPassword && (
+          <button
+            type="button"
+            className="absolute right-4 top-1/2 -translate-y-1/2 transition-colors hover:opacity-100"
+            style={{ color: CHERRY }}
+            onClick={() => setShowPassword(!showPassword)}
+            tabIndex={-1}
+          >
+            {showPassword ? (
+              <EyeSlash size={20} weight="regular" />
+            ) : (
+              <Eye size={20} weight="regular" />
+            )}
+          </button>
+        )}
       </div>
       {error && <p className="mt-1 text-sm text-red-600 ml-1">{error}</p>}
     </div>

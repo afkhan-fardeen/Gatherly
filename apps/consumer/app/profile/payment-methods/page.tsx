@@ -5,6 +5,7 @@ import Link from "next/link";
 import toast from "react-hot-toast";
 import { CreditCard, Plus, Trash } from "@phosphor-icons/react";
 import { AppLayout } from "@/components/AppLayout";
+import { TYPO } from "@/lib/events-ui";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 
@@ -101,12 +102,12 @@ export default function PaymentMethodsPage() {
           >
             ←
           </Link>
-          <h1 className="text-xl font-bold tracking-tight">Payment methods</h1>
+          <h1 className={TYPO.H1}>Payment methods</h1>
         </div>
       </header>
 
       <main className="p-6 pb-32 space-y-6">
-        <p className="text-slate-500 text-sm">
+        <p className={TYPO.SUBTEXT}>
           Add cards for quick checkout. Use dummy numbers like 4242424242424242.
         </p>
 
@@ -138,8 +139,8 @@ export default function PaymentMethodsPage() {
         ) : methods.length === 0 ? (
           <div className="text-center py-12 rounded-md border border-slate-200 bg-white">
             <CreditCard size={48} weight="regular" className="text-slate-300 mx-auto" />
-            <p className="text-slate-500 mt-4 font-medium">No saved cards</p>
-            <p className="text-slate-400 text-sm mt-1">Add a card above</p>
+            <p className={`${TYPO.SUBTEXT} mt-4 font-medium`}>No saved cards</p>
+            <p className={`${TYPO.SUBTEXT} mt-1`}>Add a card above</p>
           </div>
         ) : (
           <div className="space-y-2">
@@ -153,8 +154,8 @@ export default function PaymentMethodsPage() {
                     <CreditCard size={20} weight="regular" className="text-slate-500" />
                   </div>
                   <div>
-                    <p className="font-semibold text-slate-900 capitalize">{m.brand}</p>
-                    <p className="text-slate-500 text-sm">•••• {m.last4}</p>
+                    <p className={`${TYPO.CARD_TITLE} capitalize`}>{m.brand}</p>
+                    <p className={TYPO.SUBTEXT}>•••• {m.last4}</p>
                   </div>
                 </div>
                 <button

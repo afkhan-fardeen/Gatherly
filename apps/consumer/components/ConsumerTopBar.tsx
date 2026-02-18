@@ -1,28 +1,14 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Bell, User, SignOut } from "@phosphor-icons/react";
+import { Bell } from "@phosphor-icons/react";
 import { Logo } from "./Logo";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 
 export function ConsumerTopBar() {
-  const [user, setUser] = useState<{ name: string; profilePictureUrl?: string | null } | null>(null);
   const [unreadCount, setUnreadCount] = useState(0);
-  const [profileOpen, setProfileOpen] = useState(false);
-  const profileRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (!token) return;
-    fetch(`${API_URL}/api/auth/me`, { headers: { Authorization: `Bearer ${token}` } })
-      .then((r) => (r.ok ? r.json() : null))
-      .then((data) => {
-        if (data) setUser(data);
-      })
-      .catch(() => {});
-  }, []);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -40,83 +26,22 @@ export function ConsumerTopBar() {
     return () => clearInterval(interval);
   }, []);
 
-  useEffect(() => {
-    function handleClickOutside(e: MouseEvent) {
-      if (profileRef.current && !profileRef.current.contains(e.target as Node)) {
-        setProfileOpen(false);
-      }
-    }
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
-
-  function handleLogout() {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    window.location.href = "/login";
-  }
-
   return (
-    <div className="sticky top-0 z-50 bg-white/90 ios-blur border-b border-slate-100 rounded-b-lg shadow-sm shrink-0">
-      <div className="flex justify-between items-center px-6 py-4 min-h-[56px]">
-        <Logo href="/dashboard" className="text-4xl md:text-5xl" />
-        <div className="flex items-center gap-2">
-          <Link
-            href="/notifications"
-            className="relative p-2 rounded-md hover:bg-slate-100 transition-colors"
-          >
-            <Bell size={22} weight="regular" className="text-slate-600" />
-            {unreadCount > 0 && (
-              <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] rounded-full bg-rose-500 text-white text-[10px] font-bold flex items-center justify-center px-1">
-                {unreadCount > 99 ? "99+" : unreadCount}
-              </span>
-            )}
-          </Link>
-          <div className="relative" ref={profileRef}>
-          <button
-            type="button"
-            onClick={() => setProfileOpen(!profileOpen)}
-            className="w-9 h-9 rounded-full overflow-hidden bg-primary/10 flex items-center justify-center shrink-0 border-2 border-transparent hover:border-primary/30 transition-colors"
-          >
-            {user?.profilePictureUrl ? (
-              <img
-                src={user.profilePictureUrl}
-                alt=""
-                className="w-full h-full object-cover"
-              />
-            ) : (
-              <span className="font-semibold text-primary text-sm">
-                {user?.name
-                  ?.split(" ")
-                  .map((n) => n[0])
-                  .join("")
-                  .toUpperCase()
-                  .slice(0, 2) ?? "?"}
-              </span>
-            )}
-          </button>
-          {profileOpen && (
-            <div className="absolute right-0 top-full mt-2 w-48 py-1 bg-white rounded-md shadow-lg border border-slate-100 z-[9999]">
-              <Link
-                href="/profile"
-                onClick={() => setProfileOpen(false)}
-                className="flex items-center gap-3 px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50"
-              >
-                <User size={18} weight="regular" />
-                Profile
-              </Link>
-              <button
-                type="button"
-                onClick={handleLogout}
-                className="flex items-center gap-3 w-full px-4 py-2.5 text-sm font-medium text-red-500 hover:bg-red-50"
-              >
-                <SignOut size={18} weight="regular" />
-                Log out
-              </button>
-            </div>
-          )}
-          </div>
-        </div>
+    <div className="fixed top-0 left-0 right-0 z-50 flex justify-center">
+      <div className="w-full max-w-[430px] flex justify-between items-center px-6 py-4 min-h-[56px] bg-white/90 backdrop-blur-md rounded-b-2xl shadow-sm">
+        <Logo href="/dashboard" className="text-4xl md:text-5xl text-[#6D0D35]" />
+      <Link
+        href="/notifications"
+        className="relative p-2 -m-2 transition-colors hover:opacity-80"
+        aria-label="Notifications"
+      >
+        <Bell size={24} weight="regular" className="text-slate-600" />
+        {unreadCount > 0 && (
+          <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] rounded-full bg-rose-500 text-white text-[10px] font-bold flex items-center justify-center px-1">
+            {unreadCount > 99 ? "99+" : unreadCount}
+          </span>
+        )}
+      </Link>
       </div>
     </div>
   );

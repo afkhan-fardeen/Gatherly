@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Plus, Calendar, CaretRight, ForkKnife } from "@phosphor-icons/react";
 import { AppLayout } from "@/components/AppLayout";
-import { Tag } from "@/components/ui/Tag";
+import { CHERRY, ROUND, MINTY_LIME, MINTY_LIME_DARK, TYPO } from "@/lib/events-ui";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 
@@ -49,136 +49,153 @@ export default function EventsPage() {
 
   return (
     <AppLayout>
-      <header className="sticky top-0 z-40 bg-white/80 ios-blur px-6 py-3 border-b border-slate-100 shrink-0">
-        <div className="flex justify-between items-start">
-          <div>
-            <h1 className="text-xl font-bold tracking-tight">Events</h1>
-            <p className="text-slate-500 text-xs font-medium mt-0.5">
-              {tab === "upcoming" ? "Upcoming" : "Past"} events
-            </p>
-          </div>
-          <Link
-            href="/events/create"
-            className="w-10 h-10 rounded-md bg-primary text-white flex items-center justify-center shadow-lg shadow-primary/20"
-          >
-            <Plus size={20} weight="regular" />
-          </Link>
-        </div>
-        <div className="flex gap-2 mt-4">
-          <button
-            type="button"
-            onClick={() => setTab("upcoming")}
-            className={`flex-1 py-2 rounded-md text-sm font-semibold ${
-              tab === "upcoming" ? "bg-primary/10 text-primary" : "bg-slate-100 text-slate-500"
-            }`}
-          >
-            Upcoming
-          </button>
-          <button
-            type="button"
-            onClick={() => setTab("past")}
-            className={`flex-1 py-2 rounded-md text-sm font-semibold ${
-              tab === "past" ? "bg-primary/10 text-primary" : "bg-slate-100 text-slate-500"
-            }`}
-          >
-            Past
-          </button>
-        </div>
-      </header>
-
-      <main className="p-6 pb-32">
-        {loading ? (
-          <div className="space-y-4">
-            {[1, 2, 3].map((i) => (
-              <div
-                key={i}
-                className="h-24 bg-slate-100 rounded-md animate-pulse"
-              />
-            ))}
-          </div>
-        ) : events.length === 0 ? (
-          <div className="text-center py-16">
-            <Calendar size={64} weight="regular" className="text-slate-300 mx-auto" />
-            <p className="text-slate-500 mt-4 font-medium">No events yet</p>
-            <p className="text-slate-400 text-sm mt-1">
-              Create your first event to get started
-            </p>
+      <div className="bg-[#FAFAFA] min-h-full">
+        <header className="px-6 pt-8 pb-4 shrink-0">
+          <div className="flex justify-between items-start">
+            <div>
+              <h1 className={TYPO.H1_LARGE} style={{ color: CHERRY }}>
+                Events
+              </h1>
+              <p className={`${TYPO.SUBTEXT} mt-0.5`}>
+                {tab === "upcoming" ? "Upcoming" : "Past"} events
+              </p>
+            </div>
             <Link
               href="/events/create"
-              className="inline-block mt-6 px-6 py-3 bg-primary text-white font-semibold rounded-md"
+              className="w-8 h-8 flex items-center justify-center text-white rounded-full shrink-0"
+              style={{ backgroundColor: CHERRY }}
             >
-              Create Event
+              <Plus size={16} weight="bold" />
             </Link>
           </div>
-        ) : filtered.length === 0 ? (
-          <div className="text-center py-16">
-            <Calendar size={64} weight="regular" className="text-slate-300 mx-auto" />
-            <p className="text-slate-500 mt-4 font-medium">No {tab} events</p>
-            <p className="text-slate-400 text-sm mt-1">
-              {tab === "upcoming"
-                ? "Create an event to get started"
-                : "Past events will appear here"}
-            </p>
-            {tab === "upcoming" && (
+          <div className="flex gap-2 mt-4">
+            <button
+              type="button"
+              onClick={() => setTab("upcoming")}
+              className={`flex-1 py-2.5 text-sm font-semibold rounded-full transition-colors ${
+                tab === "upcoming"
+                  ? "text-white"
+                  : "bg-white border border-slate-200 text-slate-500"
+              }`}
+              style={tab === "upcoming" ? { backgroundColor: CHERRY } : undefined}
+            >
+              Upcoming
+            </button>
+            <button
+              type="button"
+              onClick={() => setTab("past")}
+              className={`flex-1 py-2.5 text-sm font-semibold rounded-full transition-colors ${
+                tab === "past"
+                  ? "text-white"
+                  : "bg-white border border-slate-200 text-slate-500"
+              }`}
+              style={tab === "past" ? { backgroundColor: CHERRY } : undefined}
+            >
+              Past
+            </button>
+          </div>
+        </header>
+
+        <main className="p-6 pb-32">
+          {loading ? (
+            <div className="space-y-3">
+              {[1, 2, 3].map((i) => (
+                <div
+                  key={i}
+                  className={`h-24 bg-slate-200/60 ${ROUND} animate-pulse`}
+                />
+              ))}
+            </div>
+          ) : events.length === 0 ? (
+            <Link
+              href="/events/create"
+              className="flex items-center justify-center gap-2 p-6 rounded-xl border border-dashed transition-colors hover:bg-slate-50"
+              style={{ borderColor: "rgba(0,0,0,0.12)", color: "#4B5563" }}
+            >
+              <Calendar size={24} />
+              <span className={TYPO.LINK}>Create your first event</span>
+            </Link>
+          ) : filtered.length === 0 ? (
+            tab === "upcoming" ? (
               <Link
                 href="/events/create"
-                className="inline-block mt-4 text-primary font-semibold"
+                className="flex items-center justify-center gap-2 p-6 rounded-xl border border-dashed transition-colors hover:bg-slate-50"
+                style={{ borderColor: "rgba(0,0,0,0.12)", color: "#4B5563" }}
               >
-                Create Event
+                <Calendar size={24} />
+                <span className={TYPO.LINK}>Create your first event</span>
               </Link>
-            )}
-          </div>
-        ) : (
-          <div className="space-y-4">
-            {filtered.map((event) => {
-              const isPast = new Date(event.date) < today;
-              return (
-                <div
-                  key={event.id}
-                  className="border border-slate-100 rounded-md overflow-hidden"
-                >
-                  <Link
-                    href={`/events/${event.id}`}
-                    className="block p-4 hover:bg-slate-50 transition-colors"
+            ) : (
+              <div className="text-center py-16">
+                <Calendar size={64} weight="regular" className="text-slate-300 mx-auto" />
+                <p className={`${TYPO.BODY} mt-4 font-medium`}>No past events</p>
+                <p className={`${TYPO.SUBTEXT} mt-1`}>Past events will appear here</p>
+              </div>
+            )
+          ) : (
+            <div className="space-y-3">
+              {filtered.map((event) => {
+                const isPast = new Date(event.date) < today;
+                return (
+                  <div
+                    key={event.id}
+                    className={`${ROUND} overflow-hidden border border-slate-200 bg-white`}
                   >
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <h3 className="font-bold text-[15px]">{event.name}</h3>
-                        <p className="text-slate-500 text-sm mt-0.5">
-                          {new Date(event.date).toLocaleDateString("en-US", {
-                            weekday: "short",
-                            month: "short",
-                            day: "numeric",
-                            year: "numeric",
-                          })}
-                        </p>
-                        <div className="flex items-center gap-2 mt-1 flex-wrap">
-                          <span className="text-slate-400 text-xs">
-                            {event._count?.guests ?? 0} guests
-                          </span>
-                          <Tag value={event.eventType} variant="eventType" className="rounded-md">
-                            {event.eventType.replace(/_/g, " ")}
-                          </Tag>
-                        </div>
-                      </div>
-                      <CaretRight size={20} weight="regular" className="text-slate-400 shrink-0" />
-                    </div>
-                  </Link>
-                  {!isPast && (
                     <Link
-                      href={`/services/catering?eventId=${event.id}`}
-                      className="flex items-center justify-center gap-2 py-3 border-t border-slate-100 bg-primary/5 hover:bg-primary/10 text-primary font-semibold text-sm transition-colors"
+                      href={`/events/${event.id}`}
+                      className="block p-4 hover:bg-slate-50/50 transition-colors"
                     >
-                      <ForkKnife size={18} weight="regular" />
-                      Book catering
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <h3 className={TYPO.CARD_TITLE}>
+                            {event.name}
+                          </h3>
+                          <p className={`${TYPO.SUBTEXT} mt-0.5`}>
+                            {new Date(event.date).toLocaleDateString("en-US", {
+                              weekday: "short",
+                              month: "short",
+                              day: "numeric",
+                              year: "numeric",
+                            })}
+                          </p>
+                          <div className="flex items-center gap-2 mt-1.5 flex-wrap">
+                            <span className={TYPO.CAPTION}>
+                              {event._count?.guests ?? 0} guests
+                            </span>
+                            <span
+                              className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 ${ROUND}`}
+                              style={{
+                                backgroundColor: MINTY_LIME,
+                                color: MINTY_LIME_DARK,
+                              }}
+                            >
+                              {event.eventType.replace(/_/g, " ")}
+                            </span>
+                          </div>
+                        </div>
+                        <CaretRight size={20} weight="regular" className="text-slate-400 shrink-0" />
+                      </div>
                     </Link>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-        )}
-      </main>
+                    {!isPast && (
+                      <Link
+                        href={`/services/catering?eventId=${event.id}`}
+                        className={`flex items-center justify-center gap-2 py-3 border-t border-slate-100 ${TYPO.LINK} transition-colors`}
+                        style={{
+                          color: CHERRY,
+                          backgroundColor: `${CHERRY}08`,
+                        }}
+                      >
+                        <ForkKnife size={18} weight="regular" />
+                        Book catering
+                      </Link>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </main>
+      </div>
     </AppLayout>
   );
 }

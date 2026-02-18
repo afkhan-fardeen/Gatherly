@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { ArrowLeft, MagnifyingGlass, ForkKnife, CaretRight } from "@phosphor-icons/react";
 import { AppLayout } from "@/components/AppLayout";
+import { TYPO } from "@/lib/events-ui";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 
@@ -40,17 +41,17 @@ export function CateringContent() {
 
   return (
     <AppLayout>
-      <header className="sticky top-0 z-40 bg-white/80 ios-blur px-6 py-3 border-b border-slate-100 shrink-0">
+      <header className="shrink-0 px-6 py-4">
         <div className="flex items-center gap-4 mb-4">
           <Link
             href="/services"
-            className="w-10 h-10 rounded-md bg-slate-100 flex items-center justify-center"
+            className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center"
           >
             <ArrowLeft size={20} weight="regular" className="text-slate-600" />
           </Link>
           <div>
-            <h1 className="text-xl font-bold tracking-tight">Catering</h1>
-            <p className="text-slate-500 text-xs">Find the best caterers</p>
+            <h1 className={TYPO.H1}>Catering</h1>
+            <p className={TYPO.CAPTION}>Find the best caterers</p>
           </div>
         </div>
         <div className="relative">
@@ -78,8 +79,8 @@ export function CateringContent() {
         ) : vendors.length === 0 ? (
           <div className="text-center py-16">
             <ForkKnife size={64} weight="regular" className="text-slate-300 mx-auto" />
-            <p className="text-slate-500 mt-4 font-medium">No vendors found</p>
-            <p className="text-slate-400 text-sm mt-1">
+            <p className={`${TYPO.SUBTEXT} mt-4 font-medium`}>No vendors found</p>
+            <p className={`${TYPO.SUBTEXT} mt-1`}>
               Try a different search term
             </p>
           </div>
@@ -103,10 +104,10 @@ export function CateringContent() {
                   )}
                 </div>
                 <div className="flex-1 min-w-0 overflow-hidden">
-                  <h3 className="font-semibold text-sm truncate">
+                  <h3 className={`${TYPO.CARD_TITLE} text-sm truncate`}>
                     {vendor.businessName}
                   </h3>
-                  <p className="text-slate-500 text-xs truncate">
+                  <p className={`${TYPO.CAPTION} truncate`}>
                     {vendor.cuisineTypes.join(", ")}
                   </p>
                   <div className="flex items-center gap-2 mt-1 flex-wrap">

@@ -15,6 +15,7 @@ import {
 } from "@phosphor-icons/react";
 import { AppLayout } from "@/components/AppLayout";
 import { OrderProgress } from "@/components/OrderProgress";
+import { TYPO } from "@/lib/events-ui";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 
@@ -241,10 +242,10 @@ export default function BookingDetailPage() {
             <ArrowLeft size={18} weight="regular" className="text-slate-600" />
           </Link>
           <div className="flex-1 min-w-0">
-            <h1 className="text-base font-bold tracking-tight truncate">
+            <h1 className={`${TYPO.H1_SM} truncate`}>
               {booking.bookingReference}
             </h1>
-            <p className="text-slate-500 text-xs truncate">
+            <p className={`${TYPO.CAPTION} truncate`}>
               {booking.vendor.businessName} · {booking.package.name}
             </p>
           </div>
@@ -278,37 +279,37 @@ export default function BookingDetailPage() {
             )}
           </div>
           <div>
-            <h2 className="font-bold text-slate-900">{booking.vendor.businessName}</h2>
-            <p className="text-slate-600 text-sm">{booking.package.name}</p>
+            <h2 className={TYPO.CARD_TITLE}>{booking.vendor.businessName}</h2>
+            <p className={TYPO.BODY}>{booking.package.name}</p>
           </div>
         </div>
 
         {/* Event */}
         <div className="space-y-3">
-          <h3 className="text-sm font-bold text-slate-500 uppercase tracking-wider">
+          <h3 className={`${TYPO.H3} text-slate-500`}>
             Event details
           </h3>
           <div className="space-y-2">
             <div className="flex items-start gap-3">
               <Calendar size={18} weight="regular" className="text-slate-400 shrink-0 mt-0.5" />
               <div>
-                <p className="font-medium text-slate-900">{booking.event.name}</p>
-                <p className="text-slate-600 text-sm">{dateStr}</p>
+                <p className={TYPO.CARD_TITLE}>{booking.event.name}</p>
+                <p className={TYPO.BODY}>{dateStr}</p>
                 {timeStr && (
-                  <p className="text-slate-600 text-sm">{timeStr}</p>
+                  <p className={TYPO.BODY}>{timeStr}</p>
                 )}
               </div>
             </div>
             <div className="flex items-start gap-3">
               <MapPin size={18} weight="regular" className="text-slate-400 shrink-0 mt-0.5" />
               <div>
-                <p className="text-slate-600 text-sm">{booking.event.location}</p>
+                <p className={TYPO.BODY}>{booking.event.location}</p>
                 {booking.event.venueName && (
-                  <p className="text-slate-500 text-sm">{booking.event.venueName}</p>
+                  <p className={TYPO.SUBTEXT}>{booking.event.venueName}</p>
                 )}
               </div>
             </div>
-            <p className="text-slate-600 text-sm">
+            <p className={TYPO.BODY}>
               {booking.guestCount} guests
             </p>
           </div>
@@ -317,7 +318,7 @@ export default function BookingDetailPage() {
         {/* Package items */}
         {booking.package.packageItems?.length > 0 && (
           <div className="space-y-3">
-            <h3 className="text-sm font-bold text-slate-500 uppercase tracking-wider">
+            <h3 className={`${TYPO.H3} text-slate-500`}>
               Menu
             </h3>
             <ul className="space-y-2">
@@ -328,9 +329,9 @@ export default function BookingDetailPage() {
                 >
                   <Package size={18} weight="regular" className="text-slate-400 shrink-0" />
                   <div>
-                    <p className="font-medium text-slate-900">{item.name}</p>
+                    <p className={TYPO.CARD_TITLE}>{item.name}</p>
                     {item.description && (
-                      <p className="text-slate-500 text-xs">{item.description}</p>
+                      <p className={TYPO.CAPTION}>{item.description}</p>
                     )}
                   </div>
                 </li>
@@ -342,10 +343,10 @@ export default function BookingDetailPage() {
         {/* Special requirements */}
         {(booking.specialRequirements || booking.event.specialRequirements) && (
           <div className="space-y-2">
-            <h3 className="text-sm font-bold text-slate-500 uppercase tracking-wider">
+            <h3 className={`${TYPO.H3} text-slate-500`}>
               Special requirements
             </h3>
-            <p className="text-slate-600 text-sm">
+            <p className={TYPO.BODY}>
               {booking.specialRequirements || booking.event.specialRequirements}
             </p>
           </div>
@@ -353,7 +354,7 @@ export default function BookingDetailPage() {
 
         {/* Total */}
         <div className="p-4 bg-slate-50 border border-slate-100 rounded-md">
-          <p className="text-slate-600 text-sm">Total</p>
+          <p className={TYPO.BODY}>Total</p>
           <p className="text-primary font-bold text-xl">
             {Number(booking.totalAmount).toFixed(2)} BD
           </p>
@@ -388,8 +389,8 @@ export default function BookingDetailPage() {
       {payModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
           <div className="bg-white rounded-md p-6 max-w-sm w-full shadow-xl">
-            <h3 className="text-lg font-bold mb-4">Pay {Number(booking.totalAmount).toFixed(2)} BD</h3>
-            <p className="text-slate-500 text-sm mb-4">
+            <h3 className={`${TYPO.H2} mb-4`}>Pay {Number(booking.totalAmount).toFixed(2)} BD</h3>
+            <p className={`${TYPO.SUBTEXT} mb-4`}>
               {booking.vendor.businessName} · {booking.package.name}
             </p>
             {paymentMethods.length > 0 && !useNewCard ? (
@@ -472,8 +473,8 @@ export default function BookingDetailPage() {
       {reviewModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
           <div className="bg-white rounded-md p-6 max-w-sm w-full shadow-xl">
-            <h3 className="text-lg font-bold mb-4">Leave a review</h3>
-            <p className="text-slate-500 text-sm mb-4">
+            <h3 className={`${TYPO.H2} mb-4`}>Leave a review</h3>
+            <p className={`${TYPO.SUBTEXT} mb-4`}>
               {booking.vendor.businessName} · {booking.package.name}
             </p>
             <div className="flex gap-1 mb-4">

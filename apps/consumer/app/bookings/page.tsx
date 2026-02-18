@@ -7,6 +7,7 @@ import { CalendarCheck, ForkKnife, CreditCard } from "@phosphor-icons/react";
 import { AppLayout } from "@/components/AppLayout";
 import { getBookingStatusStyle } from "@/components/ui/Tag";
 import { getBookingStatusLine } from "@/lib/bookingStatus";
+import { TYPO } from "@/lib/events-ui";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 
@@ -171,7 +172,7 @@ export default function BookingsPage() {
   return (
     <AppLayout>
       <header className="sticky top-0 z-40 bg-white/80 ios-blur px-6 py-3 border-b border-slate-100 shrink-0">
-        <h1 className="text-xl font-bold tracking-tight">My Bookings</h1>
+        <h1 className={TYPO.H1}>My Bookings</h1>
         <div className="flex gap-2 mt-4">
           {(["active", "past", "cancelled"] as Tab[]).map((t) => {
             const activeStyles: Record<Tab, string> = {
@@ -207,7 +208,7 @@ export default function BookingsPage() {
         ) : filtered.length === 0 ? (
           <div className="text-center py-16">
             <CalendarCheck size={64} weight="regular" className="text-slate-300 mx-auto" />
-            <p className="text-slate-500 mt-4 font-medium">No {tab} bookings</p>
+            <p className={`${TYPO.SUBTEXT} mt-4 font-medium`}>No {tab} bookings</p>
             {tab === "active" && (
               <Link
                 href="/services/catering"
@@ -248,13 +249,13 @@ export default function BookingsPage() {
                     )}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="font-semibold text-sm line-clamp-2">
+                    <p className={`${TYPO.CARD_TITLE} text-sm line-clamp-2`}>
                       {booking.event.name} · {booking.vendor.businessName} · {booking.package.name}
                     </p>
-                    <p className="text-slate-500 text-xs mt-0.5">
+                    <p className={`${TYPO.CAPTION} mt-0.5`}>
                       {booking.bookingReference} · {new Date(booking.event.date).toLocaleDateString()} · {Number(booking.totalAmount).toFixed(2)} BD
                     </p>
-                    <p className="text-slate-500 text-xs mt-0.5">
+                    <p className={`${TYPO.CAPTION} mt-0.5`}>
                       {getBookingStatusLine(booking.status, booking.paymentStatus)}
                     </p>
                   </div>
@@ -313,8 +314,8 @@ export default function BookingsPage() {
       {payModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
           <div className="bg-white rounded-md p-6 max-w-sm w-full shadow-xl">
-            <h3 className="text-lg font-bold mb-4">Pay {Number(payModal.totalAmount).toFixed(2)} BD</h3>
-            <p className="text-slate-500 text-sm mb-4">
+            <h3 className={`${TYPO.H2} mb-4`}>Pay {Number(payModal.totalAmount).toFixed(2)} BD</h3>
+            <p className={`${TYPO.SUBTEXT} mb-4`}>
               {payModal.vendor.businessName} · {payModal.package.name}
             </p>
             {paymentMethods.length > 0 && !useNewCard ? (
@@ -396,8 +397,8 @@ export default function BookingsPage() {
       {reviewModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
           <div className="bg-white rounded-md p-6 max-w-sm w-full shadow-xl">
-            <h3 className="text-lg font-bold mb-4">Leave a review</h3>
-            <p className="text-slate-500 text-sm mb-4">
+            <h3 className={`${TYPO.H2} mb-4`}>Leave a review</h3>
+            <p className={`${TYPO.SUBTEXT} mb-4`}>
               {reviewModal.vendor.businessName} · {reviewModal.package.name}
             </p>
             <div className="flex gap-1 mb-4">

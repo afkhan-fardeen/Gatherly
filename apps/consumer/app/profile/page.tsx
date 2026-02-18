@@ -3,8 +3,20 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { CalendarCheck, Bell, CreditCard, SignOut, PencilSimple, Phone, Receipt } from "@phosphor-icons/react";
+import {
+  ArrowLeft,
+  Gear,
+  Camera,
+  Heart,
+  CreditCard,
+  Bell,
+  Question,
+  FileText,
+  SignOut,
+  CaretRight,
+} from "@phosphor-icons/react";
 import { AppLayout } from "@/components/AppLayout";
+import { CHERRY, MINTY_LIME, MINTY_LIME_DARK, WARM_PEACH, WARM_PEACH_DARK, SOFT_LILAC, SOFT_LILAC_DARK, TYPO } from "@/lib/events-ui";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 
@@ -29,7 +41,7 @@ export default function ProfilePage() {
       return;
     }
     fetch(`${API_URL}/api/auth/me`, { headers: { Authorization: `Bearer ${token}` } })
-      .then((res) => (res.ok ? res.json() : null))
+      .then((r) => (r.ok ? r.json() : null))
       .then((data) => {
         if (data) {
           setUser(data);
@@ -51,127 +63,177 @@ export default function ProfilePage() {
   function handleLogout() {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
-    router.push("/");
-    router.refresh();
+    window.location.href = "/";
   }
 
   if (loading || !user) {
     return (
       <AppLayout>
-        <div className="flex-1 flex items-center justify-center">
-          <p className="text-slate-500">{loading ? "Loading..." : "Please log in"}</p>
+        <div className="flex-1 flex items-center justify-center bg-[#FAFAFA]">
+          <p className={TYPO.SUBTEXT}>{loading ? "Loading..." : "Please log in"}</p>
         </div>
       </AppLayout>
     );
   }
 
+  const initials = user.name
+    .split(" ")
+    .map((n) => n[0])
+    .join("")
+    .toUpperCase()
+    .slice(0, 2);
+
   return (
-    <AppLayout>
-      <header className="sticky top-0 z-40 bg-white/80 ios-blur px-6 py-3 border-b border-slate-100 shrink-0">
-        <h1 className="text-xl font-bold tracking-tight">Profile</h1>
-      </header>
-
-      <main className="p-6 pb-32 space-y-6">
-        {/* User block */}
-        <div className="flex flex-col items-center py-6">
-          <div className="w-16 h-16 rounded-md border-2 border-white shadow-md overflow-hidden bg-slate-100 flex items-center justify-center shrink-0">
-            {user.profilePictureUrl ? (
-              <img
-                src={user.profilePictureUrl}
-                alt=""
-                className="w-full h-full object-cover"
-              />
-            ) : (
-              <span className="font-semibold text-lg text-slate-600">
-                {user.name
-                  .split(" ")
-                  .map((n) => n[0])
-                  .join("")
-                  .toUpperCase()
-                  .slice(0, 2)}
-              </span>
-            )}
+    <AppLayout showTopBar={false}>
+      <div className="bg-[#FAFAFA] min-h-full">
+        {/* Fixed header spacer */}
+        <div className="h-14 shrink-0" aria-hidden />
+        {/* Fixed header */}
+        <header className="fixed top-0 left-0 right-0 z-40 flex justify-center bg-[#FAFAFA]/90 backdrop-blur-md">
+          <div className="w-full max-w-[430px] px-6 py-4 flex justify-between items-center">
+            <Link
+              href="/dashboard"
+              className="p-2 -ml-2 rounded-full hover:bg-slate-100 transition-colors"
+            >
+              <ArrowLeft size={20} weight="regular" className="text-slate-600" />
+            </Link>
+            <h1 className={`${TYPO.H1} text-slate-900`}>Profile</h1>
+            <Link
+              href="/profile/edit"
+              className="p-2 -mr-2 rounded-full hover:bg-slate-100 transition-colors"
+            >
+              <Gear size={24} weight="regular" className="text-slate-600" />
+            </Link>
           </div>
-          <h2 className="text-lg font-bold tracking-tight mt-3">{user.name}</h2>
-          <p className="text-slate-500 text-sm">{user.email}</p>
-          {user.phone ? (
-            <p className="text-slate-600 text-sm mt-1 flex items-center gap-1.5">
-              <Phone size={14} weight="regular" />
-              {user.phone}
-            </p>
-          ) : (
-            <p className="text-slate-400 text-sm mt-1">No phone number</p>
-          )}
-          <Link
-            href="/profile/edit"
-            className="mt-4 flex items-center gap-2 text-primary font-semibold text-sm"
-          >
-            <PencilSimple size={16} weight="regular" />
-            Edit profile
-          </Link>
-        </div>
+        </header>
 
-        {/* Links */}
-        <div className="bg-white rounded-md shadow-sm border border-slate-100 overflow-hidden divide-y divide-slate-100">
-          <Link
-            href="/bookings"
-            className="flex items-center justify-between p-3 active:bg-slate-50 transition-colors"
-          >
-            <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-md bg-primary/10 flex items-center justify-center">
-                <CalendarCheck size={18} weight="regular" className="text-primary" />
+        <main>
+          {/* Profile section */}
+          <section className="flex flex-col items-center px-6 py-8">
+            <div className="relative group">
+              <div className="relative w-32 h-32 rounded-full overflow-hidden border-4 border-white shadow-xl ring-2 bg-slate-100"
+                style={{ boxShadow: `0 0 0 2px ${CHERRY}20` }}
+              >
+                {user.profilePictureUrl ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={user.profilePictureUrl}
+                    alt=""
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center">
+                    <span className="text-2xl font-bold text-slate-600">{initials}</span>
+                  </div>
+                )}
               </div>
-              <span className="font-medium text-sm">My Bookings</span>
+              <Link
+                href="/profile/edit"
+                className="absolute bottom-1 right-1 p-2 rounded-full shadow-lg border-2 border-white text-white transition-transform active:scale-90"
+                style={{ backgroundColor: CHERRY }}
+              >
+                <Camera size={16} weight="regular" />
+              </Link>
             </div>
-            <span className="text-slate-400 text-xs">View and manage</span>
-          </Link>
-          <Link
-            href="/profile/payment-history"
-            className="flex items-center justify-between p-3 active:bg-slate-50 transition-colors"
-          >
-            <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-md bg-primary/10 flex items-center justify-center">
-                <Receipt size={18} weight="regular" className="text-primary" />
-              </div>
-              <span className="font-medium text-sm">Payment history</span>
-            </div>
-            <span className="text-slate-400 text-xs">What you paid for</span>
-          </Link>
-          <Link
-            href="/notifications"
-            className="flex items-center justify-between p-3 active:bg-slate-50 transition-colors"
-          >
-            <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-md bg-primary/10 flex items-center justify-center">
-                <Bell size={18} weight="regular" className="text-primary" />
-              </div>
-              <span className="font-medium text-sm">Notifications</span>
-            </div>
-            <span className="text-slate-400 text-xs">Settings</span>
-          </Link>
-          <Link
-            href="/profile/payment-methods"
-            className="flex items-center justify-between p-3 active:bg-slate-50 transition-colors"
-          >
-            <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-md bg-primary/10 flex items-center justify-center">
-                <CreditCard size={18} weight="regular" className="text-primary" />
-              </div>
-              <span className="font-medium text-sm">Payment methods</span>
-            </div>
-            <span className="text-slate-400 text-xs">Add cards</span>
-          </Link>
-        </div>
+            <h2 className={`mt-6 ${TYPO.H1_LARGE} text-slate-900`}>{user.name}</h2>
+            <p className={`${TYPO.SUBTEXT} mb-6`}>{user.email}</p>
+            <Link
+              href="/profile/edit"
+              className="px-8 py-2.5 rounded-full font-semibold text-sm text-white shadow-md transition-transform active:scale-95"
+              style={{ backgroundColor: CHERRY, boxShadow: `${CHERRY}33 0 4px 12px` }}
+            >
+              Edit Profile
+            </Link>
+          </section>
 
-        {/* Sign Out */}
-        <button
-          onClick={handleLogout}
-          className="w-full py-3 text-red-500 font-semibold text-sm text-center flex items-center justify-center gap-2 hover:bg-red-50 rounded-md transition-colors"
-        >
-          <SignOut size={18} weight="regular" />
-          Sign Out
-        </button>
-      </main>
+          {/* General Settings */}
+          <section className="px-6 space-y-2">
+            <h3 className={`px-2 ${TYPO.H3} mb-3`} style={{ color: SOFT_LILAC_DARK }}>
+              General Settings
+            </h3>
+
+            <Link
+              href="/services/catering"
+              className="w-full flex items-center justify-between p-4 bg-white rounded-xl border border-slate-100 active:bg-slate-50 transition-colors"
+            >
+              <div className="flex items-center gap-4">
+                <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{ backgroundColor: MINTY_LIME, color: MINTY_LIME_DARK }}>
+                  <Heart size={20} weight="regular" />
+                </div>
+                <span className={TYPO.CARD_TITLE}>My Favorites</span>
+              </div>
+              <CaretRight size={20} weight="bold" className="text-slate-300" />
+            </Link>
+
+            <Link
+              href="/profile/payment-methods"
+              className="w-full flex items-center justify-between p-4 bg-white rounded-xl border border-slate-100 active:bg-slate-50 transition-colors"
+            >
+              <div className="flex items-center gap-4">
+                <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{ backgroundColor: WARM_PEACH, color: WARM_PEACH_DARK }}>
+                  <CreditCard size={20} weight="regular" />
+                </div>
+                <span className={TYPO.CARD_TITLE}>Payment Methods</span>
+              </div>
+              <CaretRight size={20} weight="bold" className="text-slate-300" />
+            </Link>
+
+            <Link
+              href="/notifications"
+              className="w-full flex items-center justify-between p-4 bg-white rounded-xl border border-slate-100 active:bg-slate-50 transition-colors"
+            >
+              <div className="flex items-center gap-4">
+                <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{ backgroundColor: SOFT_LILAC, color: SOFT_LILAC_DARK }}>
+                  <Bell size={20} weight="regular" />
+                </div>
+                <div className="text-left">
+                  <span className={`${TYPO.CARD_TITLE} block leading-tight`}>
+                    Notification Settings
+                  </span>
+                  <span className={TYPO.CAPTION}>Manage alerts and sounds</span>
+                </div>
+              </div>
+              <CaretRight size={20} weight="bold" className="text-slate-300" />
+            </Link>
+
+            <a
+              href="#"
+              className="w-full flex items-center justify-between p-4 bg-white rounded-xl border border-slate-100 active:bg-slate-50 transition-colors"
+            >
+              <div className="flex items-center gap-4">
+                <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{ backgroundColor: MINTY_LIME, color: MINTY_LIME_DARK }}>
+                  <Question size={20} weight="regular" />
+                </div>
+                <span className={TYPO.CARD_TITLE}>Help Center</span>
+              </div>
+              <CaretRight size={20} weight="bold" className="text-slate-300" />
+            </a>
+
+            <a
+              href="#"
+              className="w-full flex items-center justify-between p-4 bg-white rounded-xl border border-slate-100 active:bg-slate-50 transition-colors"
+            >
+              <div className="flex items-center gap-4">
+                <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{ backgroundColor: WARM_PEACH, color: WARM_PEACH_DARK }}>
+                  <FileText size={20} weight="regular" />
+                </div>
+                <span className={TYPO.CARD_TITLE}>Terms & Privacy</span>
+              </div>
+              <CaretRight size={20} weight="bold" className="text-slate-300" />
+            </a>
+
+            <div className="pt-6 pb-32">
+              <button
+                onClick={handleLogout}
+                className="w-full py-4 text-red-500 font-bold flex items-center justify-center gap-2 active:bg-red-50 rounded-xl transition-colors"
+              >
+                <SignOut size={20} weight="regular" />
+                Sign Out
+              </button>
+            </div>
+          </section>
+        </main>
+      </div>
     </AppLayout>
   );
 }

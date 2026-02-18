@@ -15,7 +15,11 @@ export function AuthButton({
     <button
       type={type}
       disabled={disabled || loading}
-      className="w-full h-12 bg-primary hover:bg-primary/90 active:scale-[0.98] text-white font-semibold rounded-md shadow-sm transition-all text-lg disabled:opacity-50 disabled:active:scale-100"
+      className="w-full py-4 text-white font-semibold rounded-full shadow-lg hover:opacity-90 active:scale-[0.98] transition-all text-base disabled:opacity-50 disabled:active:scale-100"
+      style={{
+        backgroundColor: "#6D0D35",
+        boxShadow: "0 10px 15px -3px rgba(109, 13, 53, 0.2)",
+      }}
     >
       {loading ? "Please wait..." : children}
     </button>

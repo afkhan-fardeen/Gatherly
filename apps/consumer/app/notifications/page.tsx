@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Bell, CaretRight } from "@phosphor-icons/react";
 import { AppLayout } from "@/components/AppLayout";
+import { TYPO } from "@/lib/events-ui";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 
@@ -81,7 +82,7 @@ export default function NotificationsPage() {
     if (items.length === 0) return null;
     return (
       <section>
-        <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 px-1">
+        <h3 className={`${TYPO.H3} text-slate-400 mb-2 px-1`}>
           {title}
         </h3>
         <div className="space-y-0 divide-y divide-slate-100 rounded-md border border-slate-200 bg-white overflow-hidden">
@@ -92,10 +93,10 @@ export default function NotificationsPage() {
                   <div className="w-2 h-2 rounded-full bg-primary shrink-0" />
                 )}
                 <div className="flex-1 min-w-0">
-                  <p className="font-medium text-sm text-slate-900 truncate">
+                  <p className={`${TYPO.CARD_TITLE} text-sm truncate`}>
                     {notification.title}
                   </p>
-                  <p className="text-xs text-slate-500 mt-0.5">
+                  <p className={`${TYPO.CAPTION} mt-0.5`}>
                     {new Date(notification.createdAt).toLocaleDateString()}
                   </p>
                 </div>
@@ -127,7 +128,7 @@ export default function NotificationsPage() {
     <AppLayout>
       <header className="sticky top-0 z-40 bg-white/80 ios-blur px-6 py-3 border-b border-slate-100 shrink-0">
         <div className="flex justify-between items-center">
-          <h1 className="text-xl font-bold tracking-tight">
+          <h1 className={TYPO.H1}>
             Notifications
           </h1>
           {unreadCount > 0 && (
@@ -155,8 +156,8 @@ export default function NotificationsPage() {
         ) : notifications.length === 0 ? (
           <div className="text-center py-16 rounded-md border border-slate-200 bg-white">
             <Bell size={64} weight="regular" className="text-slate-300 mx-auto" />
-            <p className="text-slate-500 mt-4 font-medium">No notifications</p>
-            <p className="text-slate-400 text-sm mt-1">
+            <p className={`${TYPO.SUBTEXT} mt-4 font-medium`}>No notifications</p>
+            <p className={`${TYPO.SUBTEXT} mt-1`}>
               You&apos;re all caught up
             </p>
           </div>

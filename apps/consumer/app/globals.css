@@ -2,6 +2,27 @@
 @tailwind components;
 @tailwind utilities;
 
+@keyframes pageTransitionIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.page-transition {
+  min-height: 100%;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .page-transition {
+    animation: none !important;
+  }
+}
+
 @font-face {
   font-family: "Bright";
   src: url("/fonts/Bright.otf") format("opentype");
@@ -10,13 +31,14 @@
 }
 
 :root {
-  --background: #f8fafc;
+  --background: #F9F2E7;
   --foreground: #171717;
   --primary: #2563eb;
 }
 
 html {
   scroll-behavior: smooth;
+  background: #F9F2E7;
 }
 
 html,
@@ -24,14 +46,32 @@ body {
   margin: 0;
   padding: 0;
   min-height: 100vh;
+  min-height: 100dvh;
   overflow-x: hidden;
+  overscroll-behavior: none;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+html::-webkit-scrollbar,
+body::-webkit-scrollbar {
+  display: none;
+}
+
+/* Hide scrollbar but keep scroll */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
 }
 
 body {
   color: var(--foreground);
-  background: var(--background);
-  font-family: "Poppins", sans-serif;
+  background: #F9F2E7;
   -webkit-tap-highlight-color: transparent;
+  -webkit-overflow-scrolling: touch;
 }
 
 .ios-blur {
@@ -54,10 +94,17 @@ input[type="datetime-local"] {
   -webkit-appearance: none;
   appearance: none;
   box-sizing: border-box;
+  color: #171717;
 }
 
 input[type="date"]::-webkit-datetime-edit,
 input[type="time"]::-webkit-datetime-edit {
   padding: 0;
   line-height: 1;
+  color: #171717;
+}
+
+input[type="date"]::-webkit-date-and-time-value,
+input[type="time"]::-webkit-date-and-time-value {
+  color: #171717;
 }

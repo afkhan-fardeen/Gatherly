@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Gatherly - Vendor Profile</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,typography,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;family=Playfair+Display:wght@700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#7D1D3F",
+                        "background-light": "#FAFAFA",
+                        "background-dark": "#121212",
+                        accent: "#2D5AF7",
+                    },
+                    fontFamily: {
+                        display: ["Plus Jakarta Sans", "sans-serif"],
+                        serif: ["Playfair Display", "serif"],
+                    },
+                    borderRadius: {
+                        DEFAULT: "12px",
+                        xl: "24px",
+                    },
+                },
+            },
+        };
+    </script>
+<style type="text/tailwindcss">
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .fill-icon {
+            font-variation-settings: 'FILL' 1;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen">
+<nav class="fixed top-0 left-0 right-0 z-50 px-6 pt-12 pb-4 flex justify-between items-center bg-gradient-to-b from-black/40 to-transparent">
+<button class="w-10 h-10 flex items-center justify-center rounded-full bg-white/20 backdrop-blur-md text-white" onclick="history.back()">
+<span class="material-symbols-outlined">arrow_back_ios_new</span>
+</button>
+<div class="flex space-x-3">
+<button class="w-10 h-10 flex items-center justify-center rounded-full bg-white/20 backdrop-blur-md text-white">
+<span class="material-symbols-outlined">share</span>
+</button>
+<button class="w-10 h-10 flex items-center justify-center rounded-full bg-white/20 backdrop-blur-md text-white">
+<span class="material-symbols-outlined">favorite</span>
+</button>
+</div>
+</nav>
+<main class="pb-32">
+<section class="relative h-[400px] w-full">
+<img alt="Vendor Main Work" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAcCSPfhHhQPlAIIZMFmkWmgglZ3-uYMo9XCSfY0JYujX6WTNSI0rCSrMi9IXLF13vXNr-N4lPwWKeMlcJwI4oYcweIG8iP6bvtLW_5umFLh9b6SBmJPoWasPq83z04RlyiNSUhug2FHScYURZpGS45gOhotk-4Qf_W8UArzc2gJVzxl8UL2cjvHmS4H47_uYXph-47fT7_Gk0bXSsd8sNqro-_llnEtRU4lcx7nhjJjGgapWNsDOI1FPc1Od9y9aACyDhVrGeR15M"/>
+<div class="absolute bottom-6 right-6 bg-black/60 backdrop-blur-sm text-white px-3 py-1 rounded-full text-xs font-semibold">
+                1/12 Photos
+            </div>
+</section>
+<section class="px-6 -mt-8 relative z-10">
+<div class="bg-white dark:bg-slate-900 rounded-3xl p-6 shadow-xl shadow-black/5 border border-slate-100 dark:border-slate-800">
+<div class="flex justify-between items-start mb-4">
+<div>
+<span class="inline-block bg-primary/10 text-primary text-[10px] font-bold uppercase tracking-widest px-2 py-1 rounded mb-2">Premium Partner</span>
+<h1 class="text-2xl font-bold font-serif text-slate-900 dark:text-white">Artisan Cuisines &amp; Co.</h1>
+<p class="text-slate-500 text-sm flex items-center mt-1">
+<span class="material-symbols-outlined text-sm mr-1">location_on</span>
+                            Manhattan, New York
+                        </p>
+</div>
+<div class="bg-amber-50 dark:bg-amber-900/20 px-3 py-2 rounded-xl text-center">
+<div class="flex items-center text-amber-500 justify-center">
+<span class="material-symbols-outlined fill-icon text-sm">star</span>
+<span class="font-bold text-sm ml-1">4.9</span>
+</div>
+<p class="text-[10px] text-slate-400 font-bold uppercase">128 Reviews</p>
+</div>
+</div>
+<div class="flex border-t border-slate-100 dark:border-slate-800 pt-4 mt-2 justify-around">
+<div class="text-center">
+<p class="text-xs text-slate-400 uppercase tracking-tighter">Capacity</p>
+<p class="font-bold text-sm">50 - 500</p>
+</div>
+<div class="w-px h-8 bg-slate-100 dark:bg-slate-800"></div>
+<div class="text-center">
+<p class="text-xs text-slate-400 uppercase tracking-tighter">Category</p>
+<p class="font-bold text-sm">Catering</p>
+</div>
+<div class="w-px h-8 bg-slate-100 dark:bg-slate-800"></div>
+<div class="text-center">
+<p class="text-xs text-slate-400 uppercase tracking-tighter">Range</p>
+<p class="font-bold text-sm">$$$</p>
+</div>
+</div>
+</div>
+</section>
+<section class="px-6 mt-8">
+<h3 class="text-lg font-bold mb-3">About Vendor</h3>
+<p class="text-slate-600 dark:text-slate-400 text-sm leading-relaxed">
+                Experience culinary excellence with Artisan Cuisines. We specialize in bespoke catering for luxury weddings and corporate events. Our team brings together seasonal ingredients and contemporary techniques to create unforgettable dining experiences.
+            </p>
+<button class="text-primary font-bold text-sm mt-2 flex items-center">
+                Read more <span class="material-symbols-outlined text-sm ml-1">expand_more</span>
+</button>
+</section>
+<section class="mt-8">
+<div class="px-6 flex justify-between items-center mb-4">
+<h3 class="text-lg font-bold">Recent Projects</h3>
+<button class="text-primary font-semibold text-sm">See all</button>
+</div>
+<div class="flex overflow-x-auto px-6 space-x-3 hide-scrollbar">
+<div class="flex-shrink-0 w-40 h-52 rounded-2xl overflow-hidden shadow-sm">
+<img alt="Work 1" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBvAblOn9-kL8z3TCGfxMknjVGdE6n721umBbx0rkFBvMU7UV54sntviWJtBAkgUbLOv2B99S-97aMX1C2fulvmkXCRIsDg-L00nYaueVSdD961gksIC67O-CQUTVTZxaMkfGgHH9yob_gzaHHV023Jz5G2phPmsgd3r3UXuh60h0qZtsSLzOb8XR1J9jCAcjm6M3hCcyC-nf2n9YGMSTRKDcTp3LfLPu7Q9Zp2e-9V0imSWn_3Efvm1TekJkp324FlEAbq3krD_68"/>
+</div>
+<div class="flex-shrink-0 w-40 h-52 rounded-2xl overflow-hidden shadow-sm">
+<img alt="Work 2" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuABBpXcc0CH5Co_EfW3Y45EQxsEQiB0xPZEj04zz3a6vP8ulBLfmJCXVlDl5Q6ov5yw0HsP-kX9ikTWZVDGKqyV138kXfklEFBIlCJZgOFtW5wxvSezYjfT7ADiAb0QHwTs386FXDxgNX0mIMWpc72chsIubP-M3gpZ0FUStXXBW6DP5zzvhe5W1_JZD9s7YTt8QBbvCx97DxYPaxh2JObbcVyO4LImCO6bX3JM2MyRbC4P6zef6zj8SM5tx8tANKswcLYoSO-nUX0"/>
+</div>
+<div class="flex-shrink-0 w-40 h-52 rounded-2xl overflow-hidden shadow-sm">
+<img alt="Work 3" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAcCSPfhHhQPlAIIZMFmkWmgglZ3-uYMo9XCSfY0JYujX6WTNSI0rCSrMi9IXLF13vXNr-N4lPwWKeMlcJwI4oYcweIG8iP6bvtLW_5umFLh9b6SBmJPoWasPq83z04RlyiNSUhug2FHScYURZpGS45gOhotk-4Qf_W8UArzc2gJVzxl8UL2cjvHmS4H47_uYXph-47fT7_Gk0bXSsd8sNqro-_llnEtRU4lcx7nhjJjGgapWNsDOI1FPc1Od9y9aACyDhVrGeR15M"/>
+</div>
+</div>
+</section>
+<section class="px-6 mt-8">
+<h3 class="text-lg font-bold mb-4">Service Packages</h3>
+<div class="space-y-4">
+<div class="p-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50">
+<div class="flex justify-between items-center mb-2">
+<h4 class="font-bold text-slate-900 dark:text-white">Boutique Package</h4>
+<p class="text-primary font-bold">$75<span class="text-slate-400 text-[10px] font-normal tracking-normal uppercase ml-1">/ Guest</span></p>
+</div>
+<p class="text-xs text-slate-500 mb-3">Perfect for intimate gatherings and private dinners.</p>
+<ul class="space-y-2">
+<li class="flex items-center text-xs text-slate-600 dark:text-slate-400">
+<span class="material-symbols-outlined text-emerald-500 text-sm mr-2 fill-icon">check_circle</span>
+                            3-Course Set Menu
+                        </li>
+<li class="flex items-center text-xs text-slate-600 dark:text-slate-400">
+<span class="material-symbols-outlined text-emerald-500 text-sm mr-2 fill-icon">check_circle</span>
+                            Professional Waitstaff
+                        </li>
+</ul>
+</div>
+<div class="p-4 rounded-2xl border-2 border-primary bg-primary/5 relative">
+<div class="absolute -top-3 right-4 bg-primary text-white text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-widest">Most Popular</div>
+<div class="flex justify-between items-center mb-2">
+<h4 class="font-bold text-slate-900 dark:text-white">Signature Gala</h4>
+<p class="text-primary font-bold">$125<span class="text-slate-400 text-[10px] font-normal tracking-normal uppercase ml-1">/ Guest</span></p>
+</div>
+<p class="text-xs text-slate-500 mb-3">Complete catering solution for weddings and major events.</p>
+<ul class="space-y-2">
+<li class="flex items-center text-xs text-slate-600 dark:text-slate-400">
+<span class="material-symbols-outlined text-emerald-500 text-sm mr-2 fill-icon">check_circle</span>
+                            Gourmet Buffet or 5-Course Plated
+                        </li>
+<li class="flex items-center text-xs text-slate-600 dark:text-slate-400">
+<span class="material-symbols-outlined text-emerald-500 text-sm mr-2 fill-icon">check_circle</span>
+                            Premium Bar Service
+                        </li>
+<li class="flex items-center text-xs text-slate-600 dark:text-slate-400">
+<span class="material-symbols-outlined text-emerald-500 text-sm mr-2 fill-icon">check_circle</span>
+                            Custom Cake Design
+                        </li>
+</ul>
+</div>
+</div>
+</section>
+</main>
+<div class="fixed bottom-0 left-0 right-0 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border-t border-slate-200 dark:border-slate-800 px-6 py-5 pb-8 flex items-center space-x-4 z-50">
+<button class="w-12 h-12 flex items-center justify-center rounded-xl border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400">
+<span class="material-symbols-outlined">calendar_add_on</span>
+</button>
+<button class="flex-1 bg-primary text-white h-12 rounded-xl font-bold text-sm shadow-lg shadow-primary/20 flex items-center justify-center space-x-2">
+<span class="material-symbols-outlined text-lg">chat_bubble</span>
+<span>Message Vendor</span>
+</button>
+</div>
+<button class="fixed bottom-28 right-6 w-10 h-10 bg-white dark:bg-slate-800 rounded-full shadow-lg border border-slate-200 dark:border-slate-700 flex items-center justify-center z-50" onclick="document.documentElement.classList.toggle('dark')">
+<span class="material-symbols-outlined text-slate-600 dark:text-slate-300">dark_mode</span>
+</button>
+
+</body></html>

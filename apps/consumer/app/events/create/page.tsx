@@ -3,19 +3,32 @@
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ArrowLeft } from "@phosphor-icons/react";
+import {
+  X,
+  ArrowRight,
+  Confetti,
+  Briefcase,
+  GraduationCap,
+  DotsThree,
+} from "@phosphor-icons/react";
 import { AppLayout } from "@/components/AppLayout";
+import { parseApiError } from "@/lib/api";
+import {
+  CHERRY,
+  ROUND,
+  INPUT_CLASS,
+  BUTTON_CLASS,
+  LABEL_CLASS,
+  TYPO,
+} from "@/lib/events-ui";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 
-const EVENT_TYPES = [
-  "birthday",
-  "anniversary",
-  "corporate",
-  "wedding",
-  "engagement",
-  "family_gathering",
-  "other",
+const EVENT_TYPE_OPTIONS = [
+  { value: "wedding", label: "Social", subtitle: "Parties, Weddings", Icon: Confetti },
+  { value: "corporate", label: "Corporate", subtitle: "Meetings, Gala", Icon: Briefcase },
+  { value: "family_gathering", label: "Education", subtitle: "Workshops, Class", Icon: GraduationCap },
+  { value: "other", label: "Other", subtitle: "Custom Category", Icon: DotsThree },
 ];
 
 const STEPS = ["Basic", "Location", "Guests", "Review"];
@@ -28,6 +41,7 @@ export default function CreateEventPage() {
   useEffect(() => {
     if (mainRef.current) mainRef.current.scrollTop = 0;
   }, [step]);
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [form, setForm] = useState({
@@ -92,7 +106,7 @@ export default function CreateEventPage() {
           router.push("/login");
           return;
         }
-        throw new Error(data.error || "Failed to create event");
+        throw new Error(parseApiError(data) || "Failed to create event");
       }
       router.push(`/events/${data.id}/guests`);
       router.refresh();
@@ -104,243 +118,302 @@ export default function CreateEventPage() {
   }
 
   return (
-    <AppLayout showNav={true}>
-      <header className="sticky top-0 z-40 bg-white/80 ios-blur px-6 py-3 border-b border-slate-100 shrink-0">
-        <div className="flex items-center gap-4">
-          {step === 0 ? (
+    <AppLayout showNav={true} showTopBar={false} fullHeight>
+      <div className="flex flex-col flex-1 min-h-0 bg-[#FAFAFA]">
+        {/* Header - fixed, no scroll */}
+        <header
+          className="shrink-0 px-6 pb-4 bg-[#FAFAFA]"
+          style={{ paddingTop: "max(1rem, env(safe-area-inset-top))" }}
+        >
+          <div className="flex items-center justify-between mb-6">
             <Link
               href="/events"
-              className="w-10 h-10 rounded-md bg-slate-100 flex items-center justify-center"
+              className="w-10 h-10 flex items-center justify-center bg-white border border-slate-200 shadow-sm rounded-full"
             >
-              <ArrowLeft size={20} weight="regular" className="text-slate-600" />
+              <X size={20} weight="bold" className="text-slate-600" />
             </Link>
-          ) : (
-            <button
-              type="button"
-              onClick={() => setStep((s) => s - 1)}
-              className="w-10 h-10 rounded-md bg-slate-100 flex items-center justify-center"
-            >
-              <ArrowLeft size={20} weight="regular" className="text-slate-600" />
-            </button>
-          )}
-          <div>
-            <h1 className="text-xl font-bold tracking-tight">
-              Create Event
-            </h1>
-            <p className="text-slate-500 text-xs">
+            <h2 className="text-xs font-bold uppercase tracking-[0.2em] text-slate-400">
               Step {step + 1} of {STEPS.length}
+            </h2>
+            <div className="w-10" />
+          </div>
+          <div className={`w-full h-1.5 bg-slate-200 overflow-hidden ${ROUND}`}>
+            <div
+              className="h-full transition-all duration-500"
+              style={{
+                width: `${((step + 1) / STEPS.length) * 100}%`,
+                backgroundColor: CHERRY,
+              }}
+            />
+          </div>
+        </header>
+
+        {/* Main - single scroll area */}
+        <main
+          ref={mainRef}
+          className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden px-6 pt-6"
+        >
+          <div className="mb-8">
+            <h1 className={`${TYPO.H1_LARGE} text-slate-900 mb-1`}>
+              Create New Event
+            </h1>
+            <p className={TYPO.SUBTEXT}>
+              {step === 0
+                ? "Let's start with the basics. What are you planning?"
+                : step === 1
+                  ? "Where will your event take place?"
+                  : step === 2
+                    ? "How many guests are you expecting?"
+                    : "Review your event details before creating."}
             </p>
           </div>
-        </div>
-        <div className="flex gap-2 mt-3">
-          {STEPS.map((_, i) => (
-            <div
-              key={i}
-              className={`h-1 flex-1 rounded-md ${
-                i <= step ? "bg-primary" : "bg-slate-200"
-              }`}
-            />
-          ))}
-        </div>
-      </header>
 
-      <main ref={mainRef} className="p-6 pb-32 flex-1 overflow-y-auto">
-        <form onSubmit={handleSubmit} className="space-y-6">
-          {step === 0 && (
-            <>
-              <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-1">
-                  Event Name *
-                </label>
-                <input
-                  type="text"
-                  value={form.name}
-                  onChange={(e) => update({ name: e.target.value })}
-                  className="w-full px-4 py-3 border border-slate-200 rounded-md focus:ring-2 focus:ring-primary/20 outline-none"
-                  placeholder="e.g. Smith Wedding Reception"
-                  required
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-1">
-                  Event Type *
-                </label>
-                <select
-                  value={form.eventType}
-                  onChange={(e) => update({ eventType: e.target.value })}
-                  className="w-full px-4 py-3 border border-slate-200 rounded-md focus:ring-2 focus:ring-primary/20 outline-none"
-                  required
-                >
-                  <option value="">Select type</option>
-                  {EVENT_TYPES.map((t) => (
-                    <option key={t} value={t}>
-                      {t.replace(/_/g, " ")}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-1">
-                  Date *
-                </label>
-                <input
-                  type="date"
-                  value={form.date}
-                  onChange={(e) => update({ date: e.target.value })}
-                  className="w-full px-4 py-3 border border-slate-200 rounded-md focus:ring-2 focus:ring-primary/20 outline-none min-h-[44px]"
-                  required
-                />
-              </div>
-              <div className="flex flex-col gap-4 md:grid md:grid-cols-2">
-                <div>
-                  <label className="block text-sm font-semibold text-slate-700 mb-1">
-                    Start Time
+          <form onSubmit={handleSubmit} id="create-event-form" className="space-y-6 pb-4">
+            {step === 0 && (
+              <>
+                <div className="space-y-2">
+                  <label className={LABEL_CLASS} htmlFor="event-title">
+                    Event Title
                   </label>
                   <input
-                    type="time"
-                    value={form.timeStart}
-                    onChange={(e) => update({ timeStart: e.target.value })}
-                    className="w-full px-4 py-3 border border-slate-200 rounded-md focus:ring-2 focus:ring-primary/20 outline-none min-h-[44px]"
+                    id="event-title"
+                    type="text"
+                    value={form.name}
+                    onChange={(e) => update({ name: e.target.value })}
+                    className={INPUT_CLASS}
+                    placeholder="e.g. Summer Gala 2024"
+                    required
                   />
                 </div>
-                <div>
-                  <label className="block text-sm font-semibold text-slate-700 mb-1">
-                    End Time
+
+                <div className="space-y-2">
+                  <label className={LABEL_CLASS}>Event Type</label>
+                  <div className="grid grid-cols-2 gap-3">
+                    {EVENT_TYPE_OPTIONS.map(({ value, label, subtitle, Icon }) => {
+                      const isSelected = form.eventType === value;
+                      return (
+                        <button
+                          key={value}
+                          type="button"
+                          onClick={() => update({ eventType: value })}
+                          className={`flex items-center p-3 text-left transition-all border-2 ${ROUND} ${
+                            isSelected ? "bg-white" : "bg-white border-slate-200 hover:border-slate-300"
+                          }`}
+                          style={{
+                            borderColor: isSelected ? CHERRY : undefined,
+                            backgroundColor: isSelected ? `${CHERRY}0D` : undefined,
+                          }}
+                        >
+                          <div
+                            className={`w-9 h-9 shrink-0 flex items-center justify-center mr-3 ${ROUND} ${
+                              isSelected ? "text-white" : "bg-slate-100 text-slate-500"
+                            }`}
+                            style={isSelected ? { backgroundColor: CHERRY } : undefined}
+                          >
+                            <Icon size={18} weight="regular" />
+                          </div>
+                          <div className="min-w-0">
+                            <span
+                              className={`block font-bold text-sm truncate ${isSelected ? "" : "text-slate-700"}`}
+                              style={isSelected ? { color: CHERRY } : undefined}
+                            >
+                              {label}
+                            </span>
+                            <span className="block text-[10px] text-slate-500 truncate">
+                              {subtitle}
+                            </span>
+                          </div>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <label className={LABEL_CLASS} htmlFor="event-date">
+                    Date
                   </label>
                   <input
-                    type="time"
-                    value={form.timeEnd}
-                    onChange={(e) => update({ timeEnd: e.target.value })}
-                    className="w-full px-4 py-3 border border-slate-200 rounded-md focus:ring-2 focus:ring-primary/20 outline-none min-h-[44px]"
+                    id="event-date"
+                    type="date"
+                    value={form.date}
+                    onChange={(e) => update({ date: e.target.value })}
+                    className={INPUT_CLASS}
+                    required
                   />
                 </div>
-              </div>
-            </>
-          )}
 
-          {step === 1 && (
-            <>
-              <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-1">
-                  Location *
-                </label>
-                <input
-                  type="text"
-                  value={form.location}
-                  onChange={(e) => update({ location: e.target.value })}
-                  className="w-full px-4 py-3 border border-slate-200 rounded-md focus:ring-2 focus:ring-primary/20 outline-none"
-                  placeholder="Address or venue"
-                  required
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-1">
-                  Venue Type
-                </label>
-                <select
-                  value={form.venueType}
-                  onChange={(e) => update({ venueType: e.target.value })}
-                  className="w-full px-4 py-3 border border-slate-200 rounded-md focus:ring-2 focus:ring-primary/20 outline-none"
-                >
-                  <option value="">Select</option>
-                  <option value="home">Home</option>
-                  <option value="external">External Venue</option>
-                </select>
-              </div>
-              <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-1">
-                  Venue Name
-                </label>
-                <input
-                  type="text"
-                  value={form.venueName}
-                  onChange={(e) => update({ venueName: e.target.value })}
-                  className="w-full px-4 py-3 border border-slate-200 rounded-md focus:ring-2 focus:ring-primary/20 outline-none"
-                  placeholder="e.g. Grand Ballroom"
-                />
-              </div>
-            </>
-          )}
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="space-y-2">
+                    <label className={LABEL_CLASS} htmlFor="start-time">
+                      Start Time
+                    </label>
+                    <input
+                      id="start-time"
+                      type="time"
+                      value={form.timeStart}
+                      onChange={(e) => update({ timeStart: e.target.value })}
+                      className={INPUT_CLASS}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className={LABEL_CLASS} htmlFor="end-time">
+                      End Time
+                    </label>
+                    <input
+                      id="end-time"
+                      type="time"
+                      value={form.timeEnd}
+                      onChange={(e) => update({ timeEnd: e.target.value })}
+                      className={INPUT_CLASS}
+                    />
+                  </div>
+                </div>
+              </>
+            )}
 
-          {step === 2 && (
-            <>
-              <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-1">
-                  Guest Count *
-                </label>
-                <input
-                  type="number"
-                  min={1}
-                  value={form.guestCount}
-                  onChange={(e) =>
-                    update({ guestCount: parseInt(e.target.value) || 1 })
-                  }
-                  className="w-full px-4 py-3 border border-slate-200 rounded-md focus:ring-2 focus:ring-primary/20 outline-none"
-                  required
-                />
-              </div>
-            </>
-          )}
+            {step === 1 && (
+              <>
+                <div className="space-y-2">
+                  <label className={LABEL_CLASS} htmlFor="location">
+                    Location
+                  </label>
+                  <input
+                    id="location"
+                    type="text"
+                    value={form.location}
+                    onChange={(e) => update({ location: e.target.value })}
+                    className={INPUT_CLASS}
+                    placeholder="Address or venue"
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className={LABEL_CLASS}>Venue Type</label>
+                  <select
+                    value={form.venueType}
+                    onChange={(e) => update({ venueType: e.target.value })}
+                    className={INPUT_CLASS}
+                  >
+                    <option value="">Select</option>
+                    <option value="home">Home</option>
+                    <option value="external">External Venue</option>
+                  </select>
+                </div>
+                <div className="space-y-2">
+                  <label className={LABEL_CLASS} htmlFor="venue-name">
+                    Venue Name
+                  </label>
+                  <input
+                    id="venue-name"
+                    type="text"
+                    value={form.venueName}
+                    onChange={(e) => update({ venueName: e.target.value })}
+                    className={INPUT_CLASS}
+                    placeholder="e.g. Grand Ballroom"
+                  />
+                </div>
+              </>
+            )}
 
-          {step === 3 && (
-            <div className="space-y-4 text-sm">
-              <p>
-                <span className="text-slate-500">Event:</span> {form.name}
-              </p>
-              <p>
-                <span className="text-slate-500">Type:</span>{" "}
-                {form.eventType.replace(/_/g, " ")}
-              </p>
-              <p>
-                <span className="text-slate-500">Date:</span>{" "}
-                {form.date && new Date(form.date).toLocaleDateString()}
-              </p>
-              <p>
-                <span className="text-slate-500">Location:</span> {form.location}
-              </p>
-              <p>
-                <span className="text-slate-500">Guests:</span> {form.guestCount}
-              </p>
-              {form.specialRequirements && (
+            {step === 2 && (
+              <>
+                <div className="space-y-2">
+                  <label className={LABEL_CLASS} htmlFor="guest-count">
+                    Guest Count
+                  </label>
+                  <input
+                    id="guest-count"
+                    type="number"
+                    min={1}
+                    value={form.guestCount}
+                    onChange={(e) =>
+                      update({ guestCount: parseInt(e.target.value) || 1 })
+                    }
+                    className={INPUT_CLASS}
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className={LABEL_CLASS}>Special Requirements</label>
+                  <textarea
+                    value={form.specialRequirements}
+                    onChange={(e) =>
+                      update({ specialRequirements: e.target.value })
+                    }
+                    className={`${INPUT_CLASS} min-h-[100px] py-3 resize-none`}
+                    placeholder="Dietary needs, setup preferences..."
+                  />
+                </div>
+              </>
+            )}
+
+            {step === 3 && (
+              <div
+                className={`space-y-3 text-sm bg-white border border-slate-200 p-5 ${ROUND}`}
+              >
+                <p><span className="text-slate-500">Event:</span> {form.name}</p>
                 <p>
-                  <span className="text-slate-500">Notes:</span>{" "}
-                  {form.specialRequirements}
+                  <span className="text-slate-500">Type:</span>{" "}
+                  {EVENT_TYPE_OPTIONS.find((o) => o.value === form.eventType)?.label ??
+                    form.eventType.replace(/_/g, " ")}
                 </p>
-              )}
-            </div>
-          )}
+                <p>
+                  <span className="text-slate-500">Date:</span>{" "}
+                  {form.date ? new Date(form.date).toLocaleDateString() : "—"}
+                </p>
+                <p>
+                  <span className="text-slate-500">Location:</span>{" "}
+                  {form.location || "—"}
+                </p>
+                <p>
+                  <span className="text-slate-500">Guests:</span> {form.guestCount}
+                </p>
+                {form.specialRequirements && (
+                  <p>
+                    <span className="text-slate-500">Notes:</span>{" "}
+                    {form.specialRequirements}
+                  </p>
+                )}
+              </div>
+            )}
 
-          {step === 2 && (
-            <div>
-              <label className="block text-sm font-semibold text-slate-700 mb-1">
-                Special Requirements
-              </label>
-              <textarea
-                value={form.specialRequirements}
-                onChange={(e) =>
-                  update({ specialRequirements: e.target.value })
-                }
-                className="w-full px-4 py-3 border border-slate-200 rounded-md focus:ring-2 focus:ring-primary/20 outline-none min-h-[100px]"
-                placeholder="Dietary needs, setup preferences..."
-              />
-            </div>
-          )}
+            {error && <p className="text-sm text-red-600">{error}</p>}
+          </form>
+        </main>
 
-          {error && <p className="text-sm text-red-600">{error}</p>}
-
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full py-3 bg-primary text-white font-semibold rounded-md hover:bg-primary/90 disabled:opacity-50"
-          >
-            {loading
-              ? "Creating..."
-              : step < STEPS.length - 1
-              ? "Next"
-              : "Create Event"}
-          </button>
-        </form>
-      </main>
+        {/* Footer - fixed, no scroll */}
+        <footer
+          className="shrink-0 p-6 bg-white/90 backdrop-blur-md border-t border-slate-100"
+          style={{
+            paddingBottom: "max(1.5rem, env(safe-area-inset-bottom))",
+          }}
+        >
+          <form onSubmit={handleSubmit}>
+            <button
+              type="submit"
+              disabled={loading}
+              className={BUTTON_CLASS}
+              style={{
+                backgroundColor: CHERRY,
+                boxShadow: `${CHERRY}33 0 8px 24px`,
+              }}
+            >
+              <span>
+                {loading
+                  ? "Creating..."
+                  : step < STEPS.length - 1
+                    ? "Continue"
+                    : "Create Event"}
+              </span>
+              <ArrowRight size={20} weight="bold" />
+            </button>
+          </form>
+          <p className={`${TYPO.CAPTION} text-center mt-3`}>
+            You can edit these details later in the event settings.
+          </p>
+        </footer>
+      </div>
     </AppLayout>
   );
 }

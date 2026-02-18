@@ -14,7 +14,7 @@ import {
   CaretRight,
 } from "@phosphor-icons/react";
 import { AppLayout } from "@/components/AppLayout";
-import { Tag } from "@/components/ui/Tag";
+import { CHERRY, ROUND, MINTY_LIME, MINTY_LIME_DARK, WARM_PEACH_DARK, SOFT_LILAC_DARK, TYPO } from "@/lib/events-ui";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 
@@ -51,10 +51,7 @@ export default function EventDetailPage() {
     fetch(`${API_URL}/api/events/${eventId}`, {
       headers: { Authorization: `Bearer ${token}` },
     })
-      .then((res) => {
-        if (!res.ok) return null;
-        return res.json();
-      })
+      .then((res) => (res.ok ? res.json() : null))
       .then(setEvent)
       .catch(() => setEvent(null))
       .finally(() => setLoading(false));
@@ -70,9 +67,7 @@ export default function EventDetailPage() {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` },
       });
-      if (res.ok) {
-        router.push("/events");
-      }
+      if (res.ok) router.push("/events");
     } finally {
       setDeleting(false);
     }
@@ -81,7 +76,7 @@ export default function EventDetailPage() {
   if (loading) {
     return (
       <AppLayout>
-        <div className="flex-1 flex items-center justify-center">
+        <div className="flex-1 flex items-center justify-center bg-[#FAFAFA]">
           <p className="text-slate-500">Loading...</p>
         </div>
       </AppLayout>
@@ -91,9 +86,13 @@ export default function EventDetailPage() {
   if (!event) {
     return (
       <AppLayout>
-        <div className="flex-1 flex flex-col items-center justify-center p-6">
-          <p className="text-slate-500 text-center">Event not found</p>
-          <Link href="/events" className="mt-4 text-primary font-semibold hover:underline">
+        <div className="flex-1 flex flex-col items-center justify-center p-6 bg-[#FAFAFA]">
+          <p className={`${TYPO.SUBTEXT} text-center`}>Event not found</p>
+          <Link
+            href="/events"
+            className={`mt-4 ${TYPO.LINK} hover:underline`}
+            style={{ color: CHERRY }}
+          >
             Back to events
           </Link>
         </div>
@@ -111,136 +110,166 @@ export default function EventDetailPage() {
 
   return (
     <AppLayout>
-      <header className="sticky top-0 z-40 bg-white/80 ios-blur px-6 py-3 border-b border-slate-100 shrink-0">
-        <div className="flex items-center gap-3">
-          <Link
-            href="/events"
-            className="w-9 h-9 rounded-md bg-slate-100 flex items-center justify-center shrink-0"
-          >
-            <ArrowLeft size={18} weight="regular" className="text-slate-600" />
-          </Link>
-          <h1 className="text-base font-bold tracking-tight truncate flex-1">
-            {event.name}
-          </h1>
-        </div>
-      </header>
-
-      <main className="p-6 pb-32 space-y-6">
-        <div className="space-y-4">
-          <div className="flex items-center gap-2 mt-1">
-            <Tag value={event.eventType} variant="eventType" className="rounded-md">
-              {event.eventType.replace(/_/g, " ")}
-            </Tag>
-          </div>
-          <div className="flex items-start gap-3">
-            <Calendar size={20} weight="regular" className="text-slate-400 shrink-0 mt-0.5" />
-            <div>
-              <p className="text-xs font-semibold text-slate-500 uppercase">Date</p>
-              <p className="text-slate-900 font-medium">{dateStr}</p>
-            </div>
-          </div>
-          <div className="flex items-start gap-3">
-            <Users size={20} weight="regular" className="text-slate-400 shrink-0 mt-0.5" />
-            <div>
-              <p className="text-xs font-semibold text-slate-500 uppercase">Guests</p>
-              <p className="text-slate-900 font-medium">{event.guestCount} guests</p>
-            </div>
-          </div>
-          <div className="flex items-start gap-3">
-            <MapPin size={20} weight="regular" className="text-slate-400 shrink-0 mt-0.5" />
-            <div>
-              <p className="text-xs font-semibold text-slate-500 uppercase">Location</p>
-              <p className="text-slate-900 font-medium">{event.location}</p>
-              {event.venueName && (
-                <p className="text-slate-500 text-sm mt-0.5">{event.venueName}</p>
-              )}
-            </div>
-          </div>
-          {(event.budgetMin != null || event.budgetMax != null) && (
-            <div>
-              <p className="text-xs font-semibold text-slate-500 uppercase">Budget</p>
-              <p className="text-slate-900 font-medium">
-                {event.budgetMin != null && event.budgetMax != null
-                  ? `${Number(event.budgetMin).toFixed(0)} – ${Number(event.budgetMax).toFixed(0)} BD`
-                  : event.budgetMin != null
-                  ? `From ${Number(event.budgetMin).toFixed(0)} BD`
-                  : `Up to ${Number(event.budgetMax).toFixed(0)} BD`}
-              </p>
-            </div>
-          )}
-          {event.dietaryRequirements?.length > 0 && (
-            <div>
-              <p className="text-xs font-semibold text-slate-500 uppercase mb-1">
-                Dietary requirements
-              </p>
-              <div className="flex flex-wrap gap-1.5">
-                {event.dietaryRequirements.map((d) => (
-                  <Tag key={d} value={d} variant="cuisine" className="rounded-md">
-                    {d}
-                  </Tag>
-                ))}
-              </div>
-            </div>
-          )}
-          {event.specialRequirements && (
-            <div>
-              <p className="text-xs font-semibold text-slate-500 uppercase">Special requirements</p>
-              <p className="text-slate-600 text-sm mt-0.5">{event.specialRequirements}</p>
-            </div>
-          )}
-        </div>
-
-        <div className="space-y-3 pt-4 border-t border-slate-100">
-          <Link
-            href={`/events/${eventId}/guests`}
-            className="flex items-center justify-between p-4 border border-slate-200 rounded-md bg-white hover:bg-slate-50 transition-colors"
-          >
-            <div className="flex items-center gap-3">
-              <Users size={24} weight="regular" className="text-primary" />
-              <div>
-                <p className="font-semibold text-slate-900">Manage guests</p>
-                <p className="text-slate-500 text-sm">{event.guests?.length ?? 0} guests added</p>
-              </div>
-            </div>
-            <CaretRight size={20} weight="regular" className="text-slate-400" />
-          </Link>
-
-          {!isPast && (
+      <div className="bg-[#FAFAFA] min-h-full">
+        <header className="px-6 pt-6 pb-4 shrink-0">
+          <div className="flex items-center gap-3">
             <Link
-              href={`/services/catering?eventId=${eventId}`}
-              className="flex items-center justify-between p-4 border border-slate-200 rounded-md bg-primary/5 hover:bg-primary/10 transition-colors"
+              href="/events"
+              className="w-10 h-10 flex items-center justify-center bg-white border border-slate-200 rounded-full"
+            >
+              <ArrowLeft size={18} weight="regular" className="text-slate-600" />
+            </Link>
+            <h1 className={`${TYPO.H1} truncate flex-1`} style={{ color: CHERRY }}>
+              {event.name}
+            </h1>
+          </div>
+        </header>
+
+        <main className="p-6 pb-32 space-y-6">
+          <div className="space-y-4">
+            <span
+              className={`inline-block text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 ${ROUND}`}
+              style={{ backgroundColor: MINTY_LIME, color: MINTY_LIME_DARK }}
+            >
+              {event.eventType.replace(/_/g, " ")}
+            </span>
+
+            <div className={`flex items-start gap-3 p-4 bg-white border border-slate-200 ${ROUND}`}>
+              <Calendar size={20} weight="regular" className="text-slate-400 shrink-0 mt-0.5" />
+              <div>
+                <p className="text-xs font-bold uppercase tracking-wider" style={{ color: WARM_PEACH_DARK }}>Date</p>
+                <p className={`${TYPO.CARD_TITLE} mt-0.5`}>{dateStr}</p>
+              </div>
+            </div>
+
+            <div className={`flex items-start gap-3 p-4 bg-white border border-slate-200 ${ROUND}`}>
+              <Users size={20} weight="regular" className="text-slate-400 shrink-0 mt-0.5" />
+              <div>
+                <p className="text-xs font-bold uppercase tracking-wider" style={{ color: WARM_PEACH_DARK }}>Guests</p>
+                <p className={`${TYPO.CARD_TITLE} mt-0.5`}>{event.guestCount} guests</p>
+              </div>
+            </div>
+
+            <div className={`flex items-start gap-3 p-4 bg-white border border-slate-200 ${ROUND}`}>
+              <MapPin size={20} weight="regular" className="text-slate-400 shrink-0 mt-0.5" />
+              <div>
+                <p className="text-xs font-bold uppercase tracking-wider" style={{ color: SOFT_LILAC_DARK }}>Location</p>
+                <p className={`${TYPO.CARD_TITLE} mt-0.5`}>{event.location}</p>
+                {event.venueName && (
+                  <p className={`${TYPO.SUBTEXT} mt-0.5`}>{event.venueName}</p>
+                )}
+              </div>
+            </div>
+
+            {(event.budgetMin != null || event.budgetMax != null) && (
+              <div className={`p-4 bg-white border border-slate-200 ${ROUND}`}>
+                <p className="text-xs font-bold uppercase tracking-wider" style={{ color: MINTY_LIME_DARK }}>Budget</p>
+                <p className={`${TYPO.CARD_TITLE} mt-0.5`}>
+                  {event.budgetMin != null && event.budgetMax != null
+                    ? `${Number(event.budgetMin).toFixed(0)} – ${Number(event.budgetMax).toFixed(0)} BD`
+                    : event.budgetMin != null
+                      ? `From ${Number(event.budgetMin).toFixed(0)} BD`
+                      : `Up to ${Number(event.budgetMax).toFixed(0)} BD`}
+                </p>
+              </div>
+            )}
+
+            {event.dietaryRequirements?.length > 0 && (
+              <div className={`p-4 bg-white border border-slate-200 ${ROUND}`}>
+                <p className="text-xs font-bold uppercase tracking-wider mb-2" style={{ color: SOFT_LILAC_DARK }}>
+                  Dietary requirements
+                </p>
+                <div className="flex flex-wrap gap-1.5">
+                  {event.dietaryRequirements.map((d) => (
+                    <span
+                      key={d}
+                      className={`text-[10px] font-bold uppercase px-2 py-0.5 ${ROUND}`}
+                      style={{ backgroundColor: `${CHERRY}10`, color: CHERRY }}
+                    >
+                      {d}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {event.specialRequirements && (
+              <div className={`p-4 bg-white border border-slate-200 ${ROUND}`}>
+                <p className="text-xs font-bold uppercase tracking-wider" style={{ color: WARM_PEACH_DARK }}>
+                  Special requirements
+                </p>
+                <p className={`${TYPO.BODY} mt-0.5`}>{event.specialRequirements}</p>
+              </div>
+            )}
+          </div>
+
+          <div className="space-y-3 pt-2">
+            <Link
+              href={`/events/${eventId}/guests`}
+              className={`flex items-center justify-between p-4 border border-slate-200 bg-white hover:bg-slate-50/50 transition-colors ${ROUND}`}
             >
               <div className="flex items-center gap-3">
-                <ForkKnife size={24} weight="regular" className="text-primary" />
+                <div
+                  className="w-10 h-10 flex items-center justify-center rounded-full"
+                  style={{ backgroundColor: `${CHERRY}15` }}
+                >
+                  <Users size={20} weight="regular" style={{ color: CHERRY }} />
+                </div>
                 <div>
-                  <p className="font-semibold text-slate-900">Book catering</p>
-                  <p className="text-slate-500 text-sm">Find caterers for this event</p>
+                  <p className={TYPO.CARD_TITLE}>Manage guests</p>
+                  <p className={TYPO.SUBTEXT}>{event.guests?.length ?? 0} guests added</p>
                 </div>
               </div>
               <CaretRight size={20} weight="regular" className="text-slate-400" />
             </Link>
-          )}
-        </div>
 
-        <div className="flex gap-3 pt-4">
-          <Link
-            href={`/events/${eventId}/edit`}
-            className="flex-1 flex items-center justify-center gap-2 py-3 border border-slate-200 rounded-md font-semibold text-slate-700 hover:bg-slate-50 transition-colors"
-          >
-            <Pencil size={18} weight="regular" />
-            Edit
-          </Link>
-          <button
-            type="button"
-            onClick={handleDelete}
-            disabled={deleting}
-            className="flex-1 flex items-center justify-center gap-2 py-3 border border-red-200 rounded-md font-semibold text-red-600 hover:bg-red-50 transition-colors disabled:opacity-50"
-          >
-            <Trash size={18} weight="regular" />
-            {deleting ? "Deleting…" : "Delete"}
-          </button>
-        </div>
-      </main>
+            {!isPast && (
+              <Link
+                href={`/services/catering?eventId=${eventId}`}
+                className={`flex items-center justify-between p-4 border transition-colors ${ROUND}`}
+                style={{
+                  borderColor: CHERRY,
+                  backgroundColor: `${CHERRY}08`,
+                }}
+              >
+                <div className="flex items-center gap-3">
+                  <div
+                    className="w-10 h-10 flex items-center justify-center rounded-full"
+                    style={{ backgroundColor: CHERRY }}
+                  >
+                    <ForkKnife size={20} weight="regular" className="text-white" />
+                  </div>
+                  <div>
+                    <p className={TYPO.CARD_TITLE}>Book catering</p>
+                    <p className={TYPO.SUBTEXT}>Find caterers for this event</p>
+                  </div>
+                </div>
+                <CaretRight size={20} weight="regular" style={{ color: CHERRY }} />
+              </Link>
+            )}
+          </div>
+
+          <div className="flex gap-3 pt-2">
+            <Link
+              href={`/events/${eventId}/edit`}
+              className="flex-1 flex items-center justify-center gap-2 py-3 border border-slate-200 font-semibold text-slate-700 hover:bg-white transition-colors rounded-full"
+            >
+              <Pencil size={18} weight="regular" />
+              Edit
+            </Link>
+            <button
+              type="button"
+              onClick={handleDelete}
+              disabled={deleting}
+              className="flex-1 flex items-center justify-center gap-2 py-3 border font-semibold text-red-600 hover:bg-red-50 transition-colors disabled:opacity-50 rounded-full"
+              style={{ borderColor: "rgb(254 202 202)" }}
+            >
+              <Trash size={18} weight="regular" />
+              {deleting ? "Deleting…" : "Delete"}
+            </button>
+          </div>
+        </main>
+      </div>
     </AppLayout>
   );
 }

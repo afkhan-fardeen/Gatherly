@@ -3,19 +3,31 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
-import { ArrowLeft } from "@phosphor-icons/react";
+import {
+  ArrowLeft,
+  Confetti,
+  Briefcase,
+  GraduationCap,
+  DotsThree,
+} from "@phosphor-icons/react";
 import { AppLayout } from "@/components/AppLayout";
+import {
+  CHERRY,
+  ROUND,
+  INPUT_CLASS,
+  BUTTON_CLASS,
+  LABEL_CLASS,
+  TYPO,
+} from "@/lib/events-ui";
+import { parseApiError } from "@/lib/api";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 
-const EVENT_TYPES = [
-  "birthday",
-  "anniversary",
-  "corporate",
-  "wedding",
-  "engagement",
-  "family_gathering",
-  "other",
+const EVENT_TYPE_OPTIONS = [
+  { value: "wedding", label: "Social", subtitle: "Parties, Weddings", Icon: Confetti },
+  { value: "corporate", label: "Corporate", subtitle: "Meetings, Gala", Icon: Briefcase },
+  { value: "family_gathering", label: "Education", subtitle: "Workshops, Class", Icon: GraduationCap },
+  { value: "other", label: "Other", subtitle: "Custom Category", Icon: DotsThree },
 ];
 
 function formatDateForInput(d: Date) {
@@ -103,10 +115,8 @@ export default function EditEventPage() {
           specialRequirements: form.specialRequirements || undefined,
         }),
       });
-      if (!res.ok) {
-        const data = await res.json().catch(() => ({}));
-        throw new Error(data.error || "Update failed");
-      }
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(parseApiError(data) || "Update failed");
       router.push(`/events/${eventId}`);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Update failed");
@@ -118,143 +128,209 @@ export default function EditEventPage() {
   if (loading) {
     return (
       <AppLayout>
-        <div className="flex-1 flex items-center justify-center">
+        <div className="flex-1 flex items-center justify-center bg-[#FAFAFA]">
           <p className="text-slate-500">Loading...</p>
         </div>
       </AppLayout>
     );
   }
 
-  const inputClass =
-    "w-full px-4 py-3 border border-slate-200 rounded-md focus:ring-2 focus:ring-primary/20 outline-none min-h-[44px]";
-
   return (
     <AppLayout>
-      <header className="sticky top-0 z-40 bg-white/80 ios-blur px-6 py-3 border-b border-slate-100 shrink-0">
-        <div className="flex items-center gap-3">
-          <Link
-            href={`/events/${eventId}`}
-            className="w-9 h-9 rounded-md bg-slate-100 flex items-center justify-center shrink-0"
-          >
-            <ArrowLeft size={18} weight="regular" className="text-slate-600" />
-          </Link>
-          <h1 className="text-xl font-bold tracking-tight">Edit Event</h1>
-        </div>
-      </header>
-
-      <main className="p-6 pb-32">
-        <form onSubmit={handleSubmit} className="space-y-4">
-          {error && (
-            <p className="text-sm text-red-600 p-3 bg-red-50 border border-red-100">{error}</p>
-          )}
-          <div>
-            <label className="block text-sm font-semibold text-slate-700 mb-1">Event Name *</label>
-            <input
-              type="text"
-              value={form.name}
-              onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
-              className={inputClass}
-              required
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-semibold text-slate-700 mb-1">Event Type *</label>
-            <select
-              value={form.eventType}
-              onChange={(e) => setForm((f) => ({ ...f, eventType: e.target.value }))}
-              className={inputClass}
-              required
+      <div className="bg-[#FAFAFA] min-h-full">
+        <header className="px-6 pt-6 pb-4 shrink-0">
+          <div className="flex items-center gap-3">
+            <Link
+              href={`/events/${eventId}`}
+              className="w-10 h-10 flex items-center justify-center bg-white border border-slate-200 rounded-full"
             >
-              <option value="">Select type</option>
-              {EVENT_TYPES.map((t) => (
-                <option key={t} value={t}>
-                  {t.replace(/_/g, " ")}
-                </option>
-              ))}
-            </select>
+              <ArrowLeft size={18} weight="regular" className="text-slate-600" />
+            </Link>
+            <h1 className={TYPO.H1} style={{ color: CHERRY }}>
+              Edit Event
+            </h1>
           </div>
-          <div>
-            <label className="block text-sm font-semibold text-slate-700 mb-1">Date *</label>
-            <input
-              type="date"
-              value={form.date}
-              onChange={(e) => setForm((f) => ({ ...f, date: e.target.value }))}
-              className={inputClass}
-              required
-            />
-          </div>
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-semibold text-slate-700 mb-1">Start Time</label>
+        </header>
+
+        <main className="p-6 pb-32">
+          <form onSubmit={handleSubmit} className="space-y-6">
+            {error && (
+              <div
+                className={`p-4 bg-red-50 border border-red-100 ${ROUND}`}
+              >
+                <p className="text-sm text-red-600 font-medium">{error}</p>
+              </div>
+            )}
+
+            <div className="space-y-2">
+              <label className={LABEL_CLASS} htmlFor="name">
+                Event Name
+              </label>
               <input
-                type="time"
-                value={form.timeStart}
-                onChange={(e) => setForm((f) => ({ ...f, timeStart: e.target.value }))}
-                className={inputClass}
+                id="name"
+                type="text"
+                value={form.name}
+                onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
+                className={INPUT_CLASS}
+                required
               />
             </div>
-            <div>
-              <label className="block text-sm font-semibold text-slate-700 mb-1">End Time</label>
+
+            <div className="space-y-2">
+              <label className={LABEL_CLASS}>Event Type</label>
+              <div className="grid grid-cols-2 gap-3">
+                {EVENT_TYPE_OPTIONS.map(({ value, label, subtitle, Icon }) => {
+                  const isSelected = form.eventType === value;
+                  return (
+                    <button
+                      key={value}
+                      type="button"
+                      onClick={() => setForm((f) => ({ ...f, eventType: value }))}
+                      className={`flex items-center p-3 text-left transition-all border-2 ${ROUND} ${
+                        isSelected ? "bg-white" : "bg-white border-slate-200 hover:border-slate-300"
+                      }`}
+                      style={{
+                        borderColor: isSelected ? CHERRY : undefined,
+                        backgroundColor: isSelected ? `${CHERRY}0D` : undefined,
+                      }}
+                    >
+                      <div
+                        className={`w-9 h-9 shrink-0 flex items-center justify-center mr-3 ${ROUND} ${
+                          isSelected ? "text-white" : "bg-slate-100 text-slate-500"
+                        }`}
+                        style={isSelected ? { backgroundColor: CHERRY } : undefined}
+                      >
+                        <Icon size={18} weight="regular" />
+                      </div>
+                      <div className="min-w-0">
+                        <span
+                          className={`block font-bold text-sm truncate ${isSelected ? "" : "text-slate-700"}`}
+                          style={isSelected ? { color: CHERRY } : undefined}
+                        >
+                          {label}
+                        </span>
+                        <span className="block text-[10px] text-slate-500 truncate">
+                          {subtitle}
+                        </span>
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <label className={LABEL_CLASS} htmlFor="date">
+                Date
+              </label>
               <input
-                type="time"
-                value={form.timeEnd}
-                onChange={(e) => setForm((f) => ({ ...f, timeEnd: e.target.value }))}
-                className={inputClass}
+                id="date"
+                type="date"
+                value={form.date}
+                onChange={(e) => setForm((f) => ({ ...f, date: e.target.value }))}
+                className={INPUT_CLASS}
+                required
               />
             </div>
-          </div>
-          <div>
-            <label className="block text-sm font-semibold text-slate-700 mb-1">Guest Count *</label>
-            <input
-              type="number"
-              min={1}
-              value={form.guestCount}
-              onChange={(e) =>
-                setForm((f) => ({ ...f, guestCount: parseInt(e.target.value) || 1 }))
-              }
-              className={inputClass}
-              required
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-semibold text-slate-700 mb-1">Location *</label>
-            <input
-              type="text"
-              value={form.location}
-              onChange={(e) => setForm((f) => ({ ...f, location: e.target.value }))}
-              className={inputClass}
-              required
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-semibold text-slate-700 mb-1">Venue Name</label>
-            <input
-              type="text"
-              value={form.venueName}
-              onChange={(e) => setForm((f) => ({ ...f, venueName: e.target.value }))}
-              className={inputClass}
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-semibold text-slate-700 mb-1">
-              Special Requirements
-            </label>
-            <textarea
-              value={form.specialRequirements}
-              onChange={(e) => setForm((f) => ({ ...f, specialRequirements: e.target.value }))}
-              className={`${inputClass} min-h-[100px]`}
-              rows={3}
-            />
-          </div>
-          <button
-            type="submit"
-            disabled={saving}
-            className="w-full py-3 bg-primary text-white font-semibold rounded-md hover:bg-primary/90 disabled:opacity-50"
-          >
-            {saving ? "Saving…" : "Save changes"}
-          </button>
-        </form>
-      </main>
+
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-2">
+                <label className={LABEL_CLASS} htmlFor="timeStart">
+                  Start Time
+                </label>
+                <input
+                  id="timeStart"
+                  type="time"
+                  value={form.timeStart}
+                  onChange={(e) => setForm((f) => ({ ...f, timeStart: e.target.value }))}
+                  className={INPUT_CLASS}
+                />
+              </div>
+              <div className="space-y-2">
+                <label className={LABEL_CLASS} htmlFor="timeEnd">
+                  End Time
+                </label>
+                <input
+                  id="timeEnd"
+                  type="time"
+                  value={form.timeEnd}
+                  onChange={(e) => setForm((f) => ({ ...f, timeEnd: e.target.value }))}
+                  className={INPUT_CLASS}
+                />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <label className={LABEL_CLASS} htmlFor="guestCount">
+                Guest Count
+              </label>
+              <input
+                id="guestCount"
+                type="number"
+                min={1}
+                value={form.guestCount}
+                onChange={(e) =>
+                  setForm((f) => ({ ...f, guestCount: parseInt(e.target.value) || 1 }))
+                }
+                className={INPUT_CLASS}
+                required
+              />
+            </div>
+
+            <div className="space-y-2">
+              <label className={LABEL_CLASS} htmlFor="location">
+                Location
+              </label>
+              <input
+                id="location"
+                type="text"
+                value={form.location}
+                onChange={(e) => setForm((f) => ({ ...f, location: e.target.value }))}
+                className={INPUT_CLASS}
+                required
+              />
+            </div>
+
+            <div className="space-y-2">
+              <label className={LABEL_CLASS} htmlFor="venueName">
+                Venue Name
+              </label>
+              <input
+                id="venueName"
+                type="text"
+                value={form.venueName}
+                onChange={(e) => setForm((f) => ({ ...f, venueName: e.target.value }))}
+                className={INPUT_CLASS}
+                placeholder="e.g. Grand Ballroom"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <label className={LABEL_CLASS}>Special Requirements</label>
+              <textarea
+                value={form.specialRequirements}
+                onChange={(e) =>
+                  setForm((f) => ({ ...f, specialRequirements: e.target.value }))
+                }
+                className={`${INPUT_CLASS} min-h-[100px] py-3 resize-none`}
+                placeholder="Dietary needs, setup preferences..."
+              />
+            </div>
+
+            <button
+              type="submit"
+              disabled={saving}
+              className={BUTTON_CLASS}
+              style={{
+                backgroundColor: CHERRY,
+                boxShadow: `${CHERRY}33 0 8px 24px`,
+              }}
+            >
+              {saving ? "Saving…" : "Save changes"}
+            </button>
+          </form>
+        </main>
+      </div>
     </AppLayout>
   );
 }

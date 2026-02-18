@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import { ArrowLeft, Camera } from "@phosphor-icons/react";
 import { AppLayout } from "@/components/AppLayout";
+import { TYPO } from "@/lib/events-ui";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 
@@ -141,7 +142,7 @@ export default function EditProfilePage() {
           >
             <ArrowLeft size={18} weight="regular" className="text-slate-600" />
           </Link>
-          <h1 className="text-xl font-bold tracking-tight">Edit profile</h1>
+          <h1 className={TYPO.H1}>Edit profile</h1>
         </div>
       </header>
 
@@ -149,7 +150,7 @@ export default function EditProfilePage() {
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Profile image */}
           <div className="flex flex-col items-center">
-            <label className="block text-sm font-medium text-slate-700 mb-2">Profile photo</label>
+            <label className={`${TYPO.FORM_LABEL} mb-2`}>Profile photo</label>
             <div className="relative">
               <div className="w-24 h-24 rounded-md border-2 border-slate-200 overflow-hidden bg-slate-100 flex items-center justify-center shrink-0">
                 {form.profilePictureUrl ? (
@@ -187,7 +188,7 @@ export default function EditProfilePage() {
 
           {/* Name */}
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-2">Name</label>
+            <label className={`${TYPO.FORM_LABEL} mb-2`}>Name</label>
             <input
               type="text"
               value={form.name}
@@ -200,19 +201,19 @@ export default function EditProfilePage() {
 
           {/* Email (read-only) */}
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-2">Email</label>
+            <label className={`${TYPO.FORM_LABEL} mb-2`}>Email</label>
             <input
               type="email"
               value={form.email}
               readOnly
               className={`${inputClass} bg-slate-100 text-slate-500 cursor-not-allowed`}
             />
-            <p className="text-slate-400 text-xs mt-1">Email cannot be changed</p>
+            <p className={`${TYPO.CAPTION} mt-1`}>Email cannot be changed</p>
           </div>
 
           {/* Phone */}
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-2">Phone</label>
+            <label className={`${TYPO.FORM_LABEL} mb-2`}>Phone</label>
             <input
               type="tel"
               value={form.phone}
