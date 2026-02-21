@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Envelope, Lock, User, Storefront, ForkKnife, MapPin, Tag, CaretDown } from "@phosphor-icons/react";
 import { AuthLayout } from "@/components/ui/AuthLayout";
 import { AuthInput } from "@/components/ui/AuthInput";
@@ -10,8 +10,10 @@ import { AuthButton } from "@/components/ui/AuthButton";
 import { VENDOR_CATEGORIES } from "@/lib/categories";
 import { API_URL, parseJsonResponse } from "@/lib/api";
 
-export default function VendorRegisterPage() {
+function VendorRegisterForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirectTo = searchParams.get("redirect") || "/dashboard";
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -58,7 +60,7 @@ export default function VendorRegisterPage() {
           ...(areasArr.length > 0 && { serviceAreas: areasArr }),
         }),
       });
-      router.replace("/dashboard");
+      router.replace(redirectTo.startsWith("/") ? redirectTo : `/${redirectTo}`);
       router.refresh();
     } catch (err) {
       const msg = err instanceof Error ? err.message : "Registration failed";
@@ -76,7 +78,7 @@ export default function VendorRegisterPage() {
         <p className="text-[15px] text-slate-500">
           Already have an account?{" "}
           <Link
-            href="/login"
+            href={redirectTo !== "/dashboard" ? `/login?redirect=${encodeURIComponent(redirectTo)}` : "/login"}
             className="text-slate-900 font-semibold hover:underline decoration-primary decoration-2 underline-offset-4"
           >
             Sign in
@@ -170,5 +172,13 @@ export default function VendorRegisterPage() {
         </div>
       </form>
     </AuthLayout>
+  );
+}
+
+export default function VendorRegisterPage() {
+  return (
+    <Suspense fallback={<AuthLayout title="Create vendor account" footer={<p className="text-slate-500">Loading...</p>}><div className="flex items-center justify-center min-h-[200px]">Loading...</div></AuthLayout>}>
+      <VendorRegisterForm />
+    </Suspense>
   );
 }

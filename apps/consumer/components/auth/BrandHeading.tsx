@@ -9,7 +9,7 @@ interface BrandHeadingProps {
 export function BrandHeading({ className = "" }: BrandHeadingProps) {
   return (
     <h1
-      className={`text-6xl font-normal tracking-tight ${className}`}
+      className={`font-logo text-6xl font-normal tracking-tight ${className}`}
       style={{ color: CHERRY }}
     >
       Gatherlii

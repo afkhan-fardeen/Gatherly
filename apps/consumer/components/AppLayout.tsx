@@ -14,17 +14,14 @@ interface AppLayoutProps {
   fullHeight?: boolean;
 }
 
-function shouldShowMinimalTopBar(pathname: string): boolean {
-  if (pathname === "/dashboard") return true;
-  if (pathname === "/events") return true;
-  if (/^\/events\/[^/]+$/.test(pathname)) return true; // event detail only
-  if (pathname.startsWith("/services")) return true;
-  return false;
+/** Logo + Notifications header only on home (dashboard). Other pages use their own contextual headers. */
+function shouldShowLogoHeader(pathname: string): boolean {
+  return pathname === "/dashboard";
 }
 
 export function AppLayout({ children, showNav = true, showTopBar = true, fullHeight = false }: AppLayoutProps) {
   const pathname = usePathname();
-  const showMinimalTopBar = showNav && showTopBar && shouldShowMinimalTopBar(pathname ?? "");
+  const showLogoHeader = showNav && showTopBar && shouldShowLogoHeader(pathname ?? "");
 
   return (
     <>
@@ -32,19 +29,19 @@ export function AppLayout({ children, showNav = true, showTopBar = true, fullHei
         <Sidebar />
         <div className="flex-1 flex flex-col items-center md:items-stretch min-w-0 overflow-hidden">
           <main
-            className={`w-full max-w-[430px] md:max-w-6xl flex-1 min-h-0 md:px-8 md:py-6 bg-white relative shadow-2xl md:shadow-none flex flex-col min-w-0 ${
-              fullHeight ? "overflow-hidden" : "overflow-y-auto overflow-x-hidden"
+            className={`w-full max-w-[430px] md:max-w-4xl lg:max-w-5xl xl:max-w-6xl flex-1 min-h-0 md:px-8 md:py-6 md:mx-auto bg-white relative shadow-elevation-3 md:shadow-none flex flex-col min-w-0 ${
+              fullHeight ? "overflow-hidden" : "overflow-y-auto overflow-x-hidden scroll-touch"
             }`}
           >
-            {showMinimalTopBar && <div className="shrink-0 h-16 min-h-[64px]" aria-hidden />}
-            {showMinimalTopBar &&
+            {showLogoHeader && <div className="shrink-0 h-16 min-h-[64px] md:hidden" aria-hidden />}
+            {showLogoHeader &&
               typeof document !== "undefined" &&
               createPortal(<ConsumerTopBar />, document.body)}
             {children}
             {showNav && (
               <div
                 className="md:hidden shrink-0"
-                style={{ height: "calc(5.5rem + env(safe-area-inset-bottom, 0px))" }}
+                style={{ height: "calc(5rem + env(safe-area-inset-bottom, 0px))" }}
                 aria-hidden
               />
             )}

@@ -2,11 +2,12 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Bell, CaretRight } from "@phosphor-icons/react";
 import { AppLayout } from "@/components/AppLayout";
-import { TYPO } from "@/lib/events-ui";
+import { CHERRY, ROUND, TYPO } from "@/lib/events-ui";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+import { API_URL } from "@/lib/api";
 
 interface Notification {
   id: string;
@@ -19,13 +20,14 @@ interface Notification {
 }
 
 export default function NotificationsPage() {
+  const router = useRouter();
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (!token) {
-      window.location.href = "/login";
+      router.push("/login?redirect=" + encodeURIComponent("/notifications"));
       return;
     }
     function fetchNotifications(isInitial = false) {
@@ -82,15 +84,15 @@ export default function NotificationsPage() {
     if (items.length === 0) return null;
     return (
       <section>
-        <h3 className={`${TYPO.H3} text-slate-400 mb-2 px-1`}>
+        <h3 className={`${TYPO.H3} mb-3 text-text-primary`}>
           {title}
         </h3>
-        <div className="space-y-0 divide-y divide-slate-100 rounded-md border border-slate-200 bg-white overflow-hidden">
+        <div className="space-y-2">
           {items.map((notification) => {
             const inner = (
               <>
                 {!notification.isRead && (
-                  <div className="w-2 h-2 rounded-full bg-primary shrink-0" />
+                  <div className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: CHERRY }} />
                 )}
                 <div className="flex-1 min-w-0">
                   <p className={`${TYPO.CARD_TITLE} text-sm truncate`}>
@@ -101,20 +103,21 @@ export default function NotificationsPage() {
                   </p>
                 </div>
                 {notification.link && (
-                  <CaretRight size={16} weight="regular" className="text-slate-400 shrink-0" />
+                  <CaretRight size={18} weight="regular" className="text-slate-400 shrink-0" />
                 )}
               </>
             );
-            const baseClass = `flex items-center gap-4 py-3 px-4 ${
-              !notification.isRead ? "bg-primary/5" : ""
+            const baseClass = `flex items-center gap-4 py-3 px-4 rounded-[10px] border transition-colors hover:border-slate-200 ${
+              !notification.isRead ? "bg-white" : "bg-white/80"
             }`;
+            const borderStyle = { borderColor: "rgba(0,0,0,0.06)" };
             const onClick = () => !notification.isRead && markAsRead(notification.id);
             return notification.link ? (
-              <Link key={notification.id} href={notification.link} onClick={onClick} className={baseClass}>
+              <Link key={notification.id} href={notification.link} onClick={onClick} className={`${baseClass} border`} style={borderStyle}>
                 {inner}
               </Link>
             ) : (
-              <div key={notification.id} onClick={onClick} role="button" tabIndex={0} onKeyDown={(e) => e.key === "Enter" && onClick()} className={baseClass}>
+              <div key={notification.id} onClick={onClick} role="button" tabIndex={0} onKeyDown={(e) => e.key === "Enter" && onClick()} className={`${baseClass} border`} style={borderStyle}>
                 {inner}
               </div>
             );
@@ -126,16 +129,17 @@ export default function NotificationsPage() {
 
   return (
     <AppLayout>
-      <header className="sticky top-0 z-40 bg-white/80 ios-blur px-6 py-3 border-b border-slate-100 shrink-0">
+      <header className="sticky top-0 z-40 bg-white px-6 py-3 border-b border-slate-200 shrink-0">
         <div className="flex justify-between items-center">
-          <h1 className={TYPO.H1}>
+          <h1 className={`${TYPO.H1} text-text-primary`}>
             Notifications
           </h1>
           {unreadCount > 0 && (
             <button
               type="button"
               onClick={markAllRead}
-              className="text-sm font-semibold text-primary"
+              className="text-sm font-semibold"
+              style={{ color: CHERRY }}
             >
               Mark all read
             </button>
@@ -149,13 +153,16 @@ export default function NotificationsPage() {
             {[1, 2, 3].map((i) => (
               <div
                 key={i}
-                className="h-20 bg-slate-100 rounded-md animate-pulse"
+                className={`h-20 bg-slate-200/60 animate-pulse ${ROUND}`}
               />
             ))}
           </div>
         ) : notifications.length === 0 ? (
-          <div className="text-center py-16 rounded-md border border-slate-200 bg-white">
-            <Bell size={64} weight="regular" className="text-slate-300 mx-auto" />
+          <div
+            className="text-center py-16 rounded-[10px] border bg-white"
+            style={{ borderColor: "rgba(0,0,0,0.06)" }}
+          >
+            <Bell size={40} weight="regular" className="text-slate-300 mx-auto" />
             <p className={`${TYPO.SUBTEXT} mt-4 font-medium`}>No notifications</p>
             <p className={`${TYPO.SUBTEXT} mt-1`}>
               You&apos;re all caught up

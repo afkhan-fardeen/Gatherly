@@ -5,8 +5,9 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, Receipt } from "@phosphor-icons/react";
 import { AppLayout } from "@/components/AppLayout";
+import { TYPO } from "@/lib/events-ui";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+import { API_URL } from "@/lib/api";
 
 interface PaidBooking {
   id: string;
@@ -40,30 +41,30 @@ export default function PaymentHistoryPage() {
 
   return (
     <AppLayout>
-      <header className="sticky top-0 z-40 bg-white/80 ios-blur px-6 py-3 border-b border-slate-100 shrink-0">
-        <div className="flex items-center gap-4">
+      <header className="sticky top-0 z-40 bg-white px-6 py-3 border-b border-slate-200 shrink-0">
+        <div className="flex items-center gap-3">
           <Link
             href="/profile"
-            className="w-10 h-10 rounded-md bg-slate-100 flex items-center justify-center"
+            className="w-11 h-11 min-w-[44px] min-h-[44px] rounded-full border border-slate-200 bg-white flex items-center justify-center shrink-0 text-text-primary hover:bg-slate-50 transition-colors"
           >
-            <ArrowLeft size={20} weight="regular" className="text-slate-600" />
+            <ArrowLeft size={22} weight="regular" />
           </Link>
-          <h1 className="text-xl font-bold tracking-tight">Payment history</h1>
+          <h1 className={`${TYPO.H1} text-text-primary`}>Payment history</h1>
         </div>
       </header>
 
-      <main className="p-6 pb-32">
+      <main className="p-6 pb-32 bg-[var(--bg-app)]">
         {loading ? (
-          <div className="space-y-4">
+          <div className="space-y-2">
             {[1, 2, 3].map((i) => (
-              <div key={i} className="h-20 bg-slate-100 rounded-md animate-pulse" />
+              <div key={i} className="h-20 bg-slate-100 rounded-2xl animate-pulse" />
             ))}
           </div>
         ) : bookings.length === 0 ? (
-          <div className="text-center py-16 rounded-md border border-slate-200 bg-white">
-            <Receipt size={64} weight="regular" className="text-slate-300 mx-auto" />
-            <p className="text-slate-500 mt-4 font-medium">No payments yet</p>
-            <p className="text-slate-400 text-sm mt-1">
+          <div className="text-center py-16 rounded-2xl border border-slate-200 bg-white shadow-elevation-1">
+            <Receipt size={40} weight="regular" className="text-text-tertiary mx-auto" />
+            <p className={`${TYPO.SUBTEXT} mt-4 font-medium text-text-secondary`}>No payments yet</p>
+            <p className={TYPO.CAPTION}>
               Payments for your bookings will appear here.
             </p>
             <Link
@@ -79,20 +80,20 @@ export default function PaymentHistoryPage() {
               <Link
                 key={b.id}
                 href={`/bookings/${b.id}`}
-                className="flex items-center gap-4 p-4 border border-slate-100 rounded-md hover:bg-slate-50 transition-colors"
+                className="flex items-center gap-4 p-4 border border-slate-200 rounded-2xl bg-white shadow-elevation-1 hover:border-slate-300 transition-all"
               >
-                <div className="w-10 h-10 rounded-md bg-primary/10 flex items-center justify-center shrink-0">
-                  <Receipt size={20} className="text-primary" />
+                <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
+                  <Receipt size={22} className="text-primary" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="font-semibold text-sm text-slate-900 truncate">
+                  <p className={`${TYPO.CARD_TITLE} truncate`}>
                     {b.event.name} · {b.vendor.businessName}
                   </p>
-                  <p className="text-slate-500 text-xs">
+                  <p className={TYPO.CAPTION}>
                     {b.bookingReference} · {b.package.name} · {new Date(b.createdAt).toLocaleDateString()}
                   </p>
                 </div>
-                <span className="font-semibold text-slate-900 shrink-0">
+                <span className={`${TYPO.BODY_MEDIUM} shrink-0`}>
                   {Number(b.totalAmount).toFixed(2)} BD
                 </span>
               </Link>

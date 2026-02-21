@@ -44,13 +44,125 @@ async function main() {
         name: "Wedding Reception",
         eventType: "wedding",
         date: new Date("2025-04-15"),
+        timeStart: new Date("1970-01-01T18:00:00"),
+        timeEnd: new Date("1970-01-01T23:00:00"),
         guestCount: 80,
         location: "Gulf Hotel, Manama",
         venueType: "hotel",
         venueName: "Gulf Hotel Ballroom",
-        status: "confirmed",
+        status: "in_progress",
       },
     });
+  }
+
+  // Additional consumers with events
+  const consumer2 = await prisma.user.upsert({
+    where: { email: "sarah@gatherly.com" },
+    update: {},
+    create: {
+      email: "sarah@gatherly.com",
+      passwordHash,
+      name: "Sarah Ahmed",
+      role: "consumer",
+      emailVerified: true,
+      defaultLocation: "Manama, Bahrain",
+    },
+  });
+
+  let consumer2Event = await prisma.event.findFirst({ where: { userId: consumer2.id, name: "Corporate Gala Dinner" } });
+  if (!consumer2Event) {
+    await prisma.event.create({
+      data: {
+        userId: consumer2.id,
+        name: "Corporate Gala Dinner",
+        eventType: "corporate",
+        date: new Date("2025-04-20"),
+        timeStart: new Date("1970-01-01T19:00:00"),
+        timeEnd: new Date("1970-01-01T22:00:00"),
+        guestCount: 120,
+        location: "Four Seasons Hotel Bahrain Bay",
+        venueType: "hotel",
+        venueName: "Grand Ballroom",
+        status: "draft",
+      },
+    });
+  }
+
+  const consumer3 = await prisma.user.upsert({
+    where: { email: "ahmed@gatherly.com" },
+    update: {},
+    create: {
+      email: "ahmed@gatherly.com",
+      passwordHash,
+      name: "Ahmed Hassan",
+      role: "consumer",
+      emailVerified: true,
+      defaultLocation: "Riffa, Bahrain",
+    },
+  });
+
+  let consumer3Event = await prisma.event.findFirst({ where: { userId: consumer3.id, name: "Birthday Celebration" } });
+  if (!consumer3Event) {
+    await prisma.event.create({
+      data: {
+        userId: consumer3.id,
+        name: "Birthday Celebration",
+        eventType: "wedding",
+        date: new Date("2025-02-01"),
+        timeStart: new Date("1970-01-01T14:00:00"),
+        timeEnd: new Date("1970-01-01T18:00:00"),
+        guestCount: 35,
+        location: "Home, Riffa",
+        venueType: "home",
+        venueName: null,
+        status: "completed",
+      },
+    });
+  }
+
+  // Guests for main consumer event
+  const existingGuests = await prisma.guest.count({ where: { eventId: consumerEvent.id } });
+  if (existingGuests === 0) {
+    await prisma.guest.createMany({
+      data: [
+        { eventId: consumerEvent.id, name: "Mariam Al-Khalifa", email: "mariam@example.com", rsvpStatus: "confirmed" },
+        { eventId: consumerEvent.id, name: "Omar Al-Rashid", email: "omar@example.com", rsvpStatus: "confirmed" },
+        { eventId: consumerEvent.id, name: "Layla Hassan", email: "layla@example.com", rsvpStatus: "pending" },
+        { eventId: consumerEvent.id, name: "Yusuf Ibrahim", phone: "+973 1234 5678", rsvpStatus: "confirmed" },
+        { eventId: consumerEvent.id, name: "Noor Al-Mahmood", email: "noor@example.com", rsvpStatus: "declined" },
+      ],
+    });
+  }
+
+  // Sample booking: consumer's wedding with Bahraini Delights
+  const bahrainiVendor = await prisma.vendor.findFirst({
+    where: { businessName: "Bahraini Delights Catering" },
+    include: { packages: { where: { name: "Traditional Bahraini Feast" }, take: 1 } },
+  });
+  if (bahrainiVendor?.packages[0]) {
+    const existingBooking = await prisma.booking.findFirst({
+      where: { eventId: consumerEvent.id, vendorId: bahrainiVendor.id },
+    });
+    if (!existingBooking) {
+      const pkg = bahrainiVendor.packages[0];
+      const subtotal = Number(pkg.basePrice) * consumerEvent.guestCount;
+      const setupFee = Number(pkg.setupFee ?? 0);
+      await prisma.booking.create({
+        data: {
+          bookingReference: "BKG-SEED01",
+          userId: consumer.id,
+          vendorId: bahrainiVendor.id,
+          eventId: consumerEvent.id,
+          packageId: pkg.id,
+          guestCount: consumerEvent.guestCount,
+          subtotal,
+          serviceCharges: 0,
+          totalAmount: subtotal + setupFee,
+          status: "confirmed",
+          paymentStatus: "paid",
+        },
+      });
+    }
   }
 
   const vendorsData = [
@@ -108,6 +220,8 @@ async function main() {
           setupFee: 100,
           dietaryTags: ["halal", "seafood_options"],
           displayOrder: 1,
+          isSpotlight: true,
+          spotlightOrder: 1,
           items: [
             { name: "Lamb Ouzi", category: "Main", displayOrder: 0 },
             { name: "Grilled Hammour", category: "Main", displayOrder: 1 },
@@ -237,6 +351,8 @@ async function main() {
           setupFee: 90,
           dietaryTags: ["halal", "seafood_options", "vegetarian_options"],
           displayOrder: 1,
+          isSpotlight: true,
+          spotlightOrder: 2,
           items: [
             { name: "Grilled Sea Bass", category: "Main", displayOrder: 0 },
             { name: "Lamb Chops", category: "Main", displayOrder: 1 },
@@ -367,6 +483,8 @@ async function main() {
           setupFee: 70,
           dietaryTags: ["halal", "seafood_options", "vegetarian_options"],
           displayOrder: 1,
+          isSpotlight: true,
+          spotlightOrder: 3,
           items: [
             { name: "Assorted Sushi Platter", category: "Main", displayOrder: 0 },
             { name: "Dim Sum (Har Gow, Siu Mai)", category: "Appetizer", displayOrder: 1 },
@@ -442,6 +560,8 @@ async function main() {
             dietaryTags: pkg.dietaryTags,
             displayOrder: pkg.displayOrder,
             isActive: true,
+            isSpotlight: (pkg as { isSpotlight?: boolean }).isSpotlight ?? false,
+            spotlightOrder: (pkg as { spotlightOrder?: number }).spotlightOrder ?? null,
           },
         });
         await prisma.packageItem.createMany({
@@ -458,9 +578,25 @@ async function main() {
     }
   }
 
+  // Ensure spotlight packages are marked (for existing DBs)
+  await prisma.package.updateMany({
+    where: { name: "Premium Gulf Package" },
+    data: { isSpotlight: true, spotlightOrder: 1 },
+  });
+  await prisma.package.updateMany({
+    where: { name: "Mediterranean Premium" },
+    data: { isSpotlight: true, spotlightOrder: 2 },
+  });
+  await prisma.package.updateMany({
+    where: { name: "Sushi & Dim Sum Deluxe" },
+    data: { isSpotlight: true, spotlightOrder: 3 },
+  });
+
   console.log("Seed complete. Test accounts (password: " + PASSWORD + "):");
   console.log("- admin@gatherly.com");
-  console.log("- consumer@gatherly.com (1 consumer)");
+  console.log("- consumer@gatherly.com (Fatima – Wedding, guests)");
+  console.log("- sarah@gatherly.com (Corporate Gala)");
+  console.log("- ahmed@gatherly.com (Birthday – completed)");
   console.log("- vendor1@gatherly.com (Bahraini Delights)");
   console.log("- vendor2@gatherly.com (Spice Route Indian)");
   console.log("- vendor3@gatherly.com (Mediterranean Breeze)");

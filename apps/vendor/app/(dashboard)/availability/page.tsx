@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { VendorLayout } from "@/components/VendorLayout";
 import { PageHeader } from "@/components/PageHeader";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+import { API_URL } from "@/lib/api";
 
 function toYMD(d: Date): string {
   return d.toISOString().slice(0, 10);

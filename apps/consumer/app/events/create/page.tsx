@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { Suspense, useState, useEffect } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import {
   X,
   ArrowRight,
@@ -10,37 +10,47 @@ import {
   Briefcase,
   GraduationCap,
   DotsThree,
+  Camera,
+  CaretDown,
+  CaretUp,
 } from "@phosphor-icons/react";
 import { AppLayout } from "@/components/AppLayout";
-import { parseApiError } from "@/lib/api";
-import {
-  CHERRY,
-  ROUND,
-  INPUT_CLASS,
-  BUTTON_CLASS,
-  LABEL_CLASS,
-  TYPO,
-} from "@/lib/events-ui";
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+import { parseApiError, API_URL, getNetworkErrorMessage } from "@/lib/api";
+import { compressImage } from "@/lib/compress-image";
+import toast from "react-hot-toast";
+import { INPUT, BUTTON, TYPO } from "@/lib/events-ui";
 
 const EVENT_TYPE_OPTIONS = [
-  { value: "wedding", label: "Social", subtitle: "Parties, Weddings", Icon: Confetti },
-  { value: "corporate", label: "Corporate", subtitle: "Meetings, Gala", Icon: Briefcase },
-  { value: "family_gathering", label: "Education", subtitle: "Workshops, Class", Icon: GraduationCap },
-  { value: "other", label: "Other", subtitle: "Custom Category", Icon: DotsThree },
+  { value: "wedding", label: "Social", Icon: Confetti },
+  { value: "corporate", label: "Corporate", Icon: Briefcase },
+  { value: "family_gathering", label: "Education", Icon: GraduationCap },
+  { value: "other", label: "Other", Icon: DotsThree },
 ];
 
-const STEPS = ["Basic", "Location", "Guests", "Review"];
-
-export default function CreateEventPage() {
+function CreateEventContent() {
   const router = useRouter();
-  const mainRef = useRef<HTMLDivElement>(null);
-  const [step, setStep] = useState(0);
+  const searchParams = useSearchParams();
+  const redirectTo = searchParams.get("redirect");
+  const [expanded, setExpanded] = useState<string | null>("details");
+  const [authChecked, setAuthChecked] = useState(false);
 
   useEffect(() => {
-    if (mainRef.current) mainRef.current.scrollTop = 0;
-  }, [step]);
+    const token = (localStorage.getItem("token") || "").trim();
+    if (!token) {
+      router.replace("/login?redirect=/events/create");
+      return;
+    }
+    fetch(`${API_URL}/api/auth/me`, {
+      headers: { Authorization: `Bearer ${token}` },
+    }).then((res) => {
+      if (!res.ok) {
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+        router.replace("/login?redirect=/events/create");
+      }
+      setAuthChecked(true);
+    }).catch(() => setAuthChecked(true));
+  }, [router]);
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -56,20 +66,20 @@ export default function CreateEventPage() {
     venueName: "",
     specialRequirements: "",
     dietaryRequirements: [] as string[],
+    imageUrl: "",
   });
+  const [uploadingImage, setUploadingImage] = useState(false);
 
   function update(f: Partial<typeof form>) {
     setForm((prev) => ({ ...prev, ...f }));
   }
 
+  function toggleSection(id: string) {
+    setExpanded((prev) => (prev === id ? null : id));
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (step < STEPS.length - 1) {
-      (e.target as HTMLButtonElement)?.blur();
-      setStep((s) => s + 1);
-      return;
-    }
-
     setError("");
     setLoading(true);
     const token = localStorage.getItem("token");
@@ -96,6 +106,7 @@ export default function CreateEventPage() {
           venueName: form.venueName || undefined,
           specialRequirements: form.specialRequirements || undefined,
           dietaryRequirements: form.dietaryRequirements,
+          ...(form.imageUrl?.trim() && { imageUrl: form.imageUrl.trim() }),
         }),
       });
       const data = await res.json();
@@ -108,312 +119,351 @@ export default function CreateEventPage() {
         }
         throw new Error(parseApiError(data) || "Failed to create event");
       }
-      router.push(`/events/${data.id}/guests`);
+      if (redirectTo?.startsWith("/vendor/") && redirectTo.includes("/book?")) {
+        const sep = redirectTo.includes("?") ? "&" : "?";
+        router.push(`${redirectTo}${sep}eventId=${data.id}`);
+      } else {
+        router.push(`/events/${data.id}`);
+      }
       router.refresh();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to create event");
+      setError(getNetworkErrorMessage(err, "Failed to create event"));
     } finally {
       setLoading(false);
     }
   }
 
+  if (!authChecked) {
+    return (
+      <AppLayout>
+        <div className="flex-1 flex items-center justify-center bg-[var(--bg-app)]">
+          <p className={TYPO.SUBTEXT}>Loading...</p>
+        </div>
+      </AppLayout>
+    );
+  }
+
   return (
-    <AppLayout showNav={true} showTopBar={false} fullHeight>
-      <div className="flex flex-col flex-1 min-h-0 bg-[#FAFAFA]">
-        {/* Header - fixed, no scroll */}
-        <header
-          className="shrink-0 px-6 pb-4 bg-[#FAFAFA]"
-          style={{ paddingTop: "max(1rem, env(safe-area-inset-top))" }}
-        >
-          <div className="flex items-center justify-between mb-6">
+    <AppLayout showNav showTopBar={false} fullHeight>
+      <div className="flex flex-col flex-1 min-h-0 bg-[var(--bg-app)]">
+        <header className="shrink-0 px-6 pt-[max(1rem,env(safe-area-inset-top))] pb-4">
+          <div className="flex items-center justify-between">
             <Link
               href="/events"
-              className="w-10 h-10 flex items-center justify-center bg-white border border-slate-200 shadow-sm rounded-full"
+              className={`${BUTTON.ICON} bg-white border border-slate-200 text-text-secondary hover:bg-slate-50`}
             >
-              <X size={20} weight="bold" className="text-slate-600" />
+              <X size={22} weight="bold" />
             </Link>
-            <h2 className="text-xs font-bold uppercase tracking-[0.2em] text-slate-400">
-              Step {step + 1} of {STEPS.length}
-            </h2>
-            <div className="w-10" />
-          </div>
-          <div className={`w-full h-1.5 bg-slate-200 overflow-hidden ${ROUND}`}>
-            <div
-              className="h-full transition-all duration-500"
-              style={{
-                width: `${((step + 1) / STEPS.length) * 100}%`,
-                backgroundColor: CHERRY,
-              }}
-            />
+            <h1 className={`${TYPO.H1} text-text-primary`}>New event</h1>
+            <div className="w-11" />
           </div>
         </header>
 
-        {/* Main - single scroll area */}
-        <main
-          ref={mainRef}
-          className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden px-6 pt-6"
-        >
-          <div className="mb-8">
-            <h1 className={`${TYPO.H1_LARGE} text-slate-900 mb-1`}>
-              Create New Event
-            </h1>
-            <p className={TYPO.SUBTEXT}>
-              {step === 0
-                ? "Let's start with the basics. What are you planning?"
-                : step === 1
-                  ? "Where will your event take place?"
-                  : step === 2
-                    ? "How many guests are you expecting?"
-                    : "Review your event details before creating."}
-            </p>
-          </div>
-
-          <form onSubmit={handleSubmit} id="create-event-form" className="space-y-6 pb-4">
-            {step === 0 && (
-              <>
-                <div className="space-y-2">
-                  <label className={LABEL_CLASS} htmlFor="event-title">
-                    Event Title
-                  </label>
-                  <input
-                    id="event-title"
-                    type="text"
-                    value={form.name}
-                    onChange={(e) => update({ name: e.target.value })}
-                    className={INPUT_CLASS}
-                    placeholder="e.g. Summer Gala 2024"
-                    required
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <label className={LABEL_CLASS}>Event Type</label>
-                  <div className="grid grid-cols-2 gap-3">
-                    {EVENT_TYPE_OPTIONS.map(({ value, label, subtitle, Icon }) => {
-                      const isSelected = form.eventType === value;
-                      return (
-                        <button
-                          key={value}
-                          type="button"
-                          onClick={() => update({ eventType: value })}
-                          className={`flex items-center p-3 text-left transition-all border-2 ${ROUND} ${
-                            isSelected ? "bg-white" : "bg-white border-slate-200 hover:border-slate-300"
-                          }`}
-                          style={{
-                            borderColor: isSelected ? CHERRY : undefined,
-                            backgroundColor: isSelected ? `${CHERRY}0D` : undefined,
-                          }}
-                        >
-                          <div
-                            className={`w-9 h-9 shrink-0 flex items-center justify-center mr-3 ${ROUND} ${
-                              isSelected ? "text-white" : "bg-slate-100 text-slate-500"
-                            }`}
-                            style={isSelected ? { backgroundColor: CHERRY } : undefined}
-                          >
-                            <Icon size={18} weight="regular" />
-                          </div>
-                          <div className="min-w-0">
-                            <span
-                              className={`block font-bold text-sm truncate ${isSelected ? "" : "text-slate-700"}`}
-                              style={isSelected ? { color: CHERRY } : undefined}
-                            >
-                              {label}
-                            </span>
-                            <span className="block text-[10px] text-slate-500 truncate">
-                              {subtitle}
-                            </span>
-                          </div>
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <label className={LABEL_CLASS} htmlFor="event-date">
-                    Date
-                  </label>
-                  <input
-                    id="event-date"
-                    type="date"
-                    value={form.date}
-                    onChange={(e) => update({ date: e.target.value })}
-                    className={INPUT_CLASS}
-                    required
-                  />
-                </div>
-
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="space-y-2">
-                    <label className={LABEL_CLASS} htmlFor="start-time">
-                      Start Time
-                    </label>
-                    <input
-                      id="start-time"
-                      type="time"
-                      value={form.timeStart}
-                      onChange={(e) => update({ timeStart: e.target.value })}
-                      className={INPUT_CLASS}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <label className={LABEL_CLASS} htmlFor="end-time">
-                      End Time
-                    </label>
-                    <input
-                      id="end-time"
-                      type="time"
-                      value={form.timeEnd}
-                      onChange={(e) => update({ timeEnd: e.target.value })}
-                      className={INPUT_CLASS}
-                    />
-                  </div>
-                </div>
-              </>
-            )}
-
-            {step === 1 && (
-              <>
-                <div className="space-y-2">
-                  <label className={LABEL_CLASS} htmlFor="location">
-                    Location
-                  </label>
-                  <input
-                    id="location"
-                    type="text"
-                    value={form.location}
-                    onChange={(e) => update({ location: e.target.value })}
-                    className={INPUT_CLASS}
-                    placeholder="Address or venue"
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className={LABEL_CLASS}>Venue Type</label>
-                  <select
-                    value={form.venueType}
-                    onChange={(e) => update({ venueType: e.target.value })}
-                    className={INPUT_CLASS}
-                  >
-                    <option value="">Select</option>
-                    <option value="home">Home</option>
-                    <option value="external">External Venue</option>
-                  </select>
-                </div>
-                <div className="space-y-2">
-                  <label className={LABEL_CLASS} htmlFor="venue-name">
-                    Venue Name
-                  </label>
-                  <input
-                    id="venue-name"
-                    type="text"
-                    value={form.venueName}
-                    onChange={(e) => update({ venueName: e.target.value })}
-                    className={INPUT_CLASS}
-                    placeholder="e.g. Grand Ballroom"
-                  />
-                </div>
-              </>
-            )}
-
-            {step === 2 && (
-              <>
-                <div className="space-y-2">
-                  <label className={LABEL_CLASS} htmlFor="guest-count">
-                    Guest Count
-                  </label>
-                  <input
-                    id="guest-count"
-                    type="number"
-                    min={1}
-                    value={form.guestCount}
-                    onChange={(e) =>
-                      update({ guestCount: parseInt(e.target.value) || 1 })
-                    }
-                    className={INPUT_CLASS}
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className={LABEL_CLASS}>Special Requirements</label>
-                  <textarea
-                    value={form.specialRequirements}
-                    onChange={(e) =>
-                      update({ specialRequirements: e.target.value })
-                    }
-                    className={`${INPUT_CLASS} min-h-[100px] py-3 resize-none`}
-                    placeholder="Dietary needs, setup preferences..."
-                  />
-                </div>
-              </>
-            )}
-
-            {step === 3 && (
-              <div
-                className={`space-y-3 text-sm bg-white border border-slate-200 p-5 ${ROUND}`}
+        <main className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden px-6 pb-6">
+          <form onSubmit={handleSubmit} id="create-event-form" className="form-no-zoom space-y-2 pb-6">
+            {/* Accordion: Event details */}
+            <div className="border-b border-slate-200">
+              <button
+                type="button"
+                onClick={() => toggleSection("details")}
+                className="w-full flex items-center justify-between py-4 text-left"
               >
-                <p><span className="text-slate-500">Event:</span> {form.name}</p>
-                <p>
-                  <span className="text-slate-500">Type:</span>{" "}
-                  {EVENT_TYPE_OPTIONS.find((o) => o.value === form.eventType)?.label ??
-                    form.eventType.replace(/_/g, " ")}
-                </p>
-                <p>
-                  <span className="text-slate-500">Date:</span>{" "}
-                  {form.date ? new Date(form.date).toLocaleDateString() : "—"}
-                </p>
-                <p>
-                  <span className="text-slate-500">Location:</span>{" "}
-                  {form.location || "—"}
-                </p>
-                <p>
-                  <span className="text-slate-500">Guests:</span> {form.guestCount}
-                </p>
-                {form.specialRequirements && (
-                  <p>
-                    <span className="text-slate-500">Notes:</span>{" "}
-                    {form.specialRequirements}
-                  </p>
+                <span className={TYPO.H3}>Event details</span>
+                {expanded === "details" ? (
+                  <CaretUp size={20} weight="bold" className="text-text-tertiary" />
+                ) : (
+                  <CaretDown size={20} weight="bold" className="text-text-tertiary" />
                 )}
-              </div>
-            )}
+              </button>
+              {expanded === "details" && (
+                <div className="pb-4 space-y-4 animate-fade-in">
+                  <div>
+                    <label className={`${TYPO.FORM_LABEL} mb-2 block`}>Event name</label>
+                    <div className="flex gap-4 items-center">
+                      <label className="relative shrink-0 cursor-pointer">
+                        <div
+                          className={`w-16 h-16 rounded-xl border-2 border-dashed flex items-center justify-center overflow-hidden transition-colors ${
+                            form.imageUrl ? "border-transparent" : "border-slate-300 bg-slate-50"
+                          }`}
+                        >
+                          {form.imageUrl ? (
+                            <img src={form.imageUrl} alt="" className="w-full h-full object-cover" />
+                          ) : (
+                            <Camera size={20} weight="regular" className="text-text-tertiary" />
+                          )}
+                        </div>
+                        <input
+                          type="file"
+                          accept="image/jpeg,image/png,image/webp,image/gif"
+                          className="sr-only"
+                          disabled={uploadingImage}
+                          onChange={async (e) => {
+                            const file = e.target.files?.[0];
+                            if (!file) return;
+                            const token = (localStorage.getItem("token") || "").trim();
+                            if (!token) {
+                              toast.error("Please sign in");
+                              router.push("/login?redirect=/events/create");
+                              return;
+                            }
+                            setUploadingImage(true);
+                            try {
+                              const compressed = await compressImage(file).catch(() => file);
+                              const fd = new FormData();
+                              fd.append("file", compressed);
+                              const res = await fetch(`${API_URL}/api/upload/image?folder=events`, {
+                                method: "POST",
+                                headers: { Authorization: `Bearer ${token}` },
+                                body: fd,
+                              });
+                              const data = await res.json().catch(() => ({}));
+                              if (res.ok && data.url) {
+                                update({ imageUrl: data.url });
+                                toast.success("Image added");
+                              } else if (res.status === 401) {
+                                localStorage.removeItem("token");
+                                router.push("/login?redirect=/events/create");
+                              } else {
+                                toast.error(data?.error || "Upload failed");
+                              }
+                            } catch {
+                              toast.error("Upload failed");
+                            } finally {
+                              setUploadingImage(false);
+                              e.target.value = "";
+                            }
+                          }}
+                        />
+                      </label>
+                      <input
+                        type="text"
+                        value={form.name}
+                        onChange={(e) => update({ name: e.target.value })}
+                        className={`${INPUT.PRIMARY} flex-1 min-w-0`}
+                        placeholder="e.g. Sarah's Birthday"
+                        required
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <label className={`${TYPO.FORM_LABEL} mb-2 block`}>Event type</label>
+                    <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-1">
+                      {EVENT_TYPE_OPTIONS.map(({ value, label, Icon }) => {
+                        const isSelected = form.eventType === value;
+                        return (
+                          <button
+                            key={value}
+                            type="button"
+                            onClick={() => update({ eventType: value })}
+                            className={`flex items-center gap-2 px-4 py-2.5 rounded-full shrink-0 transition-all ${
+                              isSelected ? "bg-primary text-white" : "bg-slate-100 text-text-secondary hover:bg-slate-200"
+                            }`}
+                          >
+                            <Icon size={18} weight={isSelected ? "fill" : "regular"} />
+                            <span className="text-sm font-medium">{label}</span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
 
-            {error && <p className="text-sm text-red-600">{error}</p>}
-          </form>
-        </main>
+            {/* Accordion: Date & time */}
+            <div className="border-b border-slate-200">
+              <button
+                type="button"
+                onClick={() => toggleSection("datetime")}
+                className="w-full flex items-center justify-between py-4 text-left"
+              >
+                <span className={TYPO.H3}>Date & time</span>
+                {expanded === "datetime" ? (
+                  <CaretUp size={20} weight="bold" className="text-text-tertiary" />
+                ) : (
+                  <CaretDown size={20} weight="bold" className="text-text-tertiary" />
+                )}
+              </button>
+              {expanded === "datetime" && (
+                <div className="pb-4 space-y-4 animate-fade-in">
+                  <div>
+                    <label className={`${TYPO.FORM_LABEL} mb-2 block`}>Date</label>
+                    <label className="block relative">
+                      <input
+                        type="date"
+                        value={form.date}
+                        onChange={(e) => update({ date: e.target.value })}
+                        className="input-date-time w-full h-12 rounded-xl border border-slate-200 bg-white text-text-primary text-sm font-medium focus:ring-2 focus:ring-primary/20 focus:border-primary/40 outline-none"
+                        required
+                      />
+                      {!form.date && (
+                        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-text-tertiary text-sm pointer-events-none">
+                          Select date
+                        </span>
+                      )}
+                    </label>
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className={`${TYPO.FORM_LABEL} mb-2 block`}>Start time</label>
+                      <label className="block relative">
+                        <input
+                          type="time"
+                          value={form.timeStart}
+                          onChange={(e) => update({ timeStart: e.target.value })}
+                          className="input-date-time w-full h-12 rounded-xl border border-slate-200 bg-white text-text-primary text-sm font-medium focus:ring-2 focus:ring-primary/20 focus:border-primary/40 outline-none"
+                        />
+                        {!form.timeStart && (
+                          <span className="absolute left-4 top-1/2 -translate-y-1/2 text-text-tertiary text-sm pointer-events-none">
+                            e.g. 6:00 PM
+                          </span>
+                        )}
+                      </label>
+                    </div>
+                    <div>
+                      <label className={`${TYPO.FORM_LABEL} mb-2 block`}>End time</label>
+                      <label className="block relative">
+                        <input
+                          type="time"
+                          value={form.timeEnd}
+                          onChange={(e) => update({ timeEnd: e.target.value })}
+                          className="input-date-time w-full h-12 rounded-xl border border-slate-200 bg-white text-text-primary text-sm font-medium focus:ring-2 focus:ring-primary/20 focus:border-primary/40 outline-none"
+                        />
+                        {!form.timeEnd && (
+                          <span className="absolute left-4 top-1/2 -translate-y-1/2 text-text-tertiary text-sm pointer-events-none">
+                            e.g. 10:00 PM
+                          </span>
+                        )}
+                      </label>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
 
-        {/* Footer - fixed, no scroll */}
-        <footer
-          className="shrink-0 p-6 bg-white/90 backdrop-blur-md border-t border-slate-100"
-          style={{
-            paddingBottom: "max(1.5rem, env(safe-area-inset-bottom))",
-          }}
-        >
-          <form onSubmit={handleSubmit}>
+            {/* Accordion: Location */}
+            <div className="border-b border-slate-200">
+              <button
+                type="button"
+                onClick={() => toggleSection("location")}
+                className="w-full flex items-center justify-between py-4 text-left"
+              >
+                <span className={TYPO.H3}>Location</span>
+                {expanded === "location" ? (
+                  <CaretUp size={20} weight="bold" className="text-text-tertiary" />
+                ) : (
+                  <CaretDown size={20} weight="bold" className="text-text-tertiary" />
+                )}
+              </button>
+              {expanded === "location" && (
+                <div className="pb-4 space-y-4 animate-fade-in">
+                  <div>
+                    <label className={`${TYPO.FORM_LABEL} mb-2 block`}>Address or venue</label>
+                    <input
+                      type="text"
+                      value={form.location}
+                      onChange={(e) => update({ location: e.target.value })}
+                      className={INPUT.PRIMARY}
+                      placeholder="e.g. 123 Main St"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className={`${TYPO.FORM_LABEL} mb-2 block`}>Venue type</label>
+                    <select
+                      value={form.venueType}
+                      onChange={(e) => update({ venueType: e.target.value })}
+                      className={INPUT.PRIMARY}
+                    >
+                      <option value="">Select</option>
+                      <option value="home">Home</option>
+                      <option value="external">External Venue</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className={`${TYPO.FORM_LABEL} mb-2 block`}>Venue name <span className="text-text-tertiary font-normal">(optional)</span></label>
+                    <input
+                      type="text"
+                      value={form.venueName}
+                      onChange={(e) => update({ venueName: e.target.value })}
+                      className={INPUT.PRIMARY}
+                      placeholder="e.g. Hilton Downtown"
+                    />
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Accordion: Guests & notes */}
+            <div className="border-b border-slate-200">
+              <button
+                type="button"
+                onClick={() => toggleSection("guests")}
+                className="w-full flex items-center justify-between py-4 text-left"
+              >
+                <span className={TYPO.H3}>Guests & notes</span>
+                {expanded === "guests" ? (
+                  <CaretUp size={20} weight="bold" className="text-text-tertiary" />
+                ) : (
+                  <CaretDown size={20} weight="bold" className="text-text-tertiary" />
+                )}
+              </button>
+              {expanded === "guests" && (
+                <div className="pb-4 space-y-4 animate-fade-in">
+                  <div>
+                    <label className={`${TYPO.FORM_LABEL} mb-2 block`}>Number of guests</label>
+                    <input
+                      type="number"
+                      min={1}
+                      value={form.guestCount}
+                      onChange={(e) => update({ guestCount: parseInt(e.target.value) || 1 })}
+                      className={INPUT.PRIMARY}
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className={`${TYPO.FORM_LABEL} mb-2 block`}>Special notes <span className="text-text-tertiary font-normal">(optional)</span></label>
+                    <textarea
+                      value={form.specialRequirements}
+                      onChange={(e) => update({ specialRequirements: e.target.value })}
+                      className={INPUT.TEXTAREA}
+                      placeholder="Dietary needs, setup preferences..."
+                    />
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {error && <p className="text-sm text-red-600 animate-fade-in">{error}</p>}
+
+            {/* Create event button — just after Guests & notes */}
             <button
               type="submit"
               disabled={loading}
-              className={BUTTON_CLASS}
-              style={{
-                backgroundColor: CHERRY,
-                boxShadow: `${CHERRY}33 0 8px 24px`,
-              }}
+              className="w-full h-14 mt-6 px-6 rounded-full font-medium text-white bg-primary shadow-elevation-2 flex items-center justify-center gap-2 active:scale-[0.98] transition-transform disabled:opacity-50"
             >
-              <span>
-                {loading
-                  ? "Creating..."
-                  : step < STEPS.length - 1
-                    ? "Continue"
-                    : "Create Event"}
-              </span>
-              <ArrowRight size={20} weight="bold" />
+              <span>{loading ? "Creating..." : "Create event"}</span>
+              <ArrowRight size={22} weight="bold" />
             </button>
           </form>
-          <p className={`${TYPO.CAPTION} text-center mt-3`}>
-            You can edit these details later in the event settings.
-          </p>
-        </footer>
+        </main>
       </div>
     </AppLayout>
+  );
+}
+
+export default function CreateEventPage() {
+  return (
+    <Suspense
+      fallback={
+        <AppLayout>
+          <div className="flex-1 flex items-center justify-center bg-[var(--bg-app)]">
+            <p className={TYPO.SUBTEXT}>Loading...</p>
+          </div>
+        </AppLayout>
+      }
+    >
+      <CreateEventContent />
+    </Suspense>
   );
 }

@@ -3,7 +3,7 @@ import { Toaster } from "react-hot-toast";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Gatherly Vendor Portal",
+  title: "Gatherlii Vendor Portal",
   description: "Manage your catering business",
 };
 

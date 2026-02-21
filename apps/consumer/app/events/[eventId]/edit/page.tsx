@@ -9,19 +9,18 @@ import {
   Briefcase,
   GraduationCap,
   DotsThree,
+  Camera,
 } from "@phosphor-icons/react";
 import { AppLayout } from "@/components/AppLayout";
 import {
-  CHERRY,
   ROUND,
-  INPUT_CLASS,
-  BUTTON_CLASS,
-  LABEL_CLASS,
+  INPUT,
+  BUTTON,
   TYPO,
 } from "@/lib/events-ui";
-import { parseApiError } from "@/lib/api";
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+import { parseApiError, API_URL } from "@/lib/api";
+import toast from "react-hot-toast";
+import { compressImage } from "@/lib/compress-image";
 
 const EVENT_TYPE_OPTIONS = [
   { value: "wedding", label: "Social", subtitle: "Parties, Weddings", Icon: Confetti },
@@ -58,7 +57,9 @@ export default function EditEventPage() {
     venueType: "",
     venueName: "",
     specialRequirements: "",
+    imageUrl: "",
   });
+  const [uploadingImage, setUploadingImage] = useState(false);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -83,6 +84,7 @@ export default function EditEventPage() {
             venueType: ev.venueType || "",
             venueName: ev.venueName || "",
             specialRequirements: ev.specialRequirements || "",
+            imageUrl: ev.imageUrl || "",
           });
         }
       })
@@ -113,6 +115,7 @@ export default function EditEventPage() {
           venueType: form.venueType || undefined,
           venueName: form.venueName || undefined,
           specialRequirements: form.specialRequirements || undefined,
+          imageUrl: form.imageUrl || undefined,
         }),
       });
       const data = await res.json().catch(() => ({}));
@@ -128,8 +131,8 @@ export default function EditEventPage() {
   if (loading) {
     return (
       <AppLayout>
-        <div className="flex-1 flex items-center justify-center bg-[#FAFAFA]">
-          <p className="text-slate-500">Loading...</p>
+        <div className="flex-1 flex items-center justify-center bg-[var(--bg-app)]">
+          <p className={TYPO.SUBTEXT}>Loading...</p>
         </div>
       </AppLayout>
     );
@@ -137,47 +140,117 @@ export default function EditEventPage() {
 
   return (
     <AppLayout>
-      <div className="bg-[#FAFAFA] min-h-full">
+      <div className="bg-[var(--bg-app)] min-h-full pb-24">
         <header className="px-6 pt-6 pb-4 shrink-0">
           <div className="flex items-center gap-3">
             <Link
               href={`/events/${eventId}`}
-              className="w-10 h-10 flex items-center justify-center bg-white border border-slate-200 rounded-full"
+              className="w-11 h-11 min-w-[44px] min-h-[44px] flex items-center justify-center bg-white border border-slate-200 rounded-full text-text-primary"
             >
-              <ArrowLeft size={18} weight="regular" className="text-slate-600" />
+              <ArrowLeft size={22} weight="regular" />
             </Link>
-            <h1 className={TYPO.H1} style={{ color: CHERRY }}>
-              Edit Event
+            <h1 className={`${TYPO.H1} text-text-primary`}>
+              Edit event
             </h1>
           </div>
         </header>
 
-        <main className="p-6 pb-32">
-          <form onSubmit={handleSubmit} className="space-y-6">
+        <main className="p-6">
+          <form onSubmit={handleSubmit} className="form-no-zoom space-y-5">
             {error && (
-              <div
-                className={`p-4 bg-red-50 border border-red-100 ${ROUND}`}
-              >
+              <div className="p-4 bg-red-50 border border-red-100 rounded-2xl">
                 <p className="text-sm text-red-600 font-medium">{error}</p>
               </div>
             )}
 
-            <div className="space-y-2">
-              <label className={LABEL_CLASS} htmlFor="name">
-                Event Name
-              </label>
+            <div>
+              <label className={`${TYPO.FORM_LABEL} mb-2 block`}>Event image <span className="text-text-tertiary font-normal">(optional)</span></label>
+              <div className="relative">
+                <div
+                  className={`w-full h-32 ${ROUND} border-2 border-dashed border-slate-200 flex items-center justify-center overflow-hidden bg-slate-50`}
+                >
+                  {form.imageUrl ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={form.imageUrl} alt="Event" className="w-full h-full object-cover" />
+                  ) : (
+                    <span className="text-slate-400 text-sm">No image</span>
+                  )}
+                </div>
+                <label className="absolute bottom-2 right-2 px-3 py-1.5 rounded-full text-xs font-semibold text-white bg-primary cursor-pointer transition-opacity hover:opacity-90">
+                  <Camera size={14} weight="regular" className="inline mr-1" />
+                  {uploadingImage ? "Uploading..." : "Upload"}
+                  <input
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp,image/gif"
+                    className="sr-only"
+                    disabled={uploadingImage}
+                    onChange={async (e) => {
+                      const file = e.target.files?.[0];
+                      if (!file) return;
+                      const token = (localStorage.getItem("token") || "").trim();
+                      if (!token) {
+                        toast.error("Please sign in to upload images");
+                        router.push(`/login?redirect=/events/${eventId}/edit`);
+                        return;
+                      }
+                      setUploadingImage(true);
+                      try {
+                        const compressed = await compressImage(file).catch(() => file);
+                        const fd = new FormData();
+                        fd.append("file", compressed);
+                        const res = await fetch(`${API_URL}/api/upload/image?folder=events`, {
+                          method: "POST",
+                          headers: { Authorization: `Bearer ${token}` },
+                          body: fd,
+                        });
+                        const data = await res.json().catch(() => ({}));
+                        if (res.ok && data.url) {
+                          setForm((f) => ({ ...f, imageUrl: data.url }));
+                          const patchRes = await fetch(`${API_URL}/api/events/${eventId}`, {
+                            method: "PUT",
+                            headers: {
+                              "Content-Type": "application/json",
+                              Authorization: `Bearer ${token}`,
+                            },
+                            body: JSON.stringify({ imageUrl: data.url }),
+                          });
+                          if (patchRes.ok) {
+                            toast.success("Image saved");
+                          } else {
+                            toast.error("Image uploaded but save failed");
+                          }
+                        } else if (res.status === 401) {
+                          localStorage.removeItem("token");
+                          localStorage.removeItem("user");
+                          toast.error("Session expired. Please sign in again.");
+                          router.push(`/login?redirect=/events/${eventId}/edit`);
+                        } else {
+                          toast.error(data?.error || "Upload failed");
+                        }
+                      } finally {
+                        setUploadingImage(false);
+                        e.target.value = "";
+                      }
+                    }}
+                  />
+                </label>
+              </div>
+            </div>
+
+            <div>
+              <label className={`${TYPO.FORM_LABEL} mb-2 block`} htmlFor="name">Event name</label>
               <input
                 id="name"
                 type="text"
                 value={form.name}
                 onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
-                className={INPUT_CLASS}
+                className={INPUT.PRIMARY}
                 required
               />
             </div>
 
-            <div className="space-y-2">
-              <label className={LABEL_CLASS}>Event Type</label>
+            <div>
+              <label className={`${TYPO.FORM_LABEL} mb-2 block`}>Event type</label>
               <div className="grid grid-cols-2 gap-3">
                 {EVENT_TYPE_OPTIONS.map(({ value, label, subtitle, Icon }) => {
                   const isSelected = form.eventType === value;
@@ -186,30 +259,24 @@ export default function EditEventPage() {
                       key={value}
                       type="button"
                       onClick={() => setForm((f) => ({ ...f, eventType: value }))}
-                      className={`flex items-center p-3 text-left transition-all border-2 ${ROUND} ${
-                        isSelected ? "bg-white" : "bg-white border-slate-200 hover:border-slate-300"
+                      className={`flex items-center p-3 text-left transition-all border-2 rounded-2xl ${
+                        isSelected ? "border-primary bg-primary/10" : "border-slate-200 bg-white hover:border-slate-300"
                       }`}
-                      style={{
-                        borderColor: isSelected ? CHERRY : undefined,
-                        backgroundColor: isSelected ? `${CHERRY}0D` : undefined,
-                      }}
                     >
                       <div
-                        className={`w-9 h-9 shrink-0 flex items-center justify-center mr-3 ${ROUND} ${
-                          isSelected ? "text-white" : "bg-slate-100 text-slate-500"
+                        className={`w-11 h-11 min-w-[44px] min-h-[44px] shrink-0 flex items-center justify-center mr-3 rounded-xl ${
+                          isSelected ? "bg-primary text-white" : "bg-slate-100 text-text-tertiary"
                         }`}
-                        style={isSelected ? { backgroundColor: CHERRY } : undefined}
                       >
                         <Icon size={18} weight="regular" />
                       </div>
                       <div className="min-w-0">
                         <span
-                          className={`block font-bold text-sm truncate ${isSelected ? "" : "text-slate-700"}`}
-                          style={isSelected ? { color: CHERRY } : undefined}
+                          className={`block font-bold text-sm truncate ${isSelected ? "text-primary" : "text-text-primary"}`}
                         >
                           {label}
                         </span>
-                        <span className="block text-[10px] text-slate-500 truncate">
+                        <span className={`block text-[10px] truncate ${TYPO.CAPTION}`}>
                           {subtitle}
                         </span>
                       </div>
@@ -219,51 +286,43 @@ export default function EditEventPage() {
               </div>
             </div>
 
-            <div className="space-y-2">
-              <label className={LABEL_CLASS} htmlFor="date">
-                Date
-              </label>
+            <div>
+              <label className={`${TYPO.FORM_LABEL} mb-2 block`} htmlFor="date">Date</label>
               <input
                 id="date"
                 type="date"
                 value={form.date}
                 onChange={(e) => setForm((f) => ({ ...f, date: e.target.value }))}
-                className={INPUT_CLASS}
+                className="input-date-time w-full h-12 rounded-xl border border-slate-200 bg-white px-4 text-sm font-medium focus:ring-2 focus:ring-primary/20 outline-none"
                 required
               />
             </div>
 
             <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-2">
-                <label className={LABEL_CLASS} htmlFor="timeStart">
-                  Start Time
-                </label>
+              <div>
+                <label className={`${TYPO.FORM_LABEL} mb-2 block`} htmlFor="timeStart">Start time</label>
                 <input
                   id="timeStart"
                   type="time"
                   value={form.timeStart}
                   onChange={(e) => setForm((f) => ({ ...f, timeStart: e.target.value }))}
-                  className={INPUT_CLASS}
+                  className="input-date-time w-full h-12 rounded-xl border border-slate-200 bg-white px-4 text-sm font-medium focus:ring-2 focus:ring-primary/20 outline-none"
                 />
               </div>
-              <div className="space-y-2">
-                <label className={LABEL_CLASS} htmlFor="timeEnd">
-                  End Time
-                </label>
+              <div>
+                <label className={`${TYPO.FORM_LABEL} mb-2 block`} htmlFor="timeEnd">End time</label>
                 <input
                   id="timeEnd"
                   type="time"
                   value={form.timeEnd}
                   onChange={(e) => setForm((f) => ({ ...f, timeEnd: e.target.value }))}
-                  className={INPUT_CLASS}
+                  className="input-date-time w-full h-12 rounded-xl border border-slate-200 bg-white px-4 text-sm font-medium focus:ring-2 focus:ring-primary/20 outline-none"
                 />
               </div>
             </div>
 
-            <div className="space-y-2">
-              <label className={LABEL_CLASS} htmlFor="guestCount">
-                Guest Count
-              </label>
+            <div>
+              <label className={`${TYPO.FORM_LABEL} mb-2 block`} htmlFor="guestCount">Guests</label>
               <input
                 id="guestCount"
                 type="number"
@@ -272,47 +331,43 @@ export default function EditEventPage() {
                 onChange={(e) =>
                   setForm((f) => ({ ...f, guestCount: parseInt(e.target.value) || 1 }))
                 }
-                className={INPUT_CLASS}
+                className={INPUT.PRIMARY}
                 required
               />
             </div>
 
-            <div className="space-y-2">
-              <label className={LABEL_CLASS} htmlFor="location">
-                Location
-              </label>
+            <div>
+              <label className={`${TYPO.FORM_LABEL} mb-2 block`} htmlFor="location">Location</label>
               <input
                 id="location"
                 type="text"
                 value={form.location}
                 onChange={(e) => setForm((f) => ({ ...f, location: e.target.value }))}
-                className={INPUT_CLASS}
+                className={INPUT.PRIMARY}
                 required
               />
             </div>
 
-            <div className="space-y-2">
-              <label className={LABEL_CLASS} htmlFor="venueName">
-                Venue Name
-              </label>
+            <div>
+              <label className={`${TYPO.FORM_LABEL} mb-2 block`} htmlFor="venueName">Venue name <span className="text-text-tertiary font-normal">(optional)</span></label>
               <input
                 id="venueName"
                 type="text"
                 value={form.venueName}
                 onChange={(e) => setForm((f) => ({ ...f, venueName: e.target.value }))}
-                className={INPUT_CLASS}
+                className={INPUT.PRIMARY}
                 placeholder="e.g. Grand Ballroom"
               />
             </div>
 
-            <div className="space-y-2">
-              <label className={LABEL_CLASS}>Special Requirements</label>
+            <div>
+              <label className={`${TYPO.FORM_LABEL} mb-2 block`}>Special requirements <span className="text-text-tertiary font-normal">(optional)</span></label>
               <textarea
                 value={form.specialRequirements}
                 onChange={(e) =>
                   setForm((f) => ({ ...f, specialRequirements: e.target.value }))
                 }
-                className={`${INPUT_CLASS} min-h-[100px] py-3 resize-none`}
+                className={INPUT.TEXTAREA}
                 placeholder="Dietary needs, setup preferences..."
               />
             </div>
@@ -320,11 +375,7 @@ export default function EditEventPage() {
             <button
               type="submit"
               disabled={saving}
-              className={BUTTON_CLASS}
-              style={{
-                backgroundColor: CHERRY,
-                boxShadow: `${CHERRY}33 0 8px 24px`,
-              }}
+              className={BUTTON.PRIMARY}
             >
               {saving ? "Saving…" : "Save changes"}
             </button>

@@ -5,19 +5,17 @@ import Link from "next/link";
 import Image from "next/image";
 import {
   MagnifyingGlass,
-  SlidersHorizontal,
   ForkKnife,
   Star,
-  Heart,
   MusicNotes,
   Camera,
   Confetti,
   CaretRight,
 } from "@phosphor-icons/react";
 import { AppLayout } from "@/components/AppLayout";
-import { CHERRY, ROUND, MINTY_LIME_DARK, WARM_PEACH, WARM_PEACH_DARK, SOFT_LILAC, SOFT_LILAC_DARK, TYPO } from "@/lib/events-ui";
+import { CHERRY, INPUT, ROUND, SOFT_LILAC, SOFT_LILAC_DARK, TYPO } from "@/lib/events-ui";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+import { API_URL } from "@/lib/api";
 
 interface Vendor {
   id: string;
@@ -73,30 +71,25 @@ export default function ServicesPage() {
   return (
     <AppLayout>
       <div className="bg-[#FAFAFA] min-h-full">
-        <main className="px-6 pt-8 pb-32 space-y-8">
-          {/* Search + Filter bar */}
-          <div className="relative flex items-center gap-3">
-            <div className="relative flex-1">
-              <MagnifyingGlass
-                size={20}
-                weight="regular"
-                className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"
-              />
-              <input
-                type="text"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                className="w-full h-12 pl-12 pr-4 bg-white border border-slate-200 rounded-full text-[16px] placeholder:text-slate-400 focus:ring-2 focus:ring-[#6D0D35]/20 focus:border-[#6D0D35]/40 outline-none transition-all"
-                placeholder="Search venues, catering, music..."
-              />
-            </div>
-            <button
-              className="w-12 h-12 shrink-0 bg-white border border-slate-200 rounded-full flex items-center justify-center transition-colors hover:bg-slate-50"
-              style={{ color: CHERRY }}
-              aria-label="Filters"
-            >
-              <SlidersHorizontal size={20} weight="regular" />
-            </button>
+        <header className="px-6 pt-8 pb-4 shrink-0">
+          <h1 className={`${TYPO.H1} text-text-primary`}>Discover</h1>
+          <p className={`${TYPO.SUBTEXT} mt-0.5`}>Find venues, catering & more</p>
+        </header>
+        <main className="px-6 pb-32 space-y-8">
+          {/* Search bar */}
+          <div className="relative">
+            <MagnifyingGlass
+              size={20}
+              weight="regular"
+              className="absolute left-5 top-1/2 -translate-y-1/2 text-text-tertiary pointer-events-none"
+            />
+            <input
+              type="text"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className={`${INPUT.SEARCH} pl-12`}
+              placeholder="Search venues, catering, music..."
+            />
           </div>
 
           {/* Category pills */}
@@ -106,10 +99,10 @@ export default function ServicesPage() {
                 key={c.id}
                 type="button"
                 onClick={() => setCategory(c.id)}
-                className={`flex-shrink-0 px-5 py-2.5 rounded-full text-sm font-normal transition-colors ${
+                className={`flex-shrink-0 px-5 py-3 rounded-full text-sm font-normal transition-colors ${
                   category === c.id
                     ? "text-white"
-                    : "bg-white text-slate-600 border border-slate-200"
+                    : "bg-white text-text-secondary border border-slate-200"
                 }`}
                 style={
                   category === c.id
@@ -124,16 +117,11 @@ export default function ServicesPage() {
 
           {/* Top Rated Partners */}
           <section>
-            <div className="flex justify-between items-end mb-4">
-              <div>
-                <h3 className={TYPO.H3} style={{ color: MINTY_LIME_DARK }}>
-                  Handpicked
-                </h3>
-                <p className={`${TYPO.H2} mt-0.5`}>Top Rated Partners</p>
-              </div>
-              <button className={TYPO.LINK} style={{ color: CHERRY }}>
-                See map
-              </button>
+            <div className="mb-4">
+              <h3 className="text-caption font-medium text-primary uppercase tracking-wider">
+                Handpicked
+              </h3>
+              <p className="text-body font-medium text-text-primary mt-0.5">Top Rated Partners</p>
             </div>
 
             {loading ? (
@@ -150,7 +138,7 @@ export default function ServicesPage() {
                 className={`text-center py-16 bg-white border border-slate-200 ${ROUND}`}
                 style={{ borderColor: "rgba(0,0,0,0.06)" }}
               >
-                <ForkKnife size={48} weight="regular" className="text-slate-300 mx-auto" />
+                <ForkKnife size={40} weight="regular" className="text-slate-300 mx-auto" />
                 <p className={`${TYPO.BODY} mt-4 font-medium`}>
                   {category === "all" || category === "catering"
                     ? "No vendors found"
@@ -170,75 +158,38 @@ export default function ServicesPage() {
                     <Link
                       key={vendor.id}
                       href={`/vendor/${vendor.id}`}
-                      className={`bg-white overflow-hidden border group ${ROUND}`}
-                      style={{ borderColor: "rgba(0,0,0,0.06)" }}
+                      className="bg-white overflow-hidden border border-slate-200 rounded-2xl shadow-elevation-1 transition-all hover:border-slate-300 active:scale-[0.99]"
                     >
-                      <div className="relative h-36">
+                      <div className="relative w-full h-28">
                         {(vendor.featuredImageUrl || vendor.logoUrl) ? (
                           <Image
                             src={vendor.featuredImageUrl || vendor.logoUrl || ""}
                             alt={vendor.businessName}
                             fill
-                            className="object-cover transition-transform duration-500 group-hover:scale-105"
+                            className="object-cover"
                             sizes="(max-width: 430px) 100vw, 400px"
                           />
                         ) : (
-                          <div
-                            className="w-full h-full flex items-center justify-center"
-                            style={{ backgroundColor: "#F9F2E7" }}
-                          >
-                            <ForkKnife size={40} weight="regular" style={{ color: CHERRY }} />
+                          <div className="w-full h-full flex items-center justify-center bg-[var(--bg-section-alt)]">
+                            <ForkKnife size={28} weight="regular" className="text-primary" />
                           </div>
                         )}
-                        <button
-                          className="absolute top-2 right-2 w-8 h-8 bg-white/80 backdrop-blur rounded-full flex items-center justify-center"
-                          onClick={(e) => e.preventDefault()}
-                          style={{ color: CHERRY }}
-                        >
-                          <Heart size={16} weight="regular" />
-                        </button>
-                        <span
-                          className="absolute bottom-2 left-2 text-white text-[9px] font-normal px-2 py-0.5 rounded-full uppercase tracking-widest"
-                          style={{ backgroundColor: WARM_PEACH, color: WARM_PEACH_DARK }}
-                        >
-                          Premium Catering
-                        </span>
                       </div>
                       <div className="p-4">
-                        <div className="flex justify-between items-start">
-                          <div>
-                            <h4 className={TYPO.CARD_TITLE}>
-                              {vendor.businessName}
-                            </h4>
-                            <div className={`flex items-center ${TYPO.SUBTEXT} mt-0.5`}>
-                              <ForkKnife size={14} weight="regular" className="mr-1" />
-                              <span>
-                                {vendor.cuisineTypes?.slice(0, 2).join(", ") || "Catering"}
-                              </span>
-                            </div>
-                          </div>
-                          {vendor.ratingCount > 0 && (
-                            <div className="flex items-center bg-amber-50 px-2.5 py-1 rounded-full">
-                              <Star size={14} weight="fill" className="text-amber-500 mr-1" />
-                              <span className="font-normal text-amber-700 text-sm">
-                                {Number(vendor.ratingAvg).toFixed(1)}
-                              </span>
-                            </div>
-                          )}
-                        </div>
-                        <div className="mt-3 flex items-center justify-between pt-3 border-t border-slate-50">
-                          <p className={TYPO.SUBTEXT}>
+                        <h4 className={TYPO.CARD_TITLE}>{vendor.businessName}</h4>
+                        <p className={`${TYPO.SUBTEXT} mt-0.5`}>
+                          {vendor.cuisineTypes?.slice(0, 2).join(", ") || "Catering"}
+                        </p>
+                        <div className="mt-3 flex items-center justify-between pt-3 border-t border-slate-100">
+                          <p className={TYPO.BODY_MEDIUM}>
                             {minPrice != null ? (
-                              <>
-                                <span className="text-slate-900 font-normal">{minPrice} BD</span> / event
-                              </>
+                              <span className="text-text-primary">{minPrice} BD</span>
                             ) : (
-                              <span className="text-slate-500">—</span>
+                              <span className="text-text-tertiary">—</span>
                             )}
+                            {minPrice != null && <span className={`${TYPO.CAPTION} ml-1`}>/ event</span>}
                           </p>
-                          <span className={`${TYPO.LINK}`} style={{ color: CHERRY }}>
-                            View Details
-                          </span>
+                          <span className={`${TYPO.LINK} text-primary`}>View</span>
                         </div>
                       </div>
                     </Link>
@@ -250,7 +201,7 @@ export default function ServicesPage() {
 
           {/* Browse by Category */}
           <section>
-            <h3 className={`${TYPO.H3} mb-4`} style={{ color: WARM_PEACH_DARK }}>
+            <h3 className="text-caption font-medium text-primary uppercase tracking-wider mb-4">
               Browse by Category
             </h3>
               <div
@@ -272,7 +223,7 @@ export default function ServicesPage() {
                     <item.icon
                       size={22}
                       weight="regular"
-                      className={item.available ? "" : "text-slate-400"}
+                      className={item.available ? "" : "text-text-tertiary"}
                       style={item.available ? { color: SOFT_LILAC_DARK } : undefined}
                     />
                   </div>
@@ -283,7 +234,7 @@ export default function ServicesPage() {
                   <div className="flex items-center gap-2 shrink-0">
                     {item.available ? (
                       <span
-                        className="text-[10px] font-normal uppercase tracking-wider px-2.5 py-1 rounded-full"
+                        className="text-[9px] font-semibold uppercase tracking-wide px-2 py-0.5 rounded-full"
                         style={{ backgroundColor: SOFT_LILAC, color: SOFT_LILAC_DARK }}
                       >
                         Available
@@ -291,7 +242,7 @@ export default function ServicesPage() {
                     ) : (
                       <span className={TYPO.CAPTION}>Coming soon</span>
                     )}
-                    <CaretRight size={18} weight="regular" className="text-slate-400" />
+                    <CaretRight size={18} weight="regular" className="text-text-tertiary" />
                   </div>
                 </Link>
               ))}

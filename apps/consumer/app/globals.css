@@ -1,3 +1,5 @@
+@import "./tokens.css";
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -13,12 +15,106 @@
   }
 }
 
+@keyframes modalBackdropIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes modalSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-modal-backdrop {
+  animation: modalBackdropIn 0.25s ease-out forwards;
+}
+
+.animate-modal-slide-up {
+  animation: modalSlideUp 0.35s cubic-bezier(0.32, 0.72, 0, 1) forwards;
+}
+
+@keyframes modalScaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.animate-modal-scale-in {
+  animation: modalScaleIn 0.3s cubic-bezier(0.32, 0.72, 0, 1) forwards;
+}
+
+/* Entrance animations — simple, delightful */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.35s ease-out forwards;
+}
+
+.animate-slide-in-up {
+  animation: slideInUp 0.45s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.animate-delay-1 { animation-delay: 60ms; }
+.animate-delay-2 { animation-delay: 120ms; }
+.animate-delay-3 { animation-delay: 180ms; }
+.animate-delay-4 { animation-delay: 240ms; }
+
 .page-transition {
   min-height: 100%;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .page-transition {
+  .page-transition,
+  .animate-modal-backdrop,
+  .animate-modal-slide-up,
+  .animate-modal-scale-in,
+  .animate-fade-in-up,
+  .animate-fade-in,
+  .animate-slide-in-up {
     animation: none !important;
   }
 }
@@ -32,13 +128,13 @@
 
 :root {
   --background: #F9F2E7;
-  --foreground: #171717;
-  --primary: #2563eb;
+  --foreground: #1A1A1A;
+  --primary: #6D0D35;
 }
 
 html {
   scroll-behavior: smooth;
-  background: #F9F2E7;
+  background: var(--bg-app);
 }
 
 html,
@@ -48,9 +144,22 @@ body {
   min-height: 100vh;
   min-height: 100dvh;
   overflow-x: hidden;
-  overscroll-behavior: none;
   -ms-overflow-style: none;
   scrollbar-width: none;
+}
+
+/* Desktop: allow normal wheel/trackpad scroll (overscroll-behavior: none can block it on some systems) */
+@media (min-width: 768px) {
+  html {
+    overflow-y: auto;
+  }
+}
+
+/* Mobile only: overscroll-behavior prevents bounce/chaining */
+@media (max-width: 767px) {
+  html, body {
+    overscroll-behavior: none;
+  }
 }
 
 html::-webkit-scrollbar,
@@ -69,9 +178,16 @@ body::-webkit-scrollbar {
 
 body {
   color: var(--foreground);
-  background: #F9F2E7;
+  background: var(--bg-app);
   -webkit-tap-highlight-color: transparent;
   -webkit-overflow-scrolling: touch;
+}
+
+/* Prevent zoom on input focus (iOS) — 16px on form pages */
+.form-no-zoom input,
+.form-no-zoom select,
+.form-no-zoom textarea {
+  font-size: 16px !important;
 }
 
 .ios-blur {
@@ -79,32 +195,76 @@ body {
   -webkit-backdrop-filter: blur(25px);
 }
 
+/* Smooth touch scroll for main content (fixes iOS scroll glitches) */
+.scroll-touch {
+  -webkit-overflow-scrolling: touch;
+  overflow-anchor: auto;
+}
+
 .circular-progress {
   background: radial-gradient(closest-side, white 79%, transparent 80% 100%),
     conic-gradient(var(--primary) 0%, #e2e8f0 0%);
 }
 
-/* Mobile Safari/Chrome date/time input fix */
-input[type="date"],
-input[type="time"],
-input[type="datetime-local"] {
+/* Date & time inputs — vertically centered, no offset */
+/* 16px font prevents iOS zoom on focus */
+.input-date-time {
   display: block;
   width: 100%;
-  min-height: 44px;
+  min-height: 48px;
+  padding: 0 16px;
   -webkit-appearance: none;
   appearance: none;
   box-sizing: border-box;
-  color: #171717;
+  color: #1A1A1A;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.input-date-time::-webkit-datetime-edit {
+  padding: 0;
+  line-height: 48px;
+  height: 48px;
+  display: block;
+  color: #1A1A1A;
+}
+
+.input-date-time::-webkit-datetime-edit-fields-wrapper {
+  padding: 0;
+  height: 48px;
+  display: flex;
+  align-items: center;
+}
+
+.input-date-time:invalid::-webkit-datetime-edit {
+  color: transparent;
+}
+
+.input-date-time:not(:invalid)::-webkit-datetime-edit {
+  color: #1A1A1A;
+}
+
+/* Fallback */
+input[type="date"],
+input[type="time"],
+input[type="datetime-local"] {
+  min-height: 48px;
+  -webkit-appearance: none;
+  appearance: none;
+  box-sizing: border-box;
+  color: #1A1A1A;
+  font-size: 16px;
+  font-weight: 500;
 }
 
 input[type="date"]::-webkit-datetime-edit,
 input[type="time"]::-webkit-datetime-edit {
-  padding: 0;
-  line-height: 1;
-  color: #171717;
+  padding: 0 4px;
+  line-height: 48px;
+  color: #1A1A1A;
 }
 
 input[type="date"]::-webkit-date-and-time-value,
 input[type="time"]::-webkit-date-and-time-value {
-  color: #171717;
+  color: #1A1A1A;
 }

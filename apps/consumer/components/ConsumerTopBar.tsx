@@ -5,7 +5,7 @@ import Link from "next/link";
 import { Bell } from "@phosphor-icons/react";
 import { Logo } from "./Logo";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+import { API_URL } from "@/lib/api";
 
 export function ConsumerTopBar() {
   const [unreadCount, setUnreadCount] = useState(0);
@@ -27,21 +27,28 @@ export function ConsumerTopBar() {
   }, []);
 
   return (
-    <div className="fixed top-0 left-0 right-0 z-50 flex justify-center">
-      <div className="w-full max-w-[430px] flex justify-between items-center px-6 py-4 min-h-[56px] bg-white/90 backdrop-blur-md rounded-b-2xl shadow-sm">
-        <Logo href="/dashboard" className="text-4xl md:text-5xl text-[#6D0D35]" />
-      <Link
-        href="/notifications"
-        className="relative p-2 -m-2 transition-colors hover:opacity-80"
-        aria-label="Notifications"
-      >
-        <Bell size={24} weight="regular" className="text-slate-600" />
-        {unreadCount > 0 && (
-          <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] rounded-full bg-rose-500 text-white text-[10px] font-bold flex items-center justify-center px-1">
-            {unreadCount > 99 ? "99+" : unreadCount}
-          </span>
-        )}
-      </Link>
+    <div className="fixed top-0 left-0 right-0 z-50 flex justify-center md:hidden">
+      <div
+          className="w-full max-w-[430px] flex justify-between items-center px-6 py-4 min-h-[56px]"
+          style={{
+            background: "var(--bg-surface)",
+            borderBottom: "1px solid var(--border-subtle)",
+            boxShadow: "var(--shadow-xs)",
+          }}
+        >
+        <Logo href="/dashboard" className="text-4xl md:text-5xl text-primary" />
+        <Link
+          href="/notifications"
+          className="relative flex items-center justify-center min-w-[44px] min-h-[44px] w-11 h-11 transition-colors hover:opacity-80"
+          aria-label="Notifications"
+        >
+          <Bell size={24} weight="regular" className="text-text-secondary" />
+          {unreadCount > 0 && (
+            <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] rounded-full bg-rose-500 text-white text-[10px] font-bold flex items-center justify-center px-1">
+              {unreadCount > 99 ? "99+" : unreadCount}
+            </span>
+          )}
+        </Link>
       </div>
     </div>
   );

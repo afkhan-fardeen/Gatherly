@@ -1,16 +1,18 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Envelope, Lock } from "@phosphor-icons/react";
 import { AuthLayout } from "@/components/ui/AuthLayout";
 import { AuthInput } from "@/components/ui/AuthInput";
 import { AuthButton } from "@/components/ui/AuthButton";
 import { API_URL, parseJsonResponse } from "@/lib/api";
 
-export default function VendorLoginPage() {
+function VendorLoginForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirectTo = searchParams.get("redirect") || "/dashboard";
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -34,7 +36,7 @@ export default function VendorLoginPage() {
       if (!data.token || !data.user) throw new Error("Invalid response from server");
       localStorage.setItem("token", data.token);
       localStorage.setItem("user", JSON.stringify(data.user));
-      router.push("/dashboard");
+      router.push(redirectTo.startsWith("/") ? redirectTo : `/${redirectTo}`);
       router.refresh();
     } catch (err) {
       const msg = err instanceof Error ? err.message : "Login failed";
@@ -51,7 +53,7 @@ export default function VendorLoginPage() {
         <p className="text-[15px] text-slate-500">
           Don&apos;t have an account?{" "}
           <Link
-            href="/register"
+            href={redirectTo !== "/dashboard" ? `/register?redirect=${encodeURIComponent(redirectTo)}` : "/register"}
             className="text-slate-900 font-semibold hover:underline decoration-primary decoration-2 underline-offset-4"
           >
             Sign up
@@ -82,5 +84,13 @@ export default function VendorLoginPage() {
         <AuthButton loading={loading}>Sign in</AuthButton>
       </form>
     </AuthLayout>
+  );
+}
+
+export default function VendorLoginPage() {
+  return (
+    <Suspense fallback={<AuthLayout title="Vendor login" footer={<p className="text-slate-500">Loading...</p>}><div className="flex items-center justify-center min-h-[200px]">Loading...</div></AuthLayout>}>
+      <VendorLoginForm />
+    </Suspense>
   );
 }

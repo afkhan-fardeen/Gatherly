@@ -16,7 +16,7 @@ import {
 } from "@phosphor-icons/react";
 import { VendorLayout } from "@/components/VendorLayout";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+import { API_URL } from "@/lib/api";
 
 type Tab = "pending" | "confirmed" | "in_progress" | "completed" | "cancelled";
 

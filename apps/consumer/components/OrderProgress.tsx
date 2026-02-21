@@ -27,7 +27,7 @@ export function OrderProgress({ status, paymentStatus }: OrderProgressProps) {
         Current status
       </h3>
       <span
-        className={`inline-block px-3 py-1.5 rounded-md text-sm font-semibold ${style}`}
+        className={`inline-block px-2 py-0.5 rounded-md text-[9px] font-semibold uppercase tracking-wide ${style}`}
       >
         {label}
       </span>

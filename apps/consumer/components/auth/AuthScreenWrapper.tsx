@@ -1,6 +1,6 @@
 "use client";
 
-const SOFT_LILAC = "#CFD7F2";
+const BURGUNDY_TINT = "#e8d4d8";
 const PRIMARY = "#3F0810";
 
 interface AuthScreenWrapperProps {
@@ -18,11 +18,11 @@ export function AuthScreenWrapper({ children, showPill = true, centered = true }
       {/* Organic blur shapes - signin.html positions */}
       <div
         className="absolute rounded-full blur-[60px] pointer-events-none w-[300px] h-[300px] -top-[50px] -right-[100px] z-0"
-        style={{ backgroundColor: SOFT_LILAC, opacity: 0.15 }}
+        style={{ backgroundColor: BURGUNDY_TINT, opacity: 0.15 }}
       />
       <div
         className="absolute rounded-full blur-[50px] pointer-events-none w-[250px] h-[250px] bottom-[50px] -left-[80px] z-0"
-        style={{ backgroundColor: SOFT_LILAC, opacity: 0.12 }}
+        style={{ backgroundColor: BURGUNDY_TINT, opacity: 0.12 }}
       />
       <div className="w-full max-w-[400px] z-10 flex flex-col gap-8">
         {children}

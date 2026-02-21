@@ -129,6 +129,7 @@ eventsRouter.post("/", async (req, res) => {
       budgetMax: data.budgetMax,
       specialRequirements: data.specialRequirements,
       dietaryRequirements: data.dietaryRequirements ?? [],
+      imageUrl: data.imageUrl || null,
     },
   });
   res.status(201).json(event);
@@ -179,6 +180,8 @@ eventsRouter.put("/:id", async (req, res) => {
       ...(data.dietaryRequirements !== undefined && {
         dietaryRequirements: data.dietaryRequirements,
       }),
+      ...(data.imageUrl !== undefined && { imageUrl: data.imageUrl || null }),
+      ...(data.status && { status: data.status }),
     },
   });
   res.json(event);

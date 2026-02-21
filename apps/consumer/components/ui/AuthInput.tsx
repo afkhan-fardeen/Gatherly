@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Eye, EyeSlash } from "@phosphor-icons/react";
 
-const SOFT_LILAC = "#CFD7F2";
+const BURGUNDY_LIGHT = "#e8d4d8";
 const CHERRY = "#6D0D35";
 
 interface AuthInputProps {
@@ -16,7 +16,6 @@ interface AuthInputProps {
   required?: boolean;
   minLength?: number;
   icon?: React.ReactNode;
-  forgotPasswordHref?: string;
 }
 
 export function AuthInput({
@@ -29,7 +28,6 @@ export function AuthInput({
   required,
   minLength,
   icon,
-  forgotPasswordHref,
 }: AuthInputProps) {
   const [showPassword, setShowPassword] = useState(false);
   const isPassword = type === "password";
@@ -38,24 +36,13 @@ export function AuthInput({
 
   return (
     <div className="space-y-1.5">
-      <div className="flex justify-between items-center ml-1">
-        <label
-          className="text-[12px] font-semibold uppercase tracking-wider"
-          htmlFor={inputId}
-          style={{ color: "#4B5563" }}
-        >
-          {label}
-        </label>
-        {isPassword && forgotPasswordHref && (
-          <a
-            href={forgotPasswordHref}
-            className="text-[11px] font-semibold hover:opacity-80 transition-opacity"
-            style={{ color: CHERRY }}
-          >
-            Forgot Password?
-          </a>
-        )}
-      </div>
+      <label
+        className="text-[12px] font-semibold uppercase tracking-wider block ml-1"
+        htmlFor={inputId}
+        style={{ color: "#4B5563" }}
+      >
+        {label}
+      </label>
       <div className="relative group">
         {icon && (
           <div
@@ -80,7 +67,7 @@ export function AuthInput({
           } ${isPassword ? "pr-12" : "pr-4"}`}
           style={{
             backgroundColor: "rgba(255, 255, 255, 0.6)",
-            border: `1px solid ${SOFT_LILAC}`,
+            border: `1px solid ${BURGUNDY_LIGHT}`,
             color: "#4B5563",
           }}
         />
@@ -93,9 +80,9 @@ export function AuthInput({
             tabIndex={-1}
           >
             {showPassword ? (
-              <EyeSlash size={20} weight="regular" />
+              <EyeSlash size={22} weight="regular" />
             ) : (
-              <Eye size={20} weight="regular" />
+              <Eye size={22} weight="regular" />
             )}
           </button>
         )}

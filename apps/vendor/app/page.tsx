@@ -149,7 +149,7 @@ export default function VendorLandingPage() {
                 Ready to take your business to the next level?
               </h2>
               <p className="text-indigo-100 text-lg mb-10 max-w-xl mx-auto relative z-10">
-                Join top event professionals using Gatherly to manage their business more
+                Join top event professionals using Gatherlii to manage their business more
                 effectively.
               </p>
               <Link
@@ -168,7 +168,7 @@ export default function VendorLandingPage() {
           <div className="flex flex-col md:flex-row justify-between items-center gap-8">
             <div className="flex flex-col items-center md:items-start">
               <div className="text-2xl font-extrabold tracking-tight text-slate-900 mb-2">
-                Gatherly
+                Gatherlii
               </div>
               <p className="text-slate-500 text-sm">Empowering the event industry since 2023.</p>
             </div>
@@ -185,7 +185,7 @@ export default function VendorLandingPage() {
             </div>
           </div>
           <div className="mt-8 pt-8 border-t border-slate-100 text-center text-slate-400 text-xs">
-            © 2023 Gatherly Inc. All rights reserved.
+            © {new Date().getFullYear()} Gatherlii. All rights reserved.
           </div>
         </div>
       </footer>

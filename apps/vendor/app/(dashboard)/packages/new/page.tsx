@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
 import Link from "next/link";
 import { VendorLayout } from "@/components/VendorLayout";
 import { PageHeader } from "@/components/PageHeader";
@@ -9,7 +10,7 @@ import { FormSection } from "@/components/FormSection";
 import { AuthButton } from "@/components/ui/AuthButton";
 import { StepIndicator } from "@/components/ui/StepIndicator";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+import { API_URL } from "@/lib/api";
 
 const inputClass =
   "w-full px-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-900 placeholder:text-slate-400 form-input-focus";
@@ -184,7 +185,7 @@ export default function NewPackagePage() {
                         const data = await res.json();
                         if (res.ok && data.url) setForm((f) => ({ ...f, imageUrl: data.url }));
                       } catch {
-                        alert("Upload failed");
+                        toast.error("Upload failed");
                       }
                       e.target.value = "";
                     }}

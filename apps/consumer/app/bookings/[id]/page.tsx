@@ -17,7 +17,7 @@ import { AppLayout } from "@/components/AppLayout";
 import { OrderProgress } from "@/components/OrderProgress";
 import { TYPO } from "@/lib/events-ui";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+import { API_URL } from "@/lib/api";
 
 interface BookingDetail {
   id: string;
@@ -198,12 +198,12 @@ export default function BookingDetailPage() {
   if (error || !booking) {
     return (
       <AppLayout>
-        <header className="sticky top-0 z-40 bg-white/80 ios-blur px-6 py-3 border-b border-slate-100 shrink-0">
+        <header className="sticky top-0 z-40 bg-white px-6 py-3 border-b border-slate-200 shrink-0">
           <Link
             href="/bookings"
             className="flex items-center gap-3 text-slate-600 font-medium"
           >
-            <ArrowLeft size={18} weight="regular" />
+            <ArrowLeft size={22} weight="regular" />
             Back to bookings
           </Link>
         </header>
@@ -233,13 +233,13 @@ export default function BookingDetailPage() {
 
   return (
     <AppLayout>
-      <header className="sticky top-0 z-40 bg-white/80 ios-blur px-6 py-3 border-b border-slate-100 shrink-0">
+      <header className="sticky top-0 z-40 bg-white px-6 py-3 border-b border-slate-200 shrink-0">
         <div className="flex items-center gap-3">
           <Link
             href="/bookings"
-            className="w-9 h-9 rounded-md bg-slate-100 flex items-center justify-center shrink-0"
+            className="w-11 h-11 min-w-[44px] min-h-[44px] rounded-radius-sm bg-slate-100 flex items-center justify-center shrink-0"
           >
-            <ArrowLeft size={18} weight="regular" className="text-slate-600" />
+            <ArrowLeft size={22} weight="regular" className="text-slate-600" />
           </Link>
           <div className="flex-1 min-w-0">
             <h1 className={`${TYPO.H1_SM} truncate`}>

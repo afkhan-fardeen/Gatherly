@@ -6,9 +6,9 @@ import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import { ArrowLeft, Camera } from "@phosphor-icons/react";
 import { AppLayout } from "@/components/AppLayout";
-import { TYPO } from "@/lib/events-ui";
+import { TYPO, INPUT } from "@/lib/events-ui";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+import { API_URL } from "@/lib/api";
 
 interface UserData {
   id: string;
@@ -122,31 +122,28 @@ export default function EditProfilePage() {
   if (loading || !user) {
     return (
       <AppLayout>
-        <div className="flex-1 flex items-center justify-center">
-          <p className="text-slate-500">{loading ? "Loading..." : "Please log in"}</p>
+        <div className="flex-1 flex items-center justify-center bg-[var(--bg-app)]">
+          <p className={TYPO.SUBTEXT}>{loading ? "Loading..." : "Please log in"}</p>
         </div>
       </AppLayout>
     );
   }
 
-  const inputClass =
-    "w-full h-12 px-4 bg-slate-50 border border-slate-200 rounded-md text-slate-900 placeholder:text-slate-400 focus:ring-2 focus:ring-primary/20 focus:bg-white transition-all outline-none";
-
   return (
     <AppLayout>
-      <header className="sticky top-0 z-40 bg-white/80 ios-blur px-6 py-3 border-b border-slate-100 shrink-0">
+      <header className="sticky top-0 z-40 bg-white px-6 py-3 border-b border-slate-200 shrink-0">
         <div className="flex items-center gap-3">
           <Link
             href="/profile"
-            className="w-9 h-9 rounded-md bg-slate-100 flex items-center justify-center shrink-0"
+            className="w-11 h-11 min-w-[44px] min-h-[44px] rounded-full border border-slate-200 bg-white flex items-center justify-center shrink-0 text-text-primary hover:bg-slate-50 transition-colors"
           >
-            <ArrowLeft size={18} weight="regular" className="text-slate-600" />
+            <ArrowLeft size={22} weight="regular" />
           </Link>
           <h1 className={TYPO.H1}>Edit profile</h1>
         </div>
       </header>
 
-      <main className="p-6 pb-32">
+      <main className="p-6 pb-32 bg-[var(--bg-app)]">
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Profile image */}
           <div className="flex flex-col items-center">
@@ -170,8 +167,8 @@ export default function EditProfilePage() {
                   </span>
                 )}
               </div>
-              <label className="absolute bottom-0 right-0 w-8 h-8 rounded-md bg-primary text-white flex items-center justify-center cursor-pointer hover:bg-primary/90">
-                <Camera size={16} weight="bold" />
+              <label className="absolute bottom-0 right-0 w-11 h-11 min-w-[44px] min-h-[44px] rounded-radius-sm bg-primary text-white flex items-center justify-center cursor-pointer hover:bg-primary/90">
+                <Camera size={18} weight="bold" />
                 <input
                   type="file"
                   accept="image/jpeg,image/png,image/webp,image/gif"
@@ -193,7 +190,7 @@ export default function EditProfilePage() {
               type="text"
               value={form.name}
               onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
-              className={inputClass}
+              className={INPUT.PRIMARY}
               placeholder="Your name"
               required
             />
@@ -206,7 +203,7 @@ export default function EditProfilePage() {
               type="email"
               value={form.email}
               readOnly
-              className={`${inputClass} bg-slate-100 text-slate-500 cursor-not-allowed`}
+              className={`${INPUT.PRIMARY} bg-slate-100 text-slate-500 cursor-not-allowed`}
             />
             <p className={`${TYPO.CAPTION} mt-1`}>Email cannot be changed</p>
           </div>
@@ -218,7 +215,7 @@ export default function EditProfilePage() {
               type="tel"
               value={form.phone}
               onChange={(e) => setForm((f) => ({ ...f, phone: e.target.value }))}
-              className={inputClass}
+              className={INPUT.PRIMARY}
               placeholder="e.g. +973 1234 5678"
             />
           </div>
@@ -226,7 +223,7 @@ export default function EditProfilePage() {
           <button
             type="submit"
             disabled={saving}
-            className="w-full py-3 bg-primary text-white font-semibold rounded-md hover:bg-primary/90 disabled:opacity-50 transition-colors"
+            className="w-full py-3 bg-primary text-white font-semibold rounded-full hover:bg-primary/90 disabled:opacity-50 transition-colors"
           >
             {saving ? "Saving..." : "Save changes"}
           </button>

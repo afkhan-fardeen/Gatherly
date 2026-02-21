@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { User, Envelope, Lock } from "@phosphor-icons/react";
 import { AuthScreenWrapper } from "@/components/auth/AuthScreenWrapper";
 import { BrandHeading } from "@/components/auth/BrandHeading";
@@ -12,10 +12,11 @@ import { AuthButton } from "@/components/ui/AuthButton";
 import { API_URL, parseJsonResponse } from "@/lib/api";
 
 const CHERRY = "#6D0D35";
-const SOFT_LILAC = "#CFD7F2";
 
-export default function RegisterPage() {
+function RegisterForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirectTo = searchParams.get("redirect") || "/dashboard";
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -37,7 +38,7 @@ export default function RegisterPage() {
       if (!data.token || !data.user) throw new Error("Invalid response from server");
       localStorage.setItem("token", data.token);
       localStorage.setItem("user", JSON.stringify(data.user));
-      router.push("/dashboard");
+      router.push(redirectTo.startsWith("/") ? redirectTo : `/${redirectTo}`);
       router.refresh();
     } catch (err) {
       const msg = err instanceof Error ? err.message : "Registration failed";
@@ -77,7 +78,7 @@ export default function RegisterPage() {
             value={name}
             onChange={setName}
             required
-            icon={<User size={20} weight="regular" />}
+            icon={<User size={22} weight="regular" />}
           />
           <AuthInput
             label="Email Address"
@@ -86,7 +87,7 @@ export default function RegisterPage() {
             value={email}
             onChange={setEmail}
             required
-            icon={<Envelope size={20} weight="regular" />}
+            icon={<Envelope size={22} weight="regular" />}
           />
           <AuthInput
             label="Password"
@@ -97,7 +98,7 @@ export default function RegisterPage() {
             error={error}
             required
             minLength={8}
-            icon={<Lock size={20} weight="regular" />}
+            icon={<Lock size={22} weight="regular" />}
           />
           <div className="mt-4">
             <AuthButton loading={loading}>Sign Up</AuthButton>
@@ -112,7 +113,7 @@ export default function RegisterPage() {
         >
           Already have an account?{" "}
           <Link
-            href="/login"
+            href={redirectTo !== "/dashboard" ? `/login?redirect=${encodeURIComponent(redirectTo)}` : "/login"}
             className="font-semibold hover:underline underline-offset-4"
             style={{ color: CHERRY }}
           >
@@ -121,5 +122,13 @@ export default function RegisterPage() {
         </p>
       </footer>
     </AuthScreenWrapper>
+  );
+}
+
+export default function RegisterPage() {
+  return (
+    <Suspense fallback={<AuthScreenWrapper><div className="flex items-center justify-center min-h-[200px]">Loading...</div></AuthScreenWrapper>}>
+      <RegisterForm />
+    </Suspense>
   );
 }

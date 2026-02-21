@@ -2,10 +2,11 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Package, Plus, PencilSimple, Trash, CaretRight } from "@phosphor-icons/react";
+import { Package, Plus, PencilSimple, Trash } from "@phosphor-icons/react";
 import { VendorLayout } from "@/components/VendorLayout";
+import { ConfirmModal } from "@/components/ConfirmModal";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+import { API_URL } from "@/lib/api";
 
 interface Pkg {
   id: string;
@@ -24,6 +25,7 @@ export default function PackagesListPage() {
   const [vendor, setVendor] = useState<{ businessName: string } | null>(null);
   const [loading, setLoading] = useState(true);
   const [deleting, setDeleting] = useState<string | null>(null);
+  const [confirmDeactivate, setConfirmDeactivate] = useState<string | null>(null);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -44,8 +46,12 @@ export default function PackagesListPage() {
       .finally(() => setLoading(false));
   }, []);
 
+  function requestDeactivate(id: string) {
+    setConfirmDeactivate(id);
+  }
+
   async function handleDelete(id: string) {
-    if (!confirm("Deactivate this package? It will no longer be visible to customers.")) return;
+    setConfirmDeactivate(null);
     const token = localStorage.getItem("token");
     if (!token) return;
     setDeleting(id);
@@ -149,7 +155,7 @@ export default function PackagesListPage() {
                       </Link>
                       <button
                         type="button"
-                        onClick={() => handleDelete(pkg.id)}
+                        onClick={() => requestDeactivate(pkg.id)}
                         disabled={deleting === pkg.id}
                         className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center text-red-500 hover:bg-red-50 disabled:opacity-50"
                         title="Deactivate"
@@ -201,6 +207,16 @@ export default function PackagesListPage() {
           )}
         </div>
       )}
+
+      <ConfirmModal
+        open={!!confirmDeactivate}
+        title="Deactivate package?"
+        message="It will no longer be visible to customers."
+        confirmLabel="Deactivate"
+        variant="danger"
+        onConfirm={() => confirmDeactivate && handleDelete(confirmDeactivate)}
+        onCancel={() => setConfirmDeactivate(null)}
+      />
     </VendorLayout>
   );
 }

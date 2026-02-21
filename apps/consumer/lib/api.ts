@@ -14,6 +14,18 @@ export function parseApiError(data: { error?: string; details?: { fieldErrors?: 
   return "Please check your input and try again.";
 }
 
+/** Returns user-friendly message for network/offline errors. Use in catch blocks. */
+export function getNetworkErrorMessage(err: unknown, fallback: string): string {
+  if (typeof navigator !== "undefined" && !navigator.onLine) {
+    return "You're offline. Please check your connection and try again.";
+  }
+  const msg = err instanceof Error ? err.message : String(err);
+  if (msg === "Failed to fetch" || msg.includes("NetworkError")) {
+    return "Unable to connect. Please check your connection and try again.";
+  }
+  return fallback;
+}
+
 /** Safely parse JSON from fetch response. Handles empty/invalid responses (e.g. Render cold start, 502). */
 export async function parseJsonResponse<T = unknown>(res: Response): Promise<T> {
   const text = await res.text();

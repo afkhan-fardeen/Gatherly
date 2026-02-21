@@ -7,7 +7,7 @@ import { BrandHeading } from "@/components/auth/BrandHeading";
 
 const CHERRY = "#6D0D35";
 const LIGHT_CREAM = "#F9F2E7";
-const SOFT_LILAC = "#CFD7F2";
+const BURGUNDY_LIGHT = "#e8d4d8";
 const SWEET_CHERRY = "#6D0D35";
 
 export default function GetStartedPage() {
@@ -30,11 +30,11 @@ export default function GetStartedPage() {
           <button
             type="button"
             className="w-full bg-white/90 border h-[56px] rounded-full flex items-center justify-center gap-4 px-6 hover:bg-white active:scale-[0.98] transition-all disabled:opacity-70"
-            style={{ borderColor: SOFT_LILAC }}
+            style={{ borderColor: BURGUNDY_LIGHT }}
             disabled
           >
             <span className="flex items-center justify-center w-6 h-6 shrink-0" style={{ color: SWEET_CHERRY }}>
-              <AppleLogo size={20} weight="regular" />
+              <AppleLogo size={22} weight="regular" />
             </span>
             <span
               className="font-semibold text-[15px]"
@@ -46,11 +46,11 @@ export default function GetStartedPage() {
           <button
             type="button"
             className="w-full bg-white/90 border h-[56px] rounded-full flex items-center justify-center gap-4 px-6 hover:bg-white active:scale-[0.98] transition-all disabled:opacity-70"
-            style={{ borderColor: SOFT_LILAC }}
+            style={{ borderColor: BURGUNDY_LIGHT }}
             disabled
           >
             <span className="flex items-center justify-center w-6 h-6 shrink-0" style={{ color: SWEET_CHERRY }}>
-              <Phone size={20} weight="regular" />
+              <Phone size={22} weight="regular" />
             </span>
             <span
               className="font-semibold text-[15px]"
@@ -69,7 +69,7 @@ export default function GetStartedPage() {
             }}
           >
             <span className="flex items-center justify-center w-6 h-6 shrink-0">
-              <Envelope size={20} weight="regular" />
+              <Envelope size={22} weight="regular" />
             </span>
             <span className="font-semibold text-[15px]">Continue with Email</span>
           </Link>

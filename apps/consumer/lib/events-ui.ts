@@ -1,31 +1,56 @@
-/** Shared design tokens for events pages (matches create event UI) */
+/** Shared design tokens (guidelines.md reference) */
 export const CHERRY = "#6D0D35";
-export const ROUND = "rounded-[10px]";
+/** 14px radius for cards (guideline radius-md) */
+export const ROUND = "rounded-radius-md";
 
-/** Typography – consistent sizing across pages */
+/** Elevation shadows (guideline xs/sm/md/lg/xl) */
+export const ELEVATION = {
+  LEVEL_1: "shadow-elevation-1",
+  LEVEL_2: "shadow-elevation-2",
+  LEVEL_3: "shadow-elevation-3",
+  LEVEL_4: "shadow-elevation-4",
+  LEVEL_5: "shadow-elevation-5",
+} as const;
+
+/** Text hierarchy – guideline */
+export const TEXT_PRIMARY = "#1A1A1A";
+export const TEXT_BODY = "#2D2D2D";
+export const TEXT_SECONDARY = "#6B6B6B";
+export const TEXT_TERTIARY = "#9E9E9E";
+
+/** Typography – 500 headlines, 400 body, 300 captions (Plus Jakarta Sans) */
 export const TYPO = {
-  /** Page title (header) – e.g. Events, Profile, My Bookings */
-  H1: "text-xl font-semibold tracking-tight",
-  /** Compact page title – e.g. booking reference */
-  H1_SM: "text-base font-semibold tracking-tight",
-  /** Large page title – e.g. Dashboard greeting, Create New Event */
-  H1_LARGE: "text-2xl font-semibold tracking-tight",
-  /** Section heading – e.g. About Vendor, Service Packages */
-  H2: "text-lg font-semibold text-slate-900",
-  /** Subsection / label – uppercase small */
-  H3: "text-sm font-bold uppercase tracking-wider",
-  /** Card/list item title */
-  CARD_TITLE: "text-base font-semibold text-slate-900",
-  /** Body paragraph */
-  BODY: "text-sm text-slate-600",
-  /** Secondary text / subtext */
-  SUBTEXT: "text-sm text-slate-500",
-  /** Caption / small helper */
-  CAPTION: "text-xs text-slate-500",
+  /** Page title – H1 20px, 500. Primary text */
+  H1: "text-typo-h1 font-medium tracking-tight text-text-primary",
+  /** Compact page title – 16px */
+  H1_SM: "text-body-lg font-medium tracking-tight text-text-primary",
+  /** Large page title – 20px (greeting). Primary text */
+  H1_LARGE: "text-typo-h1 font-medium tracking-tight text-text-primary",
+  /** Section heading – H2 17px, 500. Primary text */
+  H2: "text-typo-h2 font-medium text-text-primary",
+  /** Subsection – H3 15px, 500. Primary text */
+  H3: "text-typo-h3 font-medium text-text-primary",
+  /** Label / Badge – 12px, 500 (hard floor). Primary text */
+  LABEL: "text-caption font-medium text-text-primary",
+  H3_LABEL: "text-caption font-medium uppercase tracking-wider text-text-primary",
+  /** Card title – H3 15px, 500. Primary text */
+  CARD_TITLE: "text-typo-h3 font-medium text-text-primary",
+  /** Body – 14px, 400. Body text */
+  BODY: "text-body font-normal text-text-body",
+  /** Body medium – 14px, 500 (prices, ETA, key data). Secondary text */
+  BODY_MEDIUM: "text-body font-medium text-text-secondary",
+  /** Small / Secondary – 13px, 400 (address, supporting info). Secondary text */
+  BODY_SM: "text-body-sm font-normal text-text-secondary",
+  /** Subtext – 14px. Body text */
+  SUBTEXT: "text-body font-normal text-text-body",
+  /** Caption – 11px, 300 (timestamps, footnotes). Tertiary text */
+  CAPTION: "text-caption-sm font-light text-text-tertiary",
   /** Action link */
-  LINK: "text-sm font-semibold",
-  /** Form label (darker for readability) */
-  FORM_LABEL: "block text-sm font-medium text-slate-700",
+  LINK: "text-body font-medium text-text-body",
+  /** Form label – 14px. Primary text */
+  FORM_LABEL: "block text-body font-normal text-text-primary",
+  /** Micro – 10px, 300 (legal text only). Tertiary text */
+  MICRO: "text-micro font-light text-text-tertiary",
 } as const;
 
 /** Accent colors for labels, tags, badges */
@@ -33,18 +58,58 @@ export const MINTY_LIME = "#a8e6cf";
 export const MINTY_LIME_DARK = "#5cb87a";
 export const WARM_PEACH = "#ffdab9";
 export const WARM_PEACH_DARK = "#d4845c";
-export const SOFT_LILAC = "#e2d5f1";
-export const SOFT_LILAC_DARK = "#9b7bb8";
+/** Burgundy variants (replacing purple) */
+export const BURGUNDY_LIGHT = "#e8d4d8";
+export const BURGUNDY_DARK = "#8B3A4A";
+/** @deprecated Use BURGUNDY_LIGHT */
+export const SOFT_LILAC = "#e8d4d8";
+/** @deprecated Use BURGUNDY_DARK */
+export const SOFT_LILAC_DARK = "#8B3A4A";
 /** Use for icon buttons and pill-shaped buttons */
 export const ROUND_FULL = "rounded-full";
 
-export const INPUT_CLASS =
-  "w-full h-12 px-4 bg-white border border-slate-200 text-slate-900 text-[16px] placeholder:text-slate-400 focus:ring-2 focus:ring-[#6D0D35]/20 focus:border-[#6D0D35]/40 outline-none transition-all rounded-full";
+/** Button size stack – 44px min, 48px default, 52px CTA, 56px max. All pill-shaped. */
+export const BUTTON = {
+  /** Primary CTA: 52px, full width, pill */
+  PRIMARY: "w-full min-w-0 h-[52px] px-6 flex items-center justify-center gap-2 font-medium text-sm text-white bg-primary transition-all duration-200 active:scale-[0.98] disabled:opacity-50 rounded-full",
+  /** Secondary: 48px, min 140px, pill */
+  SECONDARY: "min-w-[140px] h-[48px] px-5 flex items-center justify-center gap-2 font-medium text-sm text-text-primary border border-slate-200 bg-white hover:bg-slate-50 transition-all duration-200 active:scale-[0.98] disabled:opacity-50 rounded-full",
+  /** Small action: 44px, min 100px, pill */
+  SMALL: "min-w-[100px] h-[44px] px-4 flex items-center justify-center gap-2 font-medium text-sm transition-all duration-200 active:scale-[0.98] disabled:opacity-50 rounded-full",
+  /** Chip/Filter: 34px, min 80px, 14px padding, pill */
+  CHIP: "min-w-[80px] h-[34px] px-[14px] flex items-center justify-center font-medium text-sm rounded-full transition-all",
+  /** Icon only: 44×44px min */
+  ICON: "min-w-[44px] min-h-[44px] w-11 h-11 flex items-center justify-center rounded-full transition-all active:scale-[0.98]",
+  /** Add to cart (+): 36×36px exception inside cards */
+  ADD_CART: "w-9 h-9 flex items-center justify-center rounded-full transition-all active:scale-[0.98]",
+} as const;
 
-export const BUTTON_CLASS =
-  `w-full h-12 flex items-center justify-center gap-2 font-semibold text-base text-white transition-all active:scale-[0.98] disabled:opacity-50 rounded-full`;
+/** Input size stack – 44px min, 48px search, 52px default. All pill-shaped. */
+export const INPUT = {
+  /** Primary input: 52px, pill */
+  PRIMARY: "w-full h-[52px] px-5 text-sm font-normal text-text-primary placeholder:text-text-tertiary bg-white border border-slate-200 rounded-full focus:ring-2 focus:ring-[#6D0D35]/20 focus:border-[#6D0D35]/40 outline-none transition-all duration-200",
+  /** Search bar: 48px, pill */
+  SEARCH: "w-full h-12 pl-5 pr-5 text-sm font-normal text-text-primary placeholder:text-text-tertiary bg-white border border-slate-200 rounded-full focus:ring-2 focus:ring-[#6D0D35]/20 focus:border-[#6D0D35]/40 outline-none transition-all duration-200",
+  /** Compact: 44px, pill */
+  COMPACT: "w-full h-11 px-4 text-sm font-normal text-text-primary placeholder:text-text-tertiary bg-white border border-slate-200 rounded-full focus:ring-2 focus:ring-[#6D0D35]/20 focus:border-[#6D0D35]/40 outline-none transition-all duration-200",
+  /** Textarea: min 96px, rounded-xl (not full pill) */
+  TEXTAREA: "w-full min-h-[96px] px-5 py-4 text-sm font-normal text-text-primary placeholder:text-text-tertiary bg-white border border-slate-200 rounded-2xl focus:ring-2 focus:ring-[#6D0D35]/20 focus:border-[#6D0D35]/40 outline-none transition-all duration-200 resize-none",
+} as const;
+
+/** @deprecated Use BUTTON.PRIMARY */
+export const BUTTON_CLASS = BUTTON.PRIMARY;
+
+/** @deprecated Use INPUT.PRIMARY or INPUT.SEARCH */
+export const INPUT_CLASS = INPUT.PRIMARY;
 
 export const LABEL_CLASS =
-  "block text-sm font-bold uppercase tracking-wider text-[#5cb87a]";
+  "block text-body font-bold uppercase tracking-wider text-[#5cb87a]";
 
-export const CARD_CLASS = `bg-white border border-slate-200 ${ROUND}`;
+/** Cards: 20px radius, border, subtle shadow — use everywhere */
+export const CARD = {
+  BASE: "bg-white border border-slate-200 rounded-2xl shadow-elevation-1",
+  PADDING: "p-5",
+  HOVER: "transition-all hover:border-slate-300 hover:shadow-elevation-2 active:scale-[0.99]",
+} as const;
+/** @deprecated Use CARD.BASE + CARD.PADDING */
+export const CARD_CLASS = `bg-white border border-slate-200 rounded-2xl p-5 shadow-elevation-1`;

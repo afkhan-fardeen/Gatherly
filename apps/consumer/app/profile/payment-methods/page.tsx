@@ -2,12 +2,13 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
-import { CreditCard, Plus, Trash } from "@phosphor-icons/react";
+import { ArrowLeft, CreditCard, Plus, Trash } from "@phosphor-icons/react";
 import { AppLayout } from "@/components/AppLayout";
 import { TYPO } from "@/lib/events-ui";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+import { API_URL, parseApiError } from "@/lib/api";
 
 interface PaymentMethod {
   id: string;
@@ -16,6 +17,7 @@ interface PaymentMethod {
 }
 
 export default function PaymentMethodsPage() {
+  const router = useRouter();
   const [methods, setMethods] = useState<PaymentMethod[]>([]);
   const [loading, setLoading] = useState(true);
   const [adding, setAdding] = useState(false);
@@ -25,7 +27,7 @@ export default function PaymentMethodsPage() {
   function fetchMethods() {
     const token = localStorage.getItem("token");
     if (!token) {
-      window.location.href = "/login";
+      router.push("/login?redirect=" + encodeURIComponent("/profile/payment-methods"));
       return;
     }
     fetch(`${API_URL}/api/payment-methods`, {
@@ -61,7 +63,7 @@ export default function PaymentMethodsPage() {
         body: JSON.stringify({ number: num }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Failed to add card");
+      if (!res.ok) throw new Error(parseApiError(data) || "Failed to add card");
       toast.success("Card added");
       setCardNumber("");
       fetchMethods();
@@ -93,20 +95,20 @@ export default function PaymentMethodsPage() {
 
   return (
     <AppLayout>
-      <header className="sticky top-0 z-40 bg-white/80 ios-blur px-6 py-3 border-b border-slate-100 shrink-0">
+      <header className="sticky top-0 z-40 bg-white px-6 py-3 border-b border-slate-200 shrink-0">
         <div className="flex items-center gap-3">
           <Link
             href="/profile"
-            className="text-slate-500 hover:text-slate-700"
+            className="w-11 h-11 min-w-[44px] min-h-[44px] rounded-full border border-slate-200 bg-white flex items-center justify-center shrink-0 text-text-primary hover:bg-slate-50 transition-colors"
             aria-label="Back"
           >
-            ←
+            <ArrowLeft size={22} weight="regular" />
           </Link>
-          <h1 className={TYPO.H1}>Payment methods</h1>
+          <h1 className={`${TYPO.H1} text-text-primary`}>Payment methods</h1>
         </div>
       </header>
 
-      <main className="p-6 pb-32 space-y-6">
+      <main className="p-6 pb-32 space-y-6 bg-[var(--bg-app)]">
         <p className={TYPO.SUBTEXT}>
           Add cards for quick checkout. Use dummy numbers like 4242424242424242.
         </p>
@@ -118,12 +120,12 @@ export default function PaymentMethodsPage() {
             placeholder="Card number (e.g. 4242…)"
             value={cardNumber}
             onChange={(e) => setCardNumber(e.target.value.replace(/\D/g, "").slice(0, 19))}
-            className="flex-1 px-4 py-3 rounded-md border border-slate-200 text-slate-900 placeholder:text-slate-400"
+            className="flex-1 px-4 py-3 rounded-full border border-slate-200 text-text-primary placeholder:text-text-tertiary bg-white focus:ring-2 focus:ring-primary/20 focus:border-primary/40 outline-none transition-all"
           />
           <button
             type="submit"
             disabled={adding || cardNumber.replace(/\D/g, "").length < 13}
-            className="px-4 py-3 rounded-md bg-primary text-white font-semibold hover:bg-primary/90 disabled:opacity-50 flex items-center gap-2"
+            className="px-4 py-3 rounded-full bg-primary text-white font-semibold hover:bg-primary/90 disabled:opacity-50 flex items-center gap-2 transition-colors"
           >
             <Plus size={18} weight="bold" />
             Add
@@ -133,12 +135,12 @@ export default function PaymentMethodsPage() {
         {loading ? (
           <div className="space-y-2">
             {[1, 2].map((i) => (
-              <div key={i} className="h-16 bg-slate-100 rounded-md animate-pulse" />
+              <div key={i} className="h-16 bg-slate-100 rounded-2xl animate-pulse" />
             ))}
           </div>
         ) : methods.length === 0 ? (
-          <div className="text-center py-12 rounded-md border border-slate-200 bg-white">
-            <CreditCard size={48} weight="regular" className="text-slate-300 mx-auto" />
+          <div className="text-center py-12 rounded-2xl border border-slate-200 bg-white shadow-elevation-1">
+            <CreditCard size={40} weight="regular" className="text-slate-300 mx-auto" />
             <p className={`${TYPO.SUBTEXT} mt-4 font-medium`}>No saved cards</p>
             <p className={`${TYPO.SUBTEXT} mt-1`}>Add a card above</p>
           </div>
@@ -147,11 +149,11 @@ export default function PaymentMethodsPage() {
             {methods.map((m) => (
               <div
                 key={m.id}
-                className="flex items-center justify-between p-4 rounded-md border border-slate-200 bg-white"
+                className="flex items-center justify-between p-4 rounded-2xl border border-slate-200 bg-white shadow-elevation-1"
               >
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-md bg-slate-100 flex items-center justify-center">
-                    <CreditCard size={20} weight="regular" className="text-slate-500" />
+                  <div className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center">
+                    <CreditCard size={22} weight="regular" className="text-slate-500" />
                   </div>
                   <div>
                     <p className={`${TYPO.CARD_TITLE} capitalize`}>{m.brand}</p>

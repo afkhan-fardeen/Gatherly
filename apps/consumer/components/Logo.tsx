@@ -7,10 +7,10 @@ interface LogoProps {
 }
 
 export function Logo({ href = "/", className = "", compact }: LogoProps) {
-  const sizeClass = className.includes("text-") ? "" : (compact ? "text-lg md:text-xl" : "text-2xl md:text-3xl");
+  const sizeClass = className.includes("text-") ? "" : (compact ? "text-lg md:text-xl" : "text-2xl md:text-3xl lg:text-4xl");
   const text = (
     <span className={`font-logo font-normal tracking-tight ${sizeClass || className}`}>
-      Gatherly
+      Gatherlii
     </span>
   );
 

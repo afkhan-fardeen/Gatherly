@@ -1,26 +1,32 @@
 import type { Metadata, Viewport } from "next";
-import { Montserrat } from "next/font/google";
+import { Plus_Jakarta_Sans } from "next/font/google";
 import { Toaster } from "react-hot-toast";
 import { PageTransition } from "@/components/PageTransition";
 import { InstallPrompt } from "@/components/InstallPrompt";
+import { OfflineBanner } from "@/components/OfflineBanner";
+import { AppUpdatePrompt } from "@/components/AppUpdatePrompt";
 import "./globals.css";
 
-const montserrat = Montserrat({ subsets: ["latin"] });
+const plusJakartaSans = Plus_Jakarta_Sans({
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700", "800"],
+  display: "swap",
+});
 
 export const metadata: Metadata = {
-  title: "Gatherly - Event Planning",
+  title: "Gatherlii - Event Planning",
   description: "Plan your events with the best services in town",
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
-    title: "Gatherly",
+    title: "Gatherlii",
   },
   formatDetection: { telephone: false },
 };
 
 export const viewport: Viewport = {
-  themeColor: "#2563eb",
+  themeColor: "#6D0D35",
   viewportFit: "cover",
 };
 
@@ -37,9 +43,11 @@ export default function RootLayout({
           content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"
         />
       </head>
-      <body className={`antialiased min-h-screen ${montserrat.className}`}>
+      <body className={`antialiased min-h-screen ${plusJakartaSans.className}`}>
+        <OfflineBanner />
         <PageTransition>{children}</PageTransition>
         <InstallPrompt />
+        <AppUpdatePrompt />
         <Toaster position="top-center" />
       </body>
     </html>

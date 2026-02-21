@@ -5,7 +5,7 @@ import Link from "next/link";
 import { Bell, CaretRight } from "@phosphor-icons/react";
 import { VendorLayout } from "@/components/VendorLayout";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+import { API_URL } from "@/lib/api";
 
 interface Notification {
   id: string;

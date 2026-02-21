@@ -1,0 +1,84 @@
+/* ============================================================
+   GATHERLII DESIGN TOKENS v2
+   PWA — mobile-first, screen-accurate
+   ============================================================ */
+
+:root {
+  /* RAW BRAND PALETTE */
+  --_burgundy:    #3F0810;
+  --_cherry:      #6D0D35;
+  --_lilac:       #CFD7F2;
+  --_peach:       #FFBE90;
+  --_lime:        #E5EDBF;
+  --_cream:       #F9F2E7;
+
+  /* BACKGROUNDS */
+  --bg-app:           #F9F2E7;
+  --bg-surface:       #FFFFFF;
+  --bg-surface-warm:  #FDFAF5;
+  --bg-section-alt:   #F3EBD8;
+  --bg-section-lilac: #EEF1FB;
+  --bg-section-peach: #FFF3E6;
+  --bg-section-lime:  #F4F7E6;
+  --bg-section-cherry:#F9EEF3;
+
+  /* TEXT */
+  --text-heading:     #2D0A12;
+  --text-title:       #3F0810;
+  --text-body:        #5A1E2C;
+  --text-secondary:   #8C5A68;
+  --text-tertiary:    #BF9AA8;
+  --text-inverse:     #F9F2E7;
+  --text-accent:      #6D0D35;
+
+  /* PRIMARY */
+  --primary:          #6D0D35;
+  --primary-hover:    #5A0A2B;
+  --primary-pressed:  #3F0810;
+  --primary-subtle:   #F5ECF0;
+  --primary-light:    #FAF0F4;
+
+  /* BORDERS */
+  --border-default:   #EAE0D0;
+  --border-strong:    #D4C4AD;
+  --border-subtle:    #F2EAD8;
+  --border-cherry:    #6D0D35;
+
+  /* SHADOWS — warm burgundy, never cold grey */
+  --shadow-xs:     0 1px 3px rgba(63, 8, 16, 0.05);
+  --shadow-sm:     0 2px 8px rgba(63, 8, 16, 0.07);
+  --shadow-md:     0 4px 16px rgba(63, 8, 16, 0.09);
+  --shadow-lg:     0 8px 28px rgba(63, 8, 16, 0.11);
+  --shadow-xl:     0 16px 48px rgba(63, 8, 16, 0.13);
+  --shadow-focus:  0 0 0 3px rgba(109, 13, 53, 0.18);
+  --shadow-cherry: 0 4px 14px rgba(109, 13, 53, 0.35);
+
+  /* SPACING */
+  --sp-1:   4px;
+  --sp-2:   8px;
+  --sp-3:   12px;
+  --sp-4:   16px;
+  --sp-5:   20px;
+  --sp-6:   24px;
+  --sp-8:   32px;
+  --sp-10:  40px;
+  --sp-12:  48px;
+  --sp-16:  64px;
+
+  /* RADIUS */
+  --radius-xs:     6px;
+  --radius-sm:     10px;
+  --radius-md:     14px;
+  --radius-lg:     20px;
+  --radius-xl:     28px;
+  --radius-pill:   999px;
+  --radius-circle: 50%;
+
+  /* ICON SIZES */
+  --icon-xs:   14px;
+  --icon-sm:   18px;
+  --icon-md:   22px;
+  --icon-nav:  24px;
+  --icon-lg:   28px;
+  --icon-xl:   40px;
+}

@@ -1,11 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import toast from "react-hot-toast";
 import { VendorLayout } from "@/components/VendorLayout";
 import { AuthButton } from "@/components/ui/AuthButton";
 import { VENDOR_CATEGORIES } from "@/lib/categories";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+import { API_URL } from "@/lib/api";
 
 const DAYS = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"] as const;
 
@@ -382,26 +383,26 @@ export default function VendorProfilePage() {
                     if (!file) return;
                     const token = localStorage.getItem("token");
                     if (!token) {
-                      alert("Please log in to upload images");
+                      toast.error("Please log in to upload images");
                       return;
                     }
                     const fd = new FormData();
                     fd.append("file", file);
                     try {
                       const res = await fetch(
-                        `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"}/api/upload/image?folder=vendor-logos`,
+                        `${API_URL}/api/upload/image?folder=vendor-logos`,
                         { method: "POST", headers: { Authorization: `Bearer ${token}` }, body: fd }
                       );
                       const data = await res.json();
                       if (res.ok && data.url) {
                         setForm((f) => ({ ...f, logoUrl: data.url }));
                       } else if (res.status === 401) {
-                        alert("Session expired. Please log in again.");
+                        toast.error("Session expired. Please log in again.");
                       } else {
-                        alert(data.error || "Upload failed");
+                        toast.error(data.error || "Upload failed");
                       }
                     } catch {
-                      alert("Upload failed");
+                      toast.error("Upload failed");
                     }
                     e.target.value = "";
                   }}
@@ -436,26 +437,26 @@ export default function VendorProfilePage() {
                       if (!file) return;
                       const token = localStorage.getItem("token");
                       if (!token) {
-                        alert("Please log in to upload images");
+                        toast.error("Please log in to upload images");
                         return;
                       }
                       const fd = new FormData();
                       fd.append("file", file);
                       try {
                         const res = await fetch(
-                          `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"}/api/upload/image?folder=vendor-featured`,
+                          `${API_URL}/api/upload/image?folder=vendor-featured`,
                           { method: "POST", headers: { Authorization: `Bearer ${token}` }, body: fd }
                         );
                         const data = await res.json();
                         if (res.ok && data.url) {
                           setForm((f) => ({ ...f, featuredImageUrl: data.url }));
                         } else if (res.status === 401) {
-                          alert("Session expired. Please log in again.");
+                          toast.error("Session expired. Please log in again.");
                         } else {
-                          alert(data.error || "Upload failed");
+                          toast.error(data.error || "Upload failed");
                         }
                       } catch {
-                        alert("Upload failed");
+                        toast.error("Upload failed");
                       }
                       e.target.value = "";
                     }}

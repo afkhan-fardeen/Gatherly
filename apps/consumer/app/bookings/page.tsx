@@ -1,15 +1,17 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import { CalendarCheck, ForkKnife, CreditCard } from "@phosphor-icons/react";
 import { AppLayout } from "@/components/AppLayout";
+import { PullToRefresh } from "@/components/PullToRefresh";
 import { getBookingStatusStyle } from "@/components/ui/Tag";
 import { getBookingStatusLine } from "@/lib/bookingStatus";
-import { TYPO } from "@/lib/events-ui";
+import { ELEVATION, ROUND, TYPO } from "@/lib/events-ui";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+import { API_URL, parseApiError } from "@/lib/api";
 
 interface Booking {
   id: string;
@@ -26,6 +28,7 @@ interface Booking {
 type Tab = "active" | "past" | "cancelled";
 
 export default function BookingsPage() {
+  const router = useRouter();
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [tab, setTab] = useState<Tab>("active");
   const [loading, setLoading] = useState(true);
@@ -40,26 +43,31 @@ export default function BookingsPage() {
   const [newCardNumber, setNewCardNumber] = useState("");
   const [useNewCard, setUseNewCard] = useState(false);
 
-  useEffect(() => {
+  const fetchBookings = useCallback(async () => {
     const token = localStorage.getItem("token");
-    if (!token) {
-      window.location.href = "/login";
-      return;
-    }
+    if (!token) return;
     const statusMap: Record<Tab, string> = {
       active: "pending,confirmed,in_preparation,delivered",
       past: "completed",
       cancelled: "cancelled",
     };
     const status = statusMap[tab];
-    fetch(`${API_URL}/api/bookings?status=${status}`, {
+    const res = await fetch(`${API_URL}/api/bookings?status=${status}`, {
       headers: { Authorization: `Bearer ${token}` },
-    })
-      .then((res) => (res.ok ? res.json() : []))
-      .then(setBookings)
-      .catch(() => setBookings([]))
-      .finally(() => setLoading(false));
+    });
+    const data = res.ok ? await res.json() : [];
+    setBookings(Array.isArray(data) ? data : []);
   }, [tab]);
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      router.push("/login?redirect=" + encodeURIComponent("/bookings"));
+      return;
+    }
+    setLoading(true);
+    fetchBookings().finally(() => setLoading(false));
+  }, [fetchBookings, router]);
 
   async function handleSubmitReview() {
     if (!reviewModal) return;
@@ -79,7 +87,7 @@ export default function BookingsPage() {
         }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Failed to submit review");
+      if (!res.ok) throw new Error(parseApiError(data) || "Failed to submit review");
       toast.success("Thanks for your review!");
       setBookings((prev) =>
         prev.map((b) =>
@@ -146,7 +154,7 @@ export default function BookingsPage() {
         body: JSON.stringify({ paymentMethodId: paymentMethodId || undefined }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Payment failed");
+      if (!res.ok) throw new Error(parseApiError(data) || "Payment failed");
       toast.success("Payment successful!");
       setBookings((prev) =>
         prev.map((b) =>
@@ -171,7 +179,8 @@ export default function BookingsPage() {
 
   return (
     <AppLayout>
-      <header className="sticky top-0 z-40 bg-white/80 ios-blur px-6 py-3 border-b border-slate-100 shrink-0">
+      <PullToRefresh onRefresh={fetchBookings}>
+      <header className="sticky top-0 z-40 bg-white px-6 py-3 border-b border-slate-200 shrink-0">
         <h1 className={TYPO.H1}>My Bookings</h1>
         <div className="flex gap-2 mt-4">
           {(["active", "past", "cancelled"] as Tab[]).map((t) => {
@@ -207,7 +216,7 @@ export default function BookingsPage() {
           </div>
         ) : filtered.length === 0 ? (
           <div className="text-center py-16">
-            <CalendarCheck size={64} weight="regular" className="text-slate-300 mx-auto" />
+            <CalendarCheck size={40} weight="regular" className="text-slate-300 mx-auto" />
             <p className={`${TYPO.SUBTEXT} mt-4 font-medium`}>No {tab} bookings</p>
             {tab === "active" && (
               <Link
@@ -219,93 +228,83 @@ export default function BookingsPage() {
             )}
           </div>
         ) : (
-          <div className="rounded-md border border-slate-100 bg-white overflow-hidden divide-y divide-slate-100">
+          <div className="space-y-3">
             {filtered.map((booking) => (
-              <div
+              <Link
                 key={booking.id}
-                className="flex flex-col sm:flex-row sm:items-center gap-3 py-4 px-4"
+                href={`/bookings/${booking.id}`}
+                className={`flex gap-4 p-4 ${ROUND} border border-slate-100 bg-white hover:border-slate-200 transition-colors ${ELEVATION.LEVEL_2} min-h-[130px]`}
               >
-                <Link
-                  href={`/bookings/${booking.id}`}
-                  className="flex items-start gap-4 flex-1 min-w-0"
-                >
-                  <div className="w-12 h-12 rounded-md bg-slate-100 flex items-center justify-center shrink-0 overflow-hidden">
-                    {booking.package.imageUrl ? (
-                      <img
-                        src={booking.package.imageUrl}
-                        alt=""
-                        className="w-full h-full object-cover"
-                        loading="lazy"
-                      />
-                    ) : booking.vendor.logoUrl ? (
-                      <img
-                        src={booking.vendor.logoUrl}
-                        alt=""
-                        className="w-full h-full object-cover"
-                        loading="lazy"
-                      />
-                    ) : (
-                      <ForkKnife size={20} weight="regular" className="text-slate-400" />
-                    )}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className={`${TYPO.CARD_TITLE} text-sm line-clamp-2`}>
-                      {booking.event.name} · {booking.vendor.businessName} · {booking.package.name}
-                    </p>
-                    <p className={`${TYPO.CAPTION} mt-0.5`}>
-                      {booking.bookingReference} · {new Date(booking.event.date).toLocaleDateString()} · {Number(booking.totalAmount).toFixed(2)} BD
-                    </p>
-                    <p className={`${TYPO.CAPTION} mt-0.5`}>
-                      {getBookingStatusLine(booking.status, booking.paymentStatus)}
-                    </p>
-                  </div>
-                </Link>
-                <div
-                  className={`flex shrink-0 gap-1.5 ${
-                    (booking.status === "completed" || booking.status === "delivered")
-                      ? "flex-col items-end"
-                      : "flex-row items-center gap-2"
-                  }`}
-                >
-                  {booking.status === "confirmed" &&
-                    (booking.paymentStatus || "unpaid") === "unpaid" && (
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        openPayModal(booking);
-                      }}
-                      disabled={payingId === booking.id}
-                      className="flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-md bg-primary text-white text-xs font-semibold hover:bg-primary/90 disabled:opacity-50"
-                    >
-                      <CreditCard size={14} weight="bold" />
-                      Pay
-                    </button>
+                <div className={`w-[100px] h-[100px] shrink-0 rounded-l-radius-md bg-slate-100 flex items-center justify-center overflow-hidden`}>
+                  {booking.package.imageUrl ? (
+                    <img
+                      src={booking.package.imageUrl}
+                      alt=""
+                      className="w-full h-full object-cover"
+                      loading="lazy"
+                    />
+                  ) : booking.vendor.logoUrl ? (
+                    <img
+                      src={booking.vendor.logoUrl}
+                      alt=""
+                      className="w-full h-full object-cover"
+                      loading="lazy"
+                    />
+                  ) : (
+                    <ForkKnife size={24} weight="regular" className="text-slate-400" />
                   )}
-                  {(booking.status === "completed" || booking.status === "delivered") &&
-                    (!booking.reviews || booking.reviews.length === 0) && (
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        setReviewModal(booking);
-                      }}
-                      className="px-3 py-1.5 rounded-md bg-slate-100 text-slate-700 text-xs font-semibold hover:bg-slate-200"
-                    >
-                      Leave review
-                    </button>
-                  )}
+                </div>
+                <div className="flex-1 min-w-0 relative">
                   <span
-                    className={`px-2.5 py-1 rounded-md text-[10px] font-extrabold uppercase ${getBookingStatusStyle(
+                    className={`absolute top-0 right-0 px-2 py-0.5 rounded-radius-xs text-[9px] font-semibold uppercase tracking-wide ${getBookingStatusStyle(
                       booking.status
                     )}`}
                   >
                     {booking.status.replace(/_/g, " ")}
                   </span>
+                  <h3 className={`${TYPO.CARD_TITLE} line-clamp-1 pr-16`}>
+                    {booking.event.name}
+                  </h3>
+                  <p className={`${TYPO.SUBTEXT} line-clamp-1 mt-0.5`}>
+                    {booking.package.name} · {booking.vendor.businessName}
+                  </p>
+                  <p className={`${TYPO.CAPTION} mt-1`}>
+                    {new Date(booking.event.date).toLocaleDateString()} · {Number(booking.totalAmount).toFixed(2)} BD
+                  </p>
+                  <div className="flex gap-2 mt-2" onClick={(e) => e.preventDefault()}>
+                    {booking.status === "confirmed" &&
+                      (booking.paymentStatus || "unpaid") === "unpaid" && (
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          openPayModal(booking);
+                        }}
+                        disabled={payingId === booking.id}
+                        className="flex items-center gap-1 px-3 py-1 rounded-md bg-primary text-white text-xs font-semibold hover:bg-primary/90 disabled:opacity-50"
+                      >
+                        <CreditCard size={14} weight="bold" />
+                        Pay
+                      </button>
+                    )}
+                    {(booking.status === "completed" || booking.status === "delivered") &&
+                      (!booking.reviews || booking.reviews.length === 0) && (
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          setReviewModal(booking);
+                        }}
+                        className="px-3 py-1 rounded-md bg-slate-100 text-slate-700 text-xs font-semibold hover:bg-slate-200"
+                      >
+                        Leave review
+                      </button>
+                    )}
+                  </div>
                 </div>
-              </div>
+              </Link>
             ))}
           </div>
         )}
@@ -313,7 +312,7 @@ export default function BookingsPage() {
 
       {payModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
-          <div className="bg-white rounded-md p-6 max-w-sm w-full shadow-xl">
+          <div className="bg-white rounded-radius-md p-6 max-w-sm w-full shadow-elevation-4">
             <h3 className={`${TYPO.H2} mb-4`}>Pay {Number(payModal.totalAmount).toFixed(2)} BD</h3>
             <p className={`${TYPO.SUBTEXT} mb-4`}>
               {payModal.vendor.businessName} · {payModal.package.name}
@@ -396,7 +395,7 @@ export default function BookingsPage() {
 
       {reviewModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
-          <div className="bg-white rounded-md p-6 max-w-sm w-full shadow-xl">
+          <div className="bg-white rounded-radius-md p-6 max-w-sm w-full shadow-elevation-4">
             <h3 className={`${TYPO.H2} mb-4`}>Leave a review</h3>
             <p className={`${TYPO.SUBTEXT} mb-4`}>
               {reviewModal.vendor.businessName} · {reviewModal.package.name}
@@ -446,6 +445,7 @@ export default function BookingsPage() {
           </div>
         </div>
       )}
+      </PullToRefresh>
     </AppLayout>
   );
 }

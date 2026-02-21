@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+const eventStatusSchema = z.enum(["draft", "in_progress", "completed", "cancelled"]);
+
 export const createEventSchema = z.object({
   name: z.string().min(2, "Event name required"),
   eventType: z.string().min(1, "Event type required"),
@@ -14,9 +16,12 @@ export const createEventSchema = z.object({
   budgetMax: z.number().optional(),
   specialRequirements: z.string().optional(),
   dietaryRequirements: z.array(z.string()).optional(),
+  imageUrl: z.string().optional(),
 });
 
-export const updateEventSchema = createEventSchema.partial();
+export const updateEventSchema = createEventSchema
+  .partial()
+  .extend({ status: eventStatusSchema.optional() });
 
 export const createGuestSchema = z.object({
   name: z.string().min(2, "Name required"),

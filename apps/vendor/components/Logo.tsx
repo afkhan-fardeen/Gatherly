@@ -8,7 +8,7 @@ interface LogoProps {
 export function Logo({ href = "/", className = "" }: LogoProps) {
   const text = (
     <span className="font-logo text-2xl md:text-3xl font-normal tracking-tight">
-      Gatherly
+      Gatherlii
     </span>
   );
 

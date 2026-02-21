@@ -16,6 +16,7 @@ import {
   CaretRight,
 } from "@phosphor-icons/react";
 import { Logo } from "./Logo";
+import { API_URL } from "@/lib/api";
 
 interface VendorLayoutProps {
   children: React.ReactNode;
@@ -38,8 +39,6 @@ const NAV_ITEMS = [
   { href: "/availability", label: "Unavailable dates", icon: CalendarBlank },
   { href: "/reviews", label: "Reviews", icon: Star },
 ];
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 
 export function VendorLayout({ children }: VendorLayoutProps) {
   const pathname = usePathname();

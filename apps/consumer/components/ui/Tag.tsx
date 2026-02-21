@@ -55,7 +55,7 @@ export function Tag({ children, variant = "cuisine", value, status, className = 
   }
   return (
     <span
-      className={`inline-block px-2.5 py-1 text-xs font-medium ${style} ${className}`}
+      className={`inline-block px-2 py-0.5 text-[9px] font-semibold uppercase tracking-wide ${style} ${className}`}
     >
       {children}
     </span>

@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
+import { EventImage } from "@/components/EventImage";
 import {
   ArrowLeft,
   Calendar,
@@ -12,16 +13,20 @@ import {
   Trash,
   ForkKnife,
   CaretRight,
+  Warning,
+  X,
 } from "@phosphor-icons/react";
 import { AppLayout } from "@/components/AppLayout";
-import { CHERRY, ROUND, MINTY_LIME, MINTY_LIME_DARK, WARM_PEACH_DARK, SOFT_LILAC_DARK, TYPO } from "@/lib/events-ui";
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+import { StatusBadge } from "@/components/ui/StatusBadge";
+import { API_URL } from "@/lib/api";
+import { ROUND, TYPO } from "@/lib/events-ui";
 
 interface Event {
   id: string;
   name: string;
   date: string;
+  timeStart?: string | null;
+  timeEnd?: string | null;
   eventType: string;
   guestCount: number;
   location: string;
@@ -32,6 +37,8 @@ interface Event {
   specialRequirements: string | null;
   dietaryRequirements: string[];
   guests: { id: string }[];
+  status?: string;
+  imageUrl?: string | null;
 }
 
 export default function EventDetailPage() {
@@ -41,6 +48,8 @@ export default function EventDetailPage() {
   const [event, setEvent] = useState<Event | null>(null);
   const [loading, setLoading] = useState(true);
   const [deleting, setDeleting] = useState(false);
+  const [markingComplete, setMarkingComplete] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -57,8 +66,26 @@ export default function EventDetailPage() {
       .finally(() => setLoading(false));
   }, [eventId]);
 
+  async function handleMarkComplete() {
+    const token = localStorage.getItem("token");
+    if (!token) return;
+    setMarkingComplete(true);
+    try {
+      const res = await fetch(`${API_URL}/api/events/${eventId}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ status: "completed" }),
+      });
+      if (res.ok && event) setEvent({ ...event, status: "completed" });
+    } finally {
+      setMarkingComplete(false);
+    }
+  }
+
   async function handleDelete() {
-    if (!confirm("Delete this event? This cannot be undone.")) return;
     const token = localStorage.getItem("token");
     if (!token) return;
     setDeleting(true);
@@ -67,7 +94,10 @@ export default function EventDetailPage() {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` },
       });
-      if (res.ok) router.push("/events");
+      if (res.ok) {
+        setShowDeleteModal(false);
+        router.push("/events");
+      }
     } finally {
       setDeleting(false);
     }
@@ -76,8 +106,8 @@ export default function EventDetailPage() {
   if (loading) {
     return (
       <AppLayout>
-        <div className="flex-1 flex items-center justify-center bg-[#FAFAFA]">
-          <p className="text-slate-500">Loading...</p>
+        <div className="flex-1 flex items-center justify-center bg-[var(--bg-app)]">
+          <p className={TYPO.SUBTEXT}>Loading...</p>
         </div>
       </AppLayout>
     );
@@ -86,12 +116,11 @@ export default function EventDetailPage() {
   if (!event) {
     return (
       <AppLayout>
-        <div className="flex-1 flex flex-col items-center justify-center p-6 bg-[#FAFAFA]">
+        <div className="flex-1 flex flex-col items-center justify-center p-6 bg-[var(--bg-app)]">
           <p className={`${TYPO.SUBTEXT} text-center`}>Event not found</p>
           <Link
             href="/events"
-            className={`mt-4 ${TYPO.LINK} hover:underline`}
-            style={{ color: CHERRY }}
+            className={`mt-4 ${TYPO.LINK} text-primary hover:underline`}
           >
             Back to events
           </Link>
@@ -107,54 +136,82 @@ export default function EventDetailPage() {
     day: "numeric",
     year: "numeric",
   });
+  function formatTime(t: string | null | undefined): string {
+    if (!t) return "";
+    try {
+      const d = new Date(t.includes("T") ? t : `1970-01-01T${t}`);
+      return d.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", hour12: true });
+    } catch {
+      return String(t);
+    }
+  }
+  const timeStr = event.timeStart
+    ? event.timeEnd
+      ? `${formatTime(event.timeStart)} – ${formatTime(event.timeEnd)}`
+      : formatTime(event.timeStart)
+    : null;
 
   return (
     <AppLayout>
-      <div className="bg-[#FAFAFA] min-h-full">
+      <div className="bg-[var(--bg-app)] min-h-full pb-24">
         <header className="px-6 pt-6 pb-4 shrink-0">
           <div className="flex items-center gap-3">
             <Link
               href="/events"
-              className="w-10 h-10 flex items-center justify-center bg-white border border-slate-200 rounded-full"
+              className="w-11 h-11 min-w-[44px] min-h-[44px] flex items-center justify-center bg-white border border-slate-200 rounded-full text-text-primary"
             >
-              <ArrowLeft size={18} weight="regular" className="text-slate-600" />
+              <ArrowLeft size={22} weight="regular" />
             </Link>
-            <h1 className={`${TYPO.H1} truncate flex-1`} style={{ color: CHERRY }}>
+            <h1 className={`${TYPO.H1} truncate flex-1 text-text-primary`}>
               {event.name}
             </h1>
           </div>
         </header>
 
-        <main className="p-6 pb-32 space-y-6">
-          <div className="space-y-4">
-            <span
-              className={`inline-block text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 ${ROUND}`}
-              style={{ backgroundColor: MINTY_LIME, color: MINTY_LIME_DARK }}
-            >
+        <main className="px-6 space-y-6">
+          {event.imageUrl && (
+            <div className="-mx-6 h-48 relative overflow-hidden rounded-2xl bg-slate-100">
+              <EventImage
+                src={event.imageUrl}
+                alt={event.name}
+                className="object-cover"
+                sizes="(max-width: 768px) 100vw, 400px"
+              />
+            </div>
+          )}
+
+          <div className="flex items-center gap-2 flex-wrap">
+            <StatusBadge status={(event.status || "draft") as "draft" | "in_progress" | "completed" | "cancelled"} />
+            <span className="text-[9px] font-semibold uppercase tracking-wide px-2 py-0.5 rounded-full bg-primary/10 text-primary">
               {event.eventType.replace(/_/g, " ")}
             </span>
+          </div>
 
-            <div className={`flex items-start gap-3 p-4 bg-white border border-slate-200 ${ROUND}`}>
-              <Calendar size={20} weight="regular" className="text-slate-400 shrink-0 mt-0.5" />
+          <div className="space-y-4">
+            <div className="flex items-start gap-3">
+              <Calendar size={20} weight="regular" className="text-text-tertiary shrink-0 mt-0.5" />
               <div>
-                <p className="text-xs font-bold uppercase tracking-wider" style={{ color: WARM_PEACH_DARK }}>Date</p>
-                <p className={`${TYPO.CARD_TITLE} mt-0.5`}>{dateStr}</p>
+                <p className={TYPO.CAPTION}>Date</p>
+                <p className={`${TYPO.BODY} mt-0.5`}>
+                  {dateStr}
+                  {timeStr && <span className="text-text-secondary"> · {timeStr}</span>}
+                </p>
               </div>
             </div>
 
-            <div className={`flex items-start gap-3 p-4 bg-white border border-slate-200 ${ROUND}`}>
-              <Users size={20} weight="regular" className="text-slate-400 shrink-0 mt-0.5" />
+            <div className="flex items-start gap-3">
+              <Users size={20} weight="regular" className="text-text-tertiary shrink-0 mt-0.5" />
               <div>
-                <p className="text-xs font-bold uppercase tracking-wider" style={{ color: WARM_PEACH_DARK }}>Guests</p>
-                <p className={`${TYPO.CARD_TITLE} mt-0.5`}>{event.guestCount} guests</p>
+                <p className={TYPO.CAPTION}>Guests</p>
+                <p className={`${TYPO.BODY} mt-0.5`}>{event.guestCount} guests</p>
               </div>
             </div>
 
-            <div className={`flex items-start gap-3 p-4 bg-white border border-slate-200 ${ROUND}`}>
-              <MapPin size={20} weight="regular" className="text-slate-400 shrink-0 mt-0.5" />
+            <div className="flex items-start gap-3">
+              <MapPin size={20} weight="regular" className="text-text-tertiary shrink-0 mt-0.5" />
               <div>
-                <p className="text-xs font-bold uppercase tracking-wider" style={{ color: SOFT_LILAC_DARK }}>Location</p>
-                <p className={`${TYPO.CARD_TITLE} mt-0.5`}>{event.location}</p>
+                <p className={TYPO.CAPTION}>Location</p>
+                <p className={`${TYPO.BODY} mt-0.5`}>{event.location}</p>
                 {event.venueName && (
                   <p className={`${TYPO.SUBTEXT} mt-0.5`}>{event.venueName}</p>
                 )}
@@ -162,9 +219,9 @@ export default function EventDetailPage() {
             </div>
 
             {(event.budgetMin != null || event.budgetMax != null) && (
-              <div className={`p-4 bg-white border border-slate-200 ${ROUND}`}>
-                <p className="text-xs font-bold uppercase tracking-wider" style={{ color: MINTY_LIME_DARK }}>Budget</p>
-                <p className={`${TYPO.CARD_TITLE} mt-0.5`}>
+              <div>
+                <p className={TYPO.CAPTION}>Budget</p>
+                <p className={`${TYPO.BODY} mt-0.5`}>
                   {event.budgetMin != null && event.budgetMax != null
                     ? `${Number(event.budgetMin).toFixed(0)} – ${Number(event.budgetMax).toFixed(0)} BD`
                     : event.budgetMin != null
@@ -175,17 +232,11 @@ export default function EventDetailPage() {
             )}
 
             {event.dietaryRequirements?.length > 0 && (
-              <div className={`p-4 bg-white border border-slate-200 ${ROUND}`}>
-                <p className="text-xs font-bold uppercase tracking-wider mb-2" style={{ color: SOFT_LILAC_DARK }}>
-                  Dietary requirements
-                </p>
-                <div className="flex flex-wrap gap-1.5">
+              <div>
+                <p className={TYPO.CAPTION}>Dietary requirements</p>
+                <div className="flex flex-wrap gap-2 mt-1">
                   {event.dietaryRequirements.map((d) => (
-                    <span
-                      key={d}
-                      className={`text-[10px] font-bold uppercase px-2 py-0.5 ${ROUND}`}
-                      style={{ backgroundColor: `${CHERRY}10`, color: CHERRY }}
-                    >
+                    <span key={d} className="text-[9px] font-semibold uppercase tracking-wide px-2 py-0.5 rounded-full bg-primary/10 text-primary">
                       {d}
                     </span>
                   ))}
@@ -194,57 +245,40 @@ export default function EventDetailPage() {
             )}
 
             {event.specialRequirements && (
-              <div className={`p-4 bg-white border border-slate-200 ${ROUND}`}>
-                <p className="text-xs font-bold uppercase tracking-wider" style={{ color: WARM_PEACH_DARK }}>
-                  Special requirements
-                </p>
+              <div>
+                <p className={TYPO.CAPTION}>Special requirements</p>
                 <p className={`${TYPO.BODY} mt-0.5`}>{event.specialRequirements}</p>
               </div>
             )}
           </div>
 
           <div className="space-y-3 pt-2">
-            <Link
-              href={`/events/${eventId}/guests`}
-              className={`flex items-center justify-between p-4 border border-slate-200 bg-white hover:bg-slate-50/50 transition-colors ${ROUND}`}
-            >
-              <div className="flex items-center gap-3">
-                <div
-                  className="w-10 h-10 flex items-center justify-center rounded-full"
-                  style={{ backgroundColor: `${CHERRY}15` }}
-                >
-                  <Users size={20} weight="regular" style={{ color: CHERRY }} />
-                </div>
-                <div>
-                  <p className={TYPO.CARD_TITLE}>Manage guests</p>
-                  <p className={TYPO.SUBTEXT}>{event.guests?.length ?? 0} guests added</p>
-                </div>
-              </div>
-              <CaretRight size={20} weight="regular" className="text-slate-400" />
-            </Link>
+            {isPast && event.status !== "completed" && event.status !== "cancelled" && (
+              <button
+                type="button"
+                onClick={handleMarkComplete}
+                disabled={markingComplete}
+                className="w-full py-3 border border-slate-200 rounded-full font-medium text-text-primary bg-white hover:bg-slate-50 transition-colors disabled:opacity-50"
+              >
+                {markingComplete ? "Updating…" : "Mark complete"}
+              </button>
+            )}
 
             {!isPast && (
               <Link
                 href={`/services/catering?eventId=${eventId}`}
-                className={`flex items-center justify-between p-4 border transition-colors ${ROUND}`}
-                style={{
-                  borderColor: CHERRY,
-                  backgroundColor: `${CHERRY}08`,
-                }}
+                className="flex items-center justify-between p-4 rounded-2xl border border-primary/30 bg-primary/5 hover:bg-primary/10 transition-colors"
               >
                 <div className="flex items-center gap-3">
-                  <div
-                    className="w-10 h-10 flex items-center justify-center rounded-full"
-                    style={{ backgroundColor: CHERRY }}
-                  >
-                    <ForkKnife size={20} weight="regular" className="text-white" />
+                  <div className="w-11 h-11 flex items-center justify-center rounded-full bg-primary">
+                    <ForkKnife size={22} weight="regular" className="text-white" />
                   </div>
                   <div>
                     <p className={TYPO.CARD_TITLE}>Book catering</p>
                     <p className={TYPO.SUBTEXT}>Find caterers for this event</p>
                   </div>
                 </div>
-                <CaretRight size={20} weight="regular" style={{ color: CHERRY }} />
+                <CaretRight size={22} weight="regular" className="text-primary" />
               </Link>
             )}
           </div>
@@ -252,24 +286,91 @@ export default function EventDetailPage() {
           <div className="flex gap-3 pt-2">
             <Link
               href={`/events/${eventId}/edit`}
-              className="flex-1 flex items-center justify-center gap-2 py-3 border border-slate-200 font-semibold text-slate-700 hover:bg-white transition-colors rounded-full"
+              className="flex-1 flex items-center justify-center gap-2 py-3 border border-slate-200 rounded-full font-medium text-text-primary bg-white hover:bg-slate-50 transition-colors"
             >
               <Pencil size={18} weight="regular" />
               Edit
             </Link>
             <button
               type="button"
-              onClick={handleDelete}
-              disabled={deleting}
-              className="flex-1 flex items-center justify-center gap-2 py-3 border font-semibold text-red-600 hover:bg-red-50 transition-colors disabled:opacity-50 rounded-full"
-              style={{ borderColor: "rgb(254 202 202)" }}
+              onClick={() => setShowDeleteModal(true)}
+              className="flex-1 flex items-center justify-center gap-2 py-3 border border-red-200 rounded-full font-medium text-red-600 bg-white hover:bg-red-50 transition-colors"
             >
               <Trash size={18} weight="regular" />
-              {deleting ? "Deleting…" : "Delete"}
+              Delete
             </button>
           </div>
         </main>
       </div>
+
+      {/* Delete confirmation modal */}
+      {showDeleteModal && (
+        <div
+          className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center p-0 sm:p-4"
+          style={{ paddingBottom: "env(safe-area-inset-bottom, 0px)" }}
+        >
+          <button
+            type="button"
+            onClick={() => !deleting && setShowDeleteModal(false)}
+            className="absolute inset-0 bg-black/50 animate-modal-backdrop"
+            aria-label="Close"
+          />
+          <div
+            className="relative bg-white w-full max-w-md rounded-t-2xl sm:rounded-2xl p-6 overflow-y-auto animate-modal-slide-up flex flex-col"
+            style={{
+              maxHeight: "min(calc(100vh - 2rem - env(safe-area-inset-bottom, 0px)), 400px)",
+              paddingBottom: "calc(2rem + env(safe-area-inset-bottom, 0px))",
+            }}
+          >
+            <div className="flex justify-between items-start mb-5">
+              <div className="flex items-center gap-3">
+                <div
+                  className="w-12 h-12 flex items-center justify-center rounded-full shrink-0"
+                  style={{ backgroundColor: "rgb(254 202 202)" }}
+                >
+                  <Warning size={24} weight="fill" className="text-red-600" />
+                </div>
+                <div>
+                  <h3 className={TYPO.H2}>Delete event?</h3>
+                  <p className={`${TYPO.SUBTEXT} mt-0.5`}>
+                    This cannot be undone. All event details and linked data will be permanently removed.
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => !deleting && setShowDeleteModal(false)}
+                className="w-11 h-11 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-full text-slate-400 hover:bg-slate-100 shrink-0"
+              >
+                <X size={22} weight="bold" />
+              </button>
+            </div>
+            <div className="flex gap-3 mt-4">
+              <button
+                type="button"
+                onClick={() => !deleting && setShowDeleteModal(false)}
+                disabled={deleting}
+                className="flex-1 py-3 font-semibold text-slate-700 border border-slate-200 rounded-full hover:bg-slate-50 transition-colors disabled:opacity-50"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleDelete}
+                disabled={deleting}
+                className="flex-1 py-3 font-semibold text-white rounded-full transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+                style={{
+                  backgroundColor: "#dc2626",
+                  boxShadow: "0 4px 14px rgba(220, 38, 38, 0.35)",
+                }}
+              >
+                {deleting ? "Deleting…" : "Delete event"}
+                <Trash size={18} weight="regular" />
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </AppLayout>
   );
 }

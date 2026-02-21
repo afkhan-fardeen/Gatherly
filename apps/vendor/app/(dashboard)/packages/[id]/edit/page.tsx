@@ -3,13 +3,15 @@
 import { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import Link from "next/link";
+import toast from "react-hot-toast";
 import { VendorLayout } from "@/components/VendorLayout";
 import { PageHeader } from "@/components/PageHeader";
 import { FormSection } from "@/components/FormSection";
 import { AuthButton } from "@/components/ui/AuthButton";
 import { StepIndicator } from "@/components/ui/StepIndicator";
+import { ConfirmModal } from "@/components/ConfirmModal";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+import { API_URL } from "@/lib/api";
 
 const inputClass =
   "w-full px-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-900 placeholder:text-slate-400 form-input-focus";
@@ -34,6 +36,7 @@ function MenuItemsSection({
 }) {
   const [adding, setAdding] = useState(false);
   const [newItem, setNewItem] = useState({ name: "", description: "", category: "" as string });
+  const [confirmRemoveId, setConfirmRemoveId] = useState<string | null>(null);
   const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
 
   async function addItem() {
@@ -57,7 +60,7 @@ function MenuItemsSection({
       onItemsChange([...items, data]);
       setNewItem({ name: "", description: "", category: "" });
     } catch (err) {
-      alert(err instanceof Error ? err.message : "Failed to add item");
+      toast.error(err instanceof Error ? err.message : "Failed to add item");
     } finally {
       setAdding(false);
     }
@@ -78,12 +81,17 @@ function MenuItemsSection({
       if (!res.ok) throw new Error(data.error || "Failed to update item");
       onItemsChange(items.map((i) => (i.id === itemId ? data : i)));
     } catch (err) {
-      alert(err instanceof Error ? err.message : "Failed to update item");
+      toast.error(err instanceof Error ? err.message : "Failed to update item");
     }
   }
 
+  function requestRemove(itemId: string) {
+    setConfirmRemoveId(itemId);
+  }
+
   async function removeItem(itemId: string) {
-    if (!token || !confirm("Remove this menu item?")) return;
+    setConfirmRemoveId(null);
+    if (!token) return;
     try {
       const res = await fetch(`${API_URL}/api/vendor/packages/${packageId}/items/${itemId}`, {
         method: "DELETE",
@@ -95,7 +103,7 @@ function MenuItemsSection({
       }
       onItemsChange(items.filter((i) => i.id !== itemId));
     } catch (err) {
-      alert(err instanceof Error ? err.message : "Failed to remove item");
+      toast.error(err instanceof Error ? err.message : "Failed to remove item");
     }
   }
 
@@ -134,7 +142,7 @@ function MenuItemsSection({
                     const data = await res.json();
                     if (res.ok && data.url) updateItem(item.id, { imageUrl: data.url });
                   } catch {
-                    alert("Upload failed");
+                    toast.error("Upload failed");
                   }
                   e.target.value = "";
                 }}
@@ -174,7 +182,7 @@ function MenuItemsSection({
             />
             <button
               type="button"
-              onClick={() => removeItem(item.id)}
+              onClick={() => requestRemove(item.id)}
               className="px-3 py-2 rounded-lg text-red-600 hover:bg-red-50 text-sm font-medium shrink-0"
             >
               Remove
@@ -219,6 +227,16 @@ function MenuItemsSection({
           {adding ? "Adding…" : "Add item"}
         </button>
       </div>
+
+      <ConfirmModal
+        open={!!confirmRemoveId}
+        title="Remove menu item?"
+        message="This item will be removed from the package."
+        confirmLabel="Remove"
+        variant="danger"
+        onConfirm={() => confirmRemoveId && removeItem(confirmRemoveId)}
+        onCancel={() => setConfirmRemoveId(null)}
+      />
     </FormSection>
   );
 }
@@ -410,7 +428,7 @@ export default function EditPackagePage() {
                         const data = await res.json();
                         if (res.ok && data.url) setForm((f) => ({ ...f, imageUrl: data.url }));
                       } catch {
-                        alert("Upload failed");
+                        toast.error("Upload failed");
                       }
                       e.target.value = "";
                     }}
