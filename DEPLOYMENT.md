@@ -17,7 +17,7 @@ Live URLs:
 | `DATABASE_URL` | Neon connection string (from Neon dashboard) |
 | `JWT_SECRET` | Strong random string (e.g. `openssl rand -base64 32`) |
 | `JWT_REFRESH_SECRET` | Another strong random string |
-| `JWT_EXPIRES_IN` | `15m` |
+| `JWT_EXPIRES_IN` | `7d` (users stay logged in for 7 days, then auto-logout) |
 | `JWT_REFRESH_EXPIRES_IN` | `7d` |
 | `CLOUDINARY_CLOUD_NAME` | Your Cloudinary cloud name |
 | `CLOUDINARY_API_KEY` | Your Cloudinary API key |

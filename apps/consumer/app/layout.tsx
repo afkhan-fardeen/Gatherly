@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Plus_Jakarta_Sans } from "next/font/google";
 import { Toaster } from "react-hot-toast";
 import { PageTransition } from "@/components/PageTransition";
+import { AppBootstrap } from "@/components/AppBootstrap";
 import { InstallPrompt } from "@/components/InstallPrompt";
 import { OfflineBanner } from "@/components/OfflineBanner";
 import { AppUpdatePrompt } from "@/components/AppUpdatePrompt";
@@ -45,7 +46,9 @@ export default function RootLayout({
       </head>
       <body className={`antialiased min-h-screen ${plusJakartaSans.className}`}>
         <OfflineBanner />
-        <PageTransition>{children}</PageTransition>
+        <AppBootstrap>
+          <PageTransition>{children}</PageTransition>
+        </AppBootstrap>
         <InstallPrompt />
         <AppUpdatePrompt />
         <Toaster position="top-center" />

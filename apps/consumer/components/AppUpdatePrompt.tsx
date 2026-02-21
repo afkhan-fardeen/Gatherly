@@ -15,6 +15,8 @@ export function AppUpdatePrompt() {
     if (!reg) return;
     reg.then((registration) => {
       if (!registration) return;
+      // Check for new version when app opens
+      registration.update();
       registration.addEventListener("updatefound", () => {
         const newWorker = registration.installing;
         if (!newWorker) return;
