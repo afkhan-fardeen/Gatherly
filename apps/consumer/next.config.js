@@ -24,7 +24,12 @@ const nextConfig = {
 
 module.exports = (phase) => {
   if (phase === PHASE_PRODUCTION_BUILD) {
-    const withPWA = require("@ducanh2912/next-pwa").default({ dest: "public" });
+    const withPWA = require("@ducanh2912/next-pwa").default({
+      dest: "public",
+      workboxOptions: {
+        cacheId: "gatherlii-v1",
+      },
+    });
     return withPWA(nextConfig);
   }
   return nextConfig;
