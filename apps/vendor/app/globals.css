@@ -30,7 +30,6 @@ body {
 body {
   color: var(--foreground);
   background: var(--background);
-  font-family: "Inter", sans-serif;
   -webkit-tap-highlight-color: transparent;
 }
 

@@ -11,11 +11,11 @@ import {
   CalendarBlank,
   Star,
   SignOut,
-  MagnifyingGlass,
   Bell,
   CaretRight,
 } from "@phosphor-icons/react";
 import { Logo } from "./Logo";
+import { SearchBar } from "./SearchBar";
 import { API_URL } from "@/lib/api";
 
 interface VendorLayoutProps {
@@ -162,17 +162,8 @@ export function VendorLayout({ children }: VendorLayoutProps) {
       <main className="hidden md:flex flex-1 flex-col min-w-0 overflow-hidden">
         <header className="h-16 flex items-center justify-between px-6 bg-white border-b border-slate-200 z-10 shrink-0">
           <div className="flex-1 flex items-center gap-4">
-            <div className="relative w-full max-w-md hidden sm:block">
-              <MagnifyingGlass
-                size={20}
-                weight="regular"
-                className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
-              />
-              <input
-                type="text"
-                placeholder="Search bookings, clients..."
-                className="w-full pl-10 pr-4 py-2 bg-slate-100 border-none rounded-full text-sm focus:ring-2 focus:ring-primary transition-all"
-              />
+            <div className="hidden sm:block w-full max-w-md">
+              <SearchBar />
             </div>
           </div>
           <div className="relative" ref={notifRef}>

@@ -18,6 +18,7 @@ import { uploadRouter } from "./routes/upload.js";
 import { vendorRouter } from "./routes/vendor.js";
 import { vendorsRouter } from "./routes/vendors.js";
 import { spotlightRouter } from "./routes/spotlight.js";
+import { spotlightVendorRouter } from "./routes/spotlight-vendor.js";
 
 const app = express();
 const PORT = process.env.PORT || process.env.API_PORT || 3001;
@@ -48,6 +49,7 @@ app.use("/api/health", healthRouter);
 app.use("/api/upload", uploadRouter);
 app.use("/api/auth", authRouter);
 app.use("/api/vendor", vendorRouter);
+app.use("/api/vendor/spotlight", spotlightVendorRouter);
 app.use("/api/events", eventsRouter);
 app.use("/api/vendors", vendorsRouter);
 app.use("/api/spotlight", spotlightRouter);

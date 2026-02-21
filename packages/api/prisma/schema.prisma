@@ -68,10 +68,11 @@ model Vendor {
   createdAt        DateTime @default(now()) @map("created_at")
   updatedAt        DateTime @updatedAt @map("updated_at")
 
-  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  packages Package[]
-  bookings Booking[]
-  reviews  Review[]
+  user                User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+  packages            Package[]
+  bookings            Booking[]
+  reviews             Review[]
+  spotlightPlacements SpotlightPlacement[]
 
   @@map("vendors")
 }
@@ -97,11 +98,29 @@ model Package {
   createdAt          DateTime @default(now()) @map("created_at")
   updatedAt          DateTime @updatedAt @map("updated_at")
 
-  vendor        Vendor         @relation(fields: [vendorId], references: [id], onDelete: Cascade)
-  packageItems  PackageItem[]
-  bookings      Booking[]
+  vendor             Vendor              @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+  packageItems       PackageItem[]
+  bookings           Booking[]
+  spotlightPlacements SpotlightPlacement[]
 
   @@map("packages")
+}
+
+model SpotlightPlacement {
+  id         String   @id @default(uuid())
+  packageId  String   @map("package_id")
+  vendorId   String   @map("vendor_id")
+  durationDays Int    @map("duration_days")
+  amountBhd  Decimal  @map("amount_bhd") @db.Decimal(8, 2)
+  startDate  DateTime @map("start_date") @db.Date
+  endDate    DateTime @map("end_date") @db.Date
+  status     String   @default("active") @map("status")
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  package Package @relation(fields: [packageId], references: [id], onDelete: Cascade)
+  vendor  Vendor  @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+
+  @@map("spotlight_placements")
 }
 
 model PackageItem {

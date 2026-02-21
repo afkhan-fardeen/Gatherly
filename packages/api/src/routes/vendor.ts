@@ -168,7 +168,10 @@ vendorRouter.get("/packages", vendorAuth, async (req: Request, res: Response) =>
   const packages = await prisma.package.findMany({
     where: { vendorId: req.vendor!.id },
     orderBy: [{ displayOrder: "asc" }, { createdAt: "asc" }],
-    include: { packageItems: { orderBy: { displayOrder: "asc" } } },
+    include: {
+      packageItems: { orderBy: { displayOrder: "asc" } },
+      vendor: { select: { featuredImageUrl: true, logoUrl: true } },
+    },
   });
 
   res.json(packages);
@@ -315,6 +318,53 @@ vendorRouter.delete("/packages/:id/items/:itemId", vendorAuth, async (req: Reque
   });
 
   res.status(204).send();
+});
+
+// GET /api/vendor/search?q=... - search bookings and packages
+vendorRouter.get("/search", vendorAuth, async (req: Request, res: Response) => {
+  const q = typeof req.query.q === "string" ? req.query.q.trim() : "";
+  const vendorId = req.vendor!.id;
+
+  if (q.length < 2) {
+    return res.json({ bookings: [], packages: [] });
+  }
+
+  const [bookings, packages] = await Promise.all([
+    prisma.booking.findMany({
+      where: {
+        vendorId,
+        OR: [
+          { bookingReference: { contains: q, mode: "insensitive" } },
+          { user: { name: { contains: q, mode: "insensitive" } } },
+          { user: { email: { contains: q, mode: "insensitive" } } },
+          { event: { name: { contains: q, mode: "insensitive" } } },
+          { package: { name: { contains: q, mode: "insensitive" } } },
+        ],
+      },
+      take: 8,
+      orderBy: { createdAt: "desc" },
+      include: {
+        user: { select: { name: true } },
+        event: { select: { name: true, date: true } },
+        package: { select: { name: true } },
+      },
+    }),
+    prisma.package.findMany({
+      where: {
+        vendorId,
+        isActive: true,
+        OR: [
+          { name: { contains: q, mode: "insensitive" } },
+          { description: { contains: q, mode: "insensitive" } },
+        ],
+      },
+      take: 5,
+      orderBy: { displayOrder: "asc" },
+      select: { id: true, name: true, imageUrl: true, basePrice: true, priceType: true },
+    }),
+  ]);
+
+  res.json({ bookings, packages });
 });
 
 vendorRouter.get("/bookings", vendorAuth, async (req: Request, res: Response) => {

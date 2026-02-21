@@ -9,7 +9,8 @@ const config: Config = {
   theme: {
     extend: {
       fontFamily: {
-        display: ["Inter", "sans-serif"],
+        sans: ["Poppins", "sans-serif"],
+        display: ["Poppins", "sans-serif"],
         logo: ["Bright", "serif"],
       },
       colors: {
