@@ -38,3 +38,20 @@ export async function parseJsonResponse<T = unknown>(res: Response): Promise<T> 
     throw new Error("Invalid response from server");
   }
 }
+
+/**
+ * Auth-aware fetch. Adds Authorization header from session.
+ * On 401, clears session and redirects to /login.
+ */
+export async function fetchAuth(input: RequestInfo | URL, init?: RequestInit): Promise<Response> {
+  const { getToken, clearSession } = await import("./session");
+  const token = getToken();
+  const headers = new Headers(init?.headers);
+  if (token) headers.set("Authorization", `Bearer ${token}`);
+  const res = await fetch(input, { ...init, headers });
+  if (res.status === 401 && typeof window !== "undefined") {
+    clearSession();
+    window.location.href = "/login";
+  }
+  return res;
+}

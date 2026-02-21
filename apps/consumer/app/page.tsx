@@ -2,13 +2,29 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Sparkle, MagnifyingGlass, Palette, CheckCircle } from "@phosphor-icons/react";
+import { validateSession, getToken } from "@/lib/session";
 
 export default function HomePage() {
+  const router = useRouter();
   const [token, setToken] = useState<string | null>(null);
+  const [checking, setChecking] = useState(true);
+
   useEffect(() => {
-    setToken(typeof window !== "undefined" ? localStorage.getItem("token") : null);
-  }, []);
+    let cancelled = false;
+    validateSession().then((result) => {
+      if (cancelled) return;
+      if (result.valid) {
+        router.replace("/dashboard");
+        return;
+      }
+      setToken(getToken());
+    }).finally(() => {
+      if (!cancelled) setChecking(false);
+    });
+    return () => { cancelled = true; };
+  }, [router]);
 
   return (
     <div className="min-h-screen bg-[var(--bg-app)] text-slate-900 flex flex-col">
@@ -22,7 +38,7 @@ export default function HomePage() {
             <span className="text-xl font-bold tracking-tight text-slate-900">Gatherlii</span>
           </Link>
           <div className="flex items-center gap-3">
-            {token ? (
+            {checking ? null : token ? (
               <Link
                 href="/dashboard"
                 className="px-5 py-2.5 rounded-xl font-semibold text-sm text-primary border border-primary hover:bg-primary/5 transition-colors"
@@ -67,7 +83,7 @@ export default function HomePage() {
                   Experience a premium approach to event planning and coordination. Discover curated vendors, create memorable events, and manage everything in one place.
                 </p>
                 <div className="flex flex-wrap gap-4">
-                  {token ? (
+                  {checking ? null : token ? (
                     <Link
                       href="/dashboard"
                       className="inline-flex items-center gap-2 px-8 py-4 rounded-2xl font-bold text-white bg-primary shadow-xl shadow-primary/20 hover:shadow-2xl transition-all active:scale-[0.98]"
@@ -155,7 +171,7 @@ export default function HomePage() {
             <p className="text-lg text-slate-600 mb-10">
               Join event planners using Gatherlii to create unforgettable experiences.
             </p>
-            {!token && (
+            {!checking && !token && (
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Link
                   href="/register"

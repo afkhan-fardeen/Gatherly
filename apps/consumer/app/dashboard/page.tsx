@@ -9,7 +9,8 @@ import { CalendarPlus, Clock, MapPin, CaretRight } from "@phosphor-icons/react";
 import { AppLayout } from "@/components/AppLayout";
 import { HorizontalSlider } from "@/components/HorizontalSlider";
 import { StatusBadge } from "@/components/ui/StatusBadge";
-import { API_URL } from "@/lib/api";
+import { API_URL, fetchAuth } from "@/lib/api";
+import { getToken } from "@/lib/session";
 import { CHERRY, ROUND, TYPO } from "@/lib/events-ui";
 
 function getGreeting(): string {
@@ -79,19 +80,17 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (!token) {
+    if (!getToken()) {
       router.replace("/login");
       return;
     }
-    const headers = { Authorization: `Bearer ${token}` };
     const params = new URLSearchParams();
     params.set("businessType", "catering");
     params.set("limit", "6");
     Promise.all([
-      fetch(`${API_URL}/api/auth/me`, { headers }).then((r) => (r.ok ? r.json() : null)),
-      fetch(`${API_URL}/api/events`, { headers }).then((r) => (r.ok ? r.json() : [])),
-      fetch(`${API_URL}/api/vendors?${params}`).then((r) => (r.ok ? r.json() : [])),
+      fetchAuth(`${API_URL}/api/auth/me`).then((r) => (r.ok ? r.json() : null)),
+      fetchAuth(`${API_URL}/api/events`).then((r) => (r.ok ? r.json() : [])),
+      fetchAuth(`${API_URL}/api/vendors?${params}`).then((r) => (r.ok ? r.json() : [])),
       fetch(`${API_URL}/api/spotlight`).then((r) => (r.ok ? r.json() : [])),
     ])
       .then(([u, evts, v, sp]) => {
@@ -138,7 +137,7 @@ export default function DashboardPage() {
 
   return (
     <AppLayout>
-      <div className="px-6 pt-8 pb-32 space-y-8 bg-white">
+      <div className="px-6 pt-8 pb-40 space-y-8 bg-white">
         {/* Greeting */}
         <h1 className={`${TYPO.H1_LARGE} text-text-primary animate-fade-in-up`}>
           {getGreeting()}, {firstName}
@@ -245,7 +244,7 @@ export default function DashboardPage() {
                         sizes="96px"
                       />
                     ) : (
-                      <div className="w-full h-full flex items-center justify-center" style={{ backgroundColor: "#F9F2E7" }}>
+                      <div className="w-full h-full flex items-center justify-center" style={{ backgroundColor: "#FFFFFF" }}>
                         <span className="text-xl font-normal text-primary">
                           {vendor.businessName.charAt(0)}
                         </span>
@@ -306,7 +305,7 @@ export default function DashboardPage() {
                     ) : (
                       <div
                         className="w-full h-full flex items-center justify-center"
-                        style={{ backgroundColor: "#F9F2E7" }}
+                        style={{ backgroundColor: "#FFFFFF" }}
                       >
                         <span className="text-4xl font-normal text-primary">
                           {item.name.charAt(0)}

@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useState } from "react";
+import { Suspense, useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Envelope, Lock } from "@phosphor-icons/react";
@@ -10,6 +10,7 @@ import { GlassCard } from "@/components/auth/GlassCard";
 import { AuthInput } from "@/components/ui/AuthInput";
 import { AuthButton } from "@/components/ui/AuthButton";
 import { API_URL, parseJsonResponse } from "@/lib/api";
+import { validateSession, setSession } from "@/lib/session";
 
 const CHERRY = "#6D0D35";
 
@@ -21,6 +22,21 @@ function LoginForm() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [checkingAuth, setCheckingAuth] = useState(true);
+
+  useEffect(() => {
+    let cancelled = false;
+    validateSession().then((result) => {
+      if (cancelled) return;
+      if (result.valid) {
+        const to = redirectTo.startsWith("/") ? redirectTo : `/${redirectTo}`;
+        router.replace(to);
+        return;
+      }
+      setCheckingAuth(false);
+    });
+    return () => { cancelled = true; };
+  }, [router, redirectTo]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -35,8 +51,7 @@ function LoginForm() {
       const data = await parseJsonResponse<{ error?: string; token?: string; user?: unknown }>(res);
       if (!res.ok) throw new Error(data.error || "Login failed");
       if (!data.token || !data.user) throw new Error("Invalid response from server");
-      localStorage.setItem("token", data.token);
-      localStorage.setItem("user", JSON.stringify(data.user));
+      setSession(data.token, data.user);
       router.push(redirectTo.startsWith("/") ? redirectTo : `/${redirectTo}`);
       router.refresh();
     } catch (err) {
@@ -45,6 +60,14 @@ function LoginForm() {
     } finally {
       setLoading(false);
     }
+  }
+
+  if (checkingAuth) {
+    return (
+      <AuthScreenWrapper>
+        <div className="flex items-center justify-center min-h-[200px]">Loading...</div>
+      </AuthScreenWrapper>
+    );
   }
 
   return (
@@ -70,7 +93,7 @@ function LoginForm() {
             Sign in to continue
           </p>
         </div>
-        <form onSubmit={handleSubmit} className="space-y-5">
+        <form onSubmit={handleSubmit} className="form-no-zoom space-y-5">
           <AuthInput
             label="Email Address"
             type="email"
