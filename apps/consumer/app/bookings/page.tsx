@@ -236,15 +236,15 @@ export default function BookingsPage() {
                 href={`/bookings/${booking.id}`}
                 className="block overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-elevation-1 transition-all hover:border-slate-300 active:scale-[0.99]"
               >
-                <div className="flex min-h-[88px]">
-                  <div className="relative w-24 min-h-full shrink-0 bg-slate-100 self-stretch">
+                <div className="flex">
+                  <div className="relative w-20 h-16 shrink-0 bg-slate-100">
                     {booking.package.imageUrl ? (
                       <Image
                         src={booking.package.imageUrl}
                         alt=""
                         fill
                         className="object-cover"
-                        sizes="96px"
+                        sizes="80px"
                         unoptimized
                       />
                     ) : booking.vendor.logoUrl ? (
@@ -253,7 +253,7 @@ export default function BookingsPage() {
                         alt=""
                         fill
                         className="object-contain p-2"
-                        sizes="96px"
+                        sizes="80px"
                         unoptimized
                       />
                     ) : (
@@ -264,11 +264,11 @@ export default function BookingsPage() {
                   </div>
                   <div className="flex-1 min-w-0 p-4 flex flex-col justify-center relative">
                     <span
-                      className={`absolute top-3 right-4 px-2 py-0.5 rounded-radius-xs text-[9px] font-semibold uppercase tracking-wide ${getBookingStatusStyle(
+                      className={`absolute top-3 right-4 px-2 py-0.5 rounded-md text-[10px] font-medium capitalize ${getBookingStatusStyle(
                         booking.status
                       )}`}
                     >
-                      {booking.status.replace(/_/g, " ")}
+                      {getBookingStatusLine(booking.status, booking.paymentStatus).split(" · ")[0]}
                     </span>
                     <h3 className={`${TYPO.CARD_TITLE} line-clamp-1 pr-16`}>
                       {booking.event.name}

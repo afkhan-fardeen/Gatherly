@@ -48,6 +48,8 @@ export default function VendorProfilePage() {
   const searchParams = useSearchParams();
   const id = params.id as string;
   const eventId = searchParams.get("eventId");
+  const guestCountParam = searchParams.get("guestCount");
+  const eventGuests = guestCountParam ? parseInt(guestCountParam, 10) : null;
   const [vendor, setVendor] = useState<Vendor | null>(null);
   const [packages, setPackages] = useState<Package[]>([]);
   const [loading, setLoading] = useState(true);
@@ -136,7 +138,11 @@ export default function VendorProfilePage() {
         {/* Nav overlay - fixed above content to avoid z-index issues */}
         <nav className="fixed top-0 left-0 right-0 z-50 px-6 pt-6 pb-4 flex justify-between items-center">
           <Link
-            href="/services"
+            href={
+              eventId
+                ? `/services/catering?eventId=${eventId}${eventGuests != null ? `&guestCount=${eventGuests}` : ""}`
+                : "/services"
+            }
             className="w-11 h-11 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-full bg-white border border-slate-200 text-text-primary shadow-sm"
           >
             <ArrowLeft size={22} weight="regular" />
@@ -219,13 +225,38 @@ export default function VendorProfilePage() {
             <p className={`${TYPO.SUBTEXT} text-center py-8`}>No packages available</p>
           ) : (
             <div className="space-y-3">
-              {packages.map((pkg, idx) => {
-                const isPopular = idx === 1 || (idx === 0 && packages.length > 1);
-                const priceSuffix = pkg.priceType === "per_person" ? "/ Guest" : "";
-                return (
+              {(() => {
+                const fits = (p: Package) =>
+                  eventGuests != null &&
+                  (p.minGuests == null || eventGuests >= p.minGuests) &&
+                  (p.maxGuests == null || eventGuests <= p.maxGuests);
+                const sorted =
+                  eventGuests != null && eventGuests >= 1
+                    ? [...packages].sort((a, b) => {
+                        const aF = fits(a);
+                        const bF = fits(b);
+                        if (aF && !bF) return -1;
+                        if (!aF && bF) return 1;
+                        return (a.minGuests ?? 0) - (b.minGuests ?? 0);
+                      })
+                    : packages;
+                return sorted.map((pkg, idx) => {
+                  const isPopular = idx === 1 || (idx === 0 && sorted.length > 1);
+                  const priceSuffix = pkg.priceType === "per_person" ? "/ Guest" : "";
+                  const pkgFits = fits(pkg);
+                  const capParts: string[] = [];
+                  if (pkg.minGuests != null) capParts.push(`Min ${pkg.minGuests}`);
+                  if (pkg.maxGuests != null) capParts.push(`Max ${pkg.maxGuests}`);
+                  const capLabel = capParts.length ? capParts.join(" · ") : null;
+                  let pkgHref = `/vendor/${id}/package/${pkg.id}`;
+                  if (eventId) {
+                    pkgHref += `?eventId=${eventId}`;
+                    if (eventGuests != null) pkgHref += `&guestCount=${eventGuests}`;
+                  }
+                  return (
                   <Link
                     key={pkg.id}
-                    href={eventId ? `/vendor/${id}/package/${pkg.id}?eventId=${eventId}` : `/vendor/${id}/package/${pkg.id}`}
+                    href={pkgHref}
                     className={`block overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-elevation-1 transition-all active:scale-[0.99] ${
                       isPopular ? "ring-1 ring-primary/20" : ""
                     }`}
@@ -257,6 +288,16 @@ export default function VendorProfilePage() {
                             {priceSuffix && <span className="text-caption-sm text-text-tertiary ml-0.5">{priceSuffix}</span>}
                           </p>
                         </div>
+                        {capLabel && (
+                          <p className={`text-[11px] mt-1 ${pkgFits && eventGuests != null ? "text-primary font-medium" : "text-text-tertiary"}`}>
+                            {pkgFits && eventGuests != null ? `✓ Fits your event (${eventGuests} guests)` : capLabel}
+                          </p>
+                        )}
+                        {capLabel && !pkgFits && eventGuests != null && (
+                          <p className="text-[11px] mt-0.5 text-amber-600 font-medium">
+                            May not fit {eventGuests} guests
+                          </p>
+                        )}
                         {pkg.packageItems.length > 0 && (
                           <ul className="mt-1.5 space-y-0.5">
                             {pkg.packageItems.slice(0, 3).map((item, i) => (
@@ -274,7 +315,8 @@ export default function VendorProfilePage() {
                     </div>
                   </Link>
                 );
-              })}
+              });
+              })()}
             </div>
           )}
         </section>

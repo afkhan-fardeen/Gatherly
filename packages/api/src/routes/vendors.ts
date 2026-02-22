@@ -36,12 +36,33 @@ vendorsRouter.get("/", async (req, res) => {
       packages: {
         where: { isActive: true },
         orderBy: { basePrice: "asc" },
-        take: 1,
+        select: {
+          id: true,
+          name: true,
+          basePrice: true,
+          priceType: true,
+          minGuests: true,
+          maxGuests: true,
+        },
       },
     },
   });
 
-  res.json(vendors);
+  // Return vendors with min/max capacity across all packages
+  const result = vendors.map((v) => {
+    const pkgList = (v.packages as { minGuests: number | null; maxGuests: number | null }[]) ?? [];
+    const minCap = pkgList.reduce((m, p) => (p.minGuests != null && (m == null || p.minGuests < m) ? p.minGuests : m), null as number | null);
+    const maxCap = pkgList.reduce((m, p) => (p.maxGuests != null && (m == null || p.maxGuests > m) ? p.maxGuests : m), null as number | null);
+    const cheapest = pkgList[0];
+    return {
+      ...v,
+      packages: cheapest ? [cheapest] : [],
+      minCapacity: minCap,
+      maxCapacity: maxCap,
+    };
+  });
+
+  res.json(result);
 });
 
 vendorsRouter.get("/:id", async (req, res) => {

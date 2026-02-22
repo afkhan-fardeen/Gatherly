@@ -117,12 +117,17 @@ export default function BookVendorPage() {
             : null;
           const ev = preferred || evs[0];
           setEventId(ev.id);
+          const minG = found.minGuests ?? 1;
+          const maxG = found.maxGuests ?? Infinity;
           const urlCount = guestCountFromUrl ? parseInt(guestCountFromUrl, 10) : NaN;
+          const evCount = ev?.guestCount ?? minG;
+          let initialCount = minG;
           if (!isNaN(urlCount) && urlCount >= 1) {
-            setGuestCount(String(urlCount));
+            initialCount = Math.max(minG, Math.min(urlCount, maxG === Infinity ? 9999 : maxG));
           } else {
-            setGuestCount(String(ev.guestCount));
+            initialCount = Math.max(minG, Math.min(evCount, maxG === Infinity ? 9999 : maxG));
           }
+          setGuestCount(String(initialCount));
         }
       })
       .catch(() => setError("Failed to load"))
@@ -130,11 +135,16 @@ export default function BookVendorPage() {
   }, [vendorId, packageId, eventIdFromUrl, guestCountFromUrl, router]);
 
   useEffect(() => {
-    if (eventId && events.length > 0 && !guestCountFromUrl) {
+    if (eventId && events.length > 0 && !guestCountFromUrl && pkg) {
       const ev = events.find((e) => e.id === eventId);
-      if (ev) setGuestCount(String(ev.guestCount));
+      if (ev) {
+        const minG = pkg.minGuests ?? 1;
+        const maxG = pkg.maxGuests ?? Infinity;
+        const clamped = Math.max(minG, Math.min(ev.guestCount, maxG === Infinity ? 9999 : maxG));
+        setGuestCount(String(clamped));
+      }
     }
-  }, [eventId, events, guestCountFromUrl]);
+  }, [eventId, events, guestCountFromUrl, pkg]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -282,6 +292,15 @@ export default function BookVendorPage() {
                   max={pkg.maxGuests ?? undefined}
                   value={guestCount}
                   onChange={(e) => setGuestCount(e.target.value)}
+                  onBlur={() => {
+                    const n = parseInt(guestCount, 10);
+                    const minG = pkg.minGuests ?? 1;
+                    const maxG = pkg.maxGuests ?? Infinity;
+                    if (!isNaN(n)) {
+                      if (n < minG) setGuestCount(String(minG));
+                      else if (maxG !== Infinity && n > maxG) setGuestCount(String(maxG));
+                    } else setGuestCount(String(minG));
+                  }}
                   className="w-full h-12 px-4 rounded-full border border-slate-200 bg-white text-slate-900"
                   required
                 />

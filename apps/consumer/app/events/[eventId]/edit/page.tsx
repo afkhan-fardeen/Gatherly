@@ -327,10 +327,18 @@ export default function EditEventPage() {
                 id="guestCount"
                 type="number"
                 min={1}
+                max={9999}
                 value={form.guestCount}
-                onChange={(e) =>
-                  setForm((f) => ({ ...f, guestCount: parseInt(e.target.value) || 1 }))
-                }
+                onChange={(e) => {
+                  const val = parseInt(e.target.value, 10);
+                  if (!e.target.value) setForm((f) => ({ ...f, guestCount: 1 }));
+                  else if (!isNaN(val)) setForm((f) => ({ ...f, guestCount: Math.max(1, Math.min(9999, val)) }));
+                }}
+                onBlur={(e) => {
+                  const val = parseInt(e.target.value, 10);
+                  if (isNaN(val) || val < 1) setForm((f) => ({ ...f, guestCount: 1 }));
+                  else if (val > 9999) setForm((f) => ({ ...f, guestCount: 9999 }));
+                }}
                 className={INPUT.PRIMARY}
                 required
               />

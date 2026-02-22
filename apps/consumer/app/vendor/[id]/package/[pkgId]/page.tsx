@@ -56,6 +56,7 @@ export default function PackageDetailPage() {
   const id = params.id as string;
   const pkgId = params.pkgId as string;
   const eventIdFromUrl = searchParams.get("eventId");
+  const guestCountFromUrl = searchParams.get("guestCount");
   const [pkg, setPkg] = useState<Package | null>(null);
   const [vendor, setVendor] = useState<Vendor | null>(null);
   const [loading, setLoading] = useState(true);
@@ -86,22 +87,26 @@ export default function PackageDetailPage() {
         setPkg(found ?? null);
         if (found) {
           const min = found.minGuests ?? 1;
-          const draft = draftMatchesVendorPackage(id, pkgId) ? getBookingDraft() : null;
-          const restored =
-            draft && draft.guestCount >= min
-              ? Math.min(
-                  draft.guestCount,
-                  found.maxGuests ?? Infinity
-                )
-              : min;
-          setGuestCount(String(restored));
+          const max = found.maxGuests ?? Infinity;
+          let initial = min;
+          const urlCount = guestCountFromUrl ? parseInt(guestCountFromUrl, 10) : NaN;
+          if (!isNaN(urlCount) && urlCount >= 1) {
+            initial = Math.max(min, Math.min(urlCount, max === Infinity ? 9999 : max));
+          } else {
+            const draft = draftMatchesVendorPackage(id, pkgId) ? getBookingDraft() : null;
+            initial =
+              draft && draft.guestCount >= min
+                ? Math.min(draft.guestCount, max === Infinity ? 9999 : max)
+                : min;
+          }
+          setGuestCount(String(initial));
         } else {
           setError("Package not found");
         }
       })
       .catch(() => setError("Failed to load"))
       .finally(() => setLoading(false));
-  }, [id, pkgId]);
+  }, [id, pkgId, guestCountFromUrl]);
 
   const minG = pkg?.minGuests ?? 1;
   const maxG = pkg?.maxGuests ?? Infinity;
@@ -209,7 +214,11 @@ export default function PackageDetailPage() {
         <header className="sticky top-0 z-40 bg-white px-6 py-4 border-b border-slate-200 shrink-0 shadow-elevation-1">
           <div className="flex items-center gap-3">
             <Link
-              href={`/vendor/${id}`}
+              href={
+                eventIdFromUrl && guestCountFromUrl
+                  ? `/vendor/${id}?eventId=${eventIdFromUrl}&guestCount=${guestCountFromUrl}`
+                  : `/vendor/${id}`
+              }
               className="w-11 h-11 min-w-[44px] min-h-[44px] rounded-full bg-slate-100 flex items-center justify-center shrink-0"
             >
               <ArrowLeft size={22} weight="regular" className="text-text-secondary" />

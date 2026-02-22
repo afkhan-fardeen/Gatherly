@@ -21,11 +21,30 @@ interface Vendor {
   logoUrl: string | null;
   featuredImageUrl: string | null;
   packages: { basePrice: number }[];
+  minCapacity?: number | null;
+  maxCapacity?: number | null;
+}
+
+function fitsCapacity(guestCount: number, minCap: number | null | undefined, maxCap: number | null | undefined): boolean {
+  if (minCap != null && guestCount < minCap) return false;
+  if (maxCap != null && guestCount > maxCap) return false;
+  return true;
+}
+
+function getCapacityLabel(minCap: number | null | undefined, maxCap: number | null | undefined, eventGuests?: number): string {
+  if (minCap == null && maxCap == null) return "";
+  if (eventGuests != null && fitsCapacity(eventGuests, minCap, maxCap)) return `Fits your event (${eventGuests} guests)`;
+  if (minCap != null && maxCap != null) return `Min ${minCap} · Max ${maxCap}`;
+  if (minCap != null) return `Min ${minCap} guests`;
+  if (maxCap != null) return `Up to ${maxCap} guests`;
+  return "";
 }
 
 export function CateringContent() {
   const searchParams = useSearchParams();
   const eventId = searchParams.get("eventId");
+  const guestCountParam = searchParams.get("guestCount");
+  const eventGuests = guestCountParam ? parseInt(guestCountParam, 10) : null;
   const [vendors, setVendors] = useState<Vendor[]>([]);
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
@@ -36,8 +55,20 @@ export function CateringContent() {
     if (search) params.set("search", search);
     const res = await fetch(`${API_URL}/api/vendors?${params}`);
     const data = res.ok ? await res.json() : [];
-    setVendors(Array.isArray(data) ? data : []);
-  }, [search]);
+    let list = Array.isArray(data) ? data : [];
+    if (eventGuests != null && !isNaN(eventGuests) && eventGuests >= 1) {
+      list = [...list].sort((a, b) => {
+        const aFit = fitsCapacity(eventGuests, a.minCapacity, a.maxCapacity);
+        const bFit = fitsCapacity(eventGuests, b.minCapacity, b.maxCapacity);
+        if (aFit && !bFit) return -1;
+        if (!aFit && bFit) return 1;
+        const aMin = a.minCapacity ?? 0;
+        const bMin = b.minCapacity ?? 0;
+        return aMin - bMin;
+      });
+    }
+    setVendors(list);
+  }, [search, eventGuests]);
 
   useEffect(() => {
     setLoading(true);
@@ -104,7 +135,15 @@ export function CateringContent() {
             <div className="grid grid-cols-1 gap-4">
               {vendors.map((vendor) => {
                 const minPrice = vendor.packages[0]?.basePrice;
-                const href = eventId ? `/vendor/${vendor.id}?eventId=${eventId}` : `/vendor/${vendor.id}`;
+                const minCap = vendor.minCapacity;
+                const maxCap = vendor.maxCapacity;
+                const capacityLabel = getCapacityLabel(minCap, maxCap, eventGuests ?? undefined);
+                const fits = eventGuests != null && fitsCapacity(eventGuests, minCap, maxCap);
+                let href = `/vendor/${vendor.id}`;
+                if (eventId) {
+                  href += `?eventId=${eventId}`;
+                  if (eventGuests != null) href += `&guestCount=${eventGuests}`;
+                }
                 return (
                   <Link
                     key={vendor.id}
@@ -143,9 +182,15 @@ export function CateringContent() {
                           <h4 className={TYPO.CARD_TITLE}>{vendor.businessName}</h4>
                           <p className={`${TYPO.SUBTEXT} mt-0.5`}>
                             {vendor.cuisineTypes?.slice(0, 2).join(", ") || "Catering"}
+                            {capacityLabel && ` · ${capacityLabel}`}
                           </p>
                         </div>
                       </div>
+                      {capacityLabel && !fits && eventGuests != null && (
+                        <p className="text-[11px] mt-1 text-amber-600 font-medium">
+                          May not fit {eventGuests} guests — check package capacity
+                        </p>
+                      )}
                       <div className="mt-3 flex items-center justify-between pt-3 border-t border-slate-100">
                         <p className={TYPO.BODY_MEDIUM}>
                           {minPrice != null ? (

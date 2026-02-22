@@ -266,7 +266,7 @@ export default function EventDetailPage() {
 
             {!isPast && (
               <Link
-                href={`/services/catering?eventId=${eventId}`}
+                href={`/services/catering?eventId=${eventId}&guestCount=${event.guestCount}`}
                 className="flex items-center justify-between p-4 rounded-2xl border border-primary/30 bg-primary/5 hover:bg-primary/10 transition-colors"
               >
                 <div className="flex items-center gap-3">

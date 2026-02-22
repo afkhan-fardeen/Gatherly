@@ -415,11 +415,24 @@ function CreateEventContent() {
                     <input
                       type="number"
                       min={1}
+                      max={9999}
                       value={form.guestCount}
-                      onChange={(e) => update({ guestCount: parseInt(e.target.value) || 1 })}
+                      onChange={(e) => {
+                        const val = parseInt(e.target.value, 10);
+                        if (!e.target.value) update({ guestCount: 1 });
+                        else if (!isNaN(val)) update({ guestCount: Math.max(1, Math.min(9999, val)) });
+                      }}
+                      onBlur={(e) => {
+                        const val = parseInt(e.target.value, 10);
+                        if (isNaN(val) || val < 1) update({ guestCount: 1 });
+                        else if (val > 9999) update({ guestCount: 9999 });
+                      }}
                       className={INPUT.PRIMARY}
                       required
                     />
+                    <p className={`${TYPO.CAPTION} mt-1 text-text-tertiary`}>
+                      Vendors have min/max capacity. This helps match you with suitable caterers.
+                    </p>
                   </div>
                   <div>
                     <label className={`${TYPO.FORM_LABEL} mb-2 block`}>Special notes <span className="text-text-tertiary font-normal">(optional)</span></label>
