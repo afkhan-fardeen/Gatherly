@@ -43,7 +43,7 @@ module.exports = (phase) => {
     const withPWA = require("@ducanh2912/next-pwa").default({
       dest: "public",
       workboxOptions: {
-        cacheId: "gatherlii-v2",
+        cacheId: "gatherlii-v3",
       },
     });
     return withPWA(nextConfig);

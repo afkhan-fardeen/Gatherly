@@ -3,13 +3,13 @@
   "short_name": "Gatherlii",
   "description": "Plan your events with the best services in town",
   "id": "/",
-  "start_url": "/?v=2",
+  "start_url": "/?v=3",
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#FFFFFF",
   "theme_color": "#6D0D35",
-  "version": "2",
+  "version": "3",
   "icons": [
     {"src": "/icons/icon-192x192.png", "sizes": "192x192", "type": "image/png", "purpose": "any"},
     {"src": "/icons/icon-512x512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable"}

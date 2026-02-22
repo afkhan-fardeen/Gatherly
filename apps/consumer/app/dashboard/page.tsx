@@ -234,13 +234,13 @@ export default function DashboardPage() {
                   href={`/vendor/${vendor.id}`}
                   className={`shrink-0 w-[100px] h-[100px] rounded-2xl overflow-hidden border border-slate-200 shadow-elevation-1 transition-all hover:border-slate-300 hover:shadow-elevation-2`}
                 >
-                  <div className="relative w-full h-full bg-slate-100">
-                    {(vendor.featuredImageUrl || vendor.logoUrl) ? (
+                  <div className="relative w-full h-full bg-white">
+                    {vendor.logoUrl ? (
                       <Image
-                        src={vendor.featuredImageUrl || vendor.logoUrl || ""}
+                        src={vendor.logoUrl}
                         alt={vendor.businessName}
                         fill
-                        className="object-cover"
+                        className="object-contain p-2"
                         sizes="96px"
                       />
                     ) : (

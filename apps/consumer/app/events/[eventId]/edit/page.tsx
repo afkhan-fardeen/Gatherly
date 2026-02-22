@@ -140,7 +140,7 @@ export default function EditEventPage() {
 
   return (
     <AppLayout>
-      <div className="bg-[var(--bg-app)] min-h-full pb-24">
+      <div className="bg-[var(--bg-app)] min-h-full pb-[calc(6rem+env(safe-area-inset-bottom,0px))]">
         <header className="px-6 pt-6 pb-4 shrink-0">
           <div className="flex items-center gap-3">
             <Link
@@ -375,7 +375,7 @@ export default function EditEventPage() {
             <button
               type="submit"
               disabled={saving}
-              className={BUTTON.PRIMARY}
+              className={`${BUTTON.PRIMARY} mb-4`}
             >
               {saving ? "Saving…" : "Save changes"}
             </button>

@@ -59,7 +59,7 @@ spotlightRouter.get("/", async (_req, res) => {
     packages.map((pkg) => ({
       id: pkg.id,
       name: pkg.name,
-      imageUrl: pkg.imageUrl || pkg.vendor.featuredImageUrl || pkg.vendor.logoUrl,
+      imageUrl: pkg.imageUrl || pkg.vendor.logoUrl || pkg.vendor.featuredImageUrl,
       basePrice: pkg.basePrice,
       priceType: pkg.priceType,
       vendorId: pkg.vendorId,

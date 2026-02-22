@@ -155,9 +155,22 @@ export default function VendorProfilePage() {
             >
               Premium Partner
             </span>
-            <h1 className={`${TYPO.H1_LARGE} text-text-primary mb-2`}>
-              {vendor.businessName}
-            </h1>
+            <div className="flex items-center gap-3 mb-2">
+              {vendor.logoUrl && (
+                <div className="relative w-12 h-12 shrink-0 rounded-xl overflow-hidden bg-white border border-slate-100">
+                  <Image
+                    src={vendor.logoUrl}
+                    alt=""
+                    fill
+                    className="object-contain p-1"
+                    sizes="48px"
+                  />
+                </div>
+              )}
+              <h1 className={`${TYPO.H1_LARGE} text-text-primary`}>
+                {vendor.businessName}
+              </h1>
+            </div>
             <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm">
               <span className={`flex items-center ${TYPO.SUBTEXT}`}>
                 <MapPin size={14} weight="regular" className="mr-1.5 shrink-0" />

@@ -252,7 +252,7 @@ export default function BookingsPage() {
                         src={booking.vendor.logoUrl}
                         alt=""
                         fill
-                        className="object-cover"
+                        className="object-contain p-2"
                         sizes="96px"
                         unoptimized
                       />

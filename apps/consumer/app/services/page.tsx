@@ -171,13 +171,13 @@ export default function ServicesPage() {
                       href={`/vendor/${vendor.id}`}
                       className="bg-white overflow-hidden border border-slate-200 rounded-2xl shadow-elevation-1 transition-all hover:border-slate-300 active:scale-[0.99]"
                     >
-                      <div className="relative w-full h-28">
-                        {(vendor.featuredImageUrl || vendor.logoUrl) ? (
+                      <div className="relative w-full h-28 bg-white">
+                        {vendor.logoUrl ? (
                           <Image
-                            src={vendor.featuredImageUrl || vendor.logoUrl || ""}
+                            src={vendor.logoUrl}
                             alt={vendor.businessName}
                             fill
-                            className="object-cover"
+                            className="object-contain p-4"
                             sizes="(max-width: 430px) 100vw, 400px"
                           />
                         ) : (

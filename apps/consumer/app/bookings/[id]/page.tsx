@@ -267,12 +267,12 @@ export default function BookingDetailPage() {
 
         {/* Vendor */}
         <div className="flex items-center gap-4 p-4 border border-slate-100 rounded-md">
-          <div className="w-14 h-14 rounded-md bg-slate-100 flex items-center justify-center shrink-0 overflow-hidden">
+          <div className="w-14 h-14 rounded-md bg-white border border-slate-100 flex items-center justify-center shrink-0 overflow-hidden">
             {booking.vendor.logoUrl ? (
               <img
                 src={booking.vendor.logoUrl}
                 alt=""
-                className="w-full h-full object-cover"
+                className="w-full h-full object-contain p-1"
               />
             ) : (
               <ForkKnife size={24} weight="regular" className="text-slate-400" />
