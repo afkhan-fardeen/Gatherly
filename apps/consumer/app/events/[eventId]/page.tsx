@@ -305,10 +305,7 @@ export default function EventDetailPage() {
 
       {/* Delete confirmation modal */}
       {showDeleteModal && (
-        <div
-          className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center p-0 sm:p-4"
-          style={{ paddingBottom: "env(safe-area-inset-bottom, 0px)" }}
-        >
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
           <button
             type="button"
             onClick={() => !deleting && setShowDeleteModal(false)}
@@ -316,11 +313,7 @@ export default function EventDetailPage() {
             aria-label="Close"
           />
           <div
-            className="relative bg-white w-full max-w-md rounded-t-2xl sm:rounded-2xl p-6 overflow-y-auto animate-modal-slide-up flex flex-col"
-            style={{
-              maxHeight: "min(calc(100vh - 2rem - env(safe-area-inset-bottom, 0px)), 400px)",
-              paddingBottom: "calc(2rem + env(safe-area-inset-bottom, 0px))",
-            }}
+            className="relative bg-white w-full max-w-md rounded-2xl p-6 shadow-xl animate-modal-scale-in flex flex-col"
           >
             <div className="flex justify-between items-start mb-5">
               <div className="flex items-center gap-3">

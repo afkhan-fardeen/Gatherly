@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Eye, EyeSlash } from "@phosphor-icons/react";
 
 const BURGUNDY_LIGHT = "#e8d4d8";
-const CHERRY = "#6D0D35";
+const BURGUNDY = "#3F0810";
 
 interface AuthInputProps {
   label: string;
@@ -47,7 +47,7 @@ export function AuthInput({
         {icon && (
           <div
             className="absolute left-4 top-1/2 -translate-y-1/2 transition-colors group-focus-within:[&>svg]:opacity-100"
-            style={{ color: CHERRY }}
+            style={{ color: BURGUNDY }}
           >
             <div className="[&>svg]:opacity-60 group-focus-within:[&>svg]:opacity-100 [&>svg]:w-5 [&>svg]:h-5">
               {icon}
@@ -75,7 +75,7 @@ export function AuthInput({
           <button
             type="button"
             className="absolute right-4 top-1/2 -translate-y-1/2 transition-colors hover:opacity-100"
-            style={{ color: CHERRY }}
+            style={{ color: BURGUNDY }}
             onClick={() => setShowPassword(!showPassword)}
             tabIndex={-1}
           >

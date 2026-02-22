@@ -29,12 +29,12 @@
   --text-secondary:   #8C5A68;
   --text-tertiary:    #BF9AA8;
   --text-inverse:     #FFFFFF;
-  --text-accent:      #6D0D35;
+  --text-accent:      #3F0810;
 
-  /* PRIMARY */
-  --primary:          #6D0D35;
-  --primary-hover:    #5A0A2B;
-  --primary-pressed:  #3F0810;
+  /* PRIMARY — Burgundy */
+  --primary:          #3F0810;
+  --primary-hover:    #2D0610;
+  --primary-pressed:  #1A0408;
   --primary-subtle:   #F5ECF0;
   --primary-light:    #FAF0F4;
 
@@ -42,7 +42,7 @@
   --border-default:   #EAE0D0;
   --border-strong:    #D4C4AD;
   --border-subtle:    #F2EAD8;
-  --border-cherry:    #6D0D35;
+  --border-cherry:    #3F0810;
 
   /* SHADOWS — warm burgundy, never cold grey */
   --shadow-xs:     0 1px 3px rgba(63, 8, 16, 0.05);

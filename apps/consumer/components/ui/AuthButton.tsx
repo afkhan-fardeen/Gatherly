@@ -17,7 +17,7 @@ export function AuthButton({
       disabled={disabled || loading}
       className="w-full py-4 text-white font-semibold rounded-full shadow-lg hover:opacity-90 active:scale-[0.98] transition-all text-base disabled:opacity-50 disabled:active:scale-100"
       style={{
-        backgroundColor: "#6D0D35",
+        backgroundColor: "#3F0810",
         boxShadow: "0 10px 15px -3px rgba(109, 13, 53, 0.2)",
       }}
     >

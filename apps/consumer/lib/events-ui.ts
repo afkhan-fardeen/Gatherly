@@ -1,5 +1,6 @@
 /** Shared design tokens (guidelines.md reference) */
-export const CHERRY = "#6D0D35";
+/** Primary brand color — Burgundy */
+export const CHERRY = "#3F0810";
 /** 14px radius for cards (guideline radius-md) */
 export const ROUND = "rounded-radius-md";
 
@@ -87,13 +88,13 @@ export const BUTTON = {
 /** Input size stack – 44px min, 48px search, 52px default. All pill-shaped. */
 export const INPUT = {
   /** Primary input: 52px, pill */
-  PRIMARY: "w-full h-[52px] px-5 text-sm font-normal text-text-primary placeholder:text-text-tertiary bg-white border border-slate-200 rounded-full focus:ring-2 focus:ring-[#6D0D35]/20 focus:border-[#6D0D35]/40 outline-none transition-all duration-200",
+  PRIMARY: "w-full h-[52px] px-5 text-sm font-normal text-text-primary placeholder:text-text-tertiary bg-white border border-slate-200 rounded-full focus:ring-2 focus:ring-[#3F0810]/20 focus:border-[#3F0810]/40 outline-none transition-all duration-200",
   /** Search bar: 48px, pill */
-  SEARCH: "w-full h-12 pl-5 pr-5 text-sm font-normal text-text-primary placeholder:text-text-tertiary bg-white border border-slate-200 rounded-full focus:ring-2 focus:ring-[#6D0D35]/20 focus:border-[#6D0D35]/40 outline-none transition-all duration-200",
+  SEARCH: "w-full h-12 pl-5 pr-5 text-sm font-normal text-text-primary placeholder:text-text-tertiary bg-white border border-slate-200 rounded-full focus:ring-2 focus:ring-[#3F0810]/20 focus:border-[#3F0810]/40 outline-none transition-all duration-200",
   /** Compact: 44px, pill */
-  COMPACT: "w-full h-11 px-4 text-sm font-normal text-text-primary placeholder:text-text-tertiary bg-white border border-slate-200 rounded-full focus:ring-2 focus:ring-[#6D0D35]/20 focus:border-[#6D0D35]/40 outline-none transition-all duration-200",
+  COMPACT: "w-full h-11 px-4 text-sm font-normal text-text-primary placeholder:text-text-tertiary bg-white border border-slate-200 rounded-full focus:ring-2 focus:ring-[#3F0810]/20 focus:border-[#3F0810]/40 outline-none transition-all duration-200",
   /** Textarea: min 96px, rounded-xl (not full pill) */
-  TEXTAREA: "w-full min-h-[96px] px-5 py-4 text-sm font-normal text-text-primary placeholder:text-text-tertiary bg-white border border-slate-200 rounded-2xl focus:ring-2 focus:ring-[#6D0D35]/20 focus:border-[#6D0D35]/40 outline-none transition-all duration-200 resize-none",
+  TEXTAREA: "w-full min-h-[96px] px-5 py-4 text-sm font-normal text-text-primary placeholder:text-text-tertiary bg-white border border-slate-200 rounded-2xl focus:ring-2 focus:ring-[#3F0810]/20 focus:border-[#3F0810]/40 outline-none transition-all duration-200 resize-none",
 } as const;
 
 /** @deprecated Use BUTTON.PRIMARY */

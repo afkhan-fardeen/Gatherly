@@ -12,7 +12,7 @@ import { AuthButton } from "@/components/ui/AuthButton";
 import { API_URL, parseJsonResponse } from "@/lib/api";
 import { validateSession, setSession } from "@/lib/session";
 
-const CHERRY = "#6D0D35";
+const BURGUNDY = "#3F0810";
 
 function RegisterForm() {
   const router = useRouter();
@@ -83,7 +83,7 @@ function RegisterForm() {
         <div className="mb-8">
           <h2
             className="text-2xl font-semibold leading-tight mb-2"
-            style={{ color: CHERRY }}
+            style={{ color: BURGUNDY }}
           >
             Create your account
           </h2>
@@ -138,7 +138,7 @@ function RegisterForm() {
           <Link
             href={redirectTo !== "/dashboard" ? `/login?redirect=${encodeURIComponent(redirectTo)}` : "/login"}
             className="font-semibold hover:underline underline-offset-4"
-            style={{ color: CHERRY }}
+            style={{ color: BURGUNDY }}
           >
             Sign in
           </Link>

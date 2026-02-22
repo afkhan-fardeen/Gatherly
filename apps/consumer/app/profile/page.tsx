@@ -115,7 +115,7 @@ export default function ProfilePage() {
             <div className="bg-white rounded-2xl border border-slate-200 shadow-elevation-1 overflow-hidden">
               <div
                 className="h-20 w-full"
-                style={{ background: "linear-gradient(135deg, #6D0D35 0%, #8B1442 50%, #6D0D35 100%)" }}
+                style={{ background: "linear-gradient(135deg, #3F0810 0%, #5A0E18 50%, #3F0810 100%)" }}
                 aria-hidden
               />
               <div className="px-6 pb-6 -mt-12 relative">

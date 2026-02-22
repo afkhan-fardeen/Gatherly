@@ -157,13 +157,13 @@ export default function VendorProfilePage() {
             </span>
             <div className="flex items-center gap-3 mb-2">
               {vendor.logoUrl && (
-                <div className="relative w-12 h-12 shrink-0 rounded-xl overflow-hidden bg-white border border-slate-100">
+                <div className="relative w-16 h-16 shrink-0 rounded-xl overflow-hidden bg-white border border-slate-100">
                   <Image
                     src={vendor.logoUrl}
                     alt=""
                     fill
-                    className="object-contain p-1"
-                    sizes="48px"
+                    className="object-contain p-1.5"
+                    sizes="64px"
                   />
                 </div>
               )}

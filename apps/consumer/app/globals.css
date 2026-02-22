@@ -129,7 +129,7 @@
 :root {
   --background: #FFFFFF;
   --foreground: #1A1A1A;
-  --primary: #6D0D35;
+  --primary: #3F0810;
 }
 
 html {
@@ -155,12 +155,7 @@ body {
   }
 }
 
-/* Mobile only: overscroll-behavior prevents bounce/chaining */
-@media (max-width: 767px) {
-  html, body {
-    overscroll-behavior: none;
-  }
-}
+/* Allow normal scroll behavior everywhere — no overscroll restrictions */
 
 html::-webkit-scrollbar,
 body::-webkit-scrollbar {

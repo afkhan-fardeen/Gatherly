@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { WifiSlash } from "@phosphor-icons/react";
 
-const CHERRY = "#6D0D35";
+const BURGUNDY = "#3F0810";
 
 export function OfflineBanner() {
   const [isOnline, setIsOnline] = useState(true);
@@ -27,7 +27,7 @@ export function OfflineBanner() {
     <div
       className="fixed top-0 left-0 right-0 z-[9999] flex items-center justify-center gap-2 py-3 px-4 text-white text-sm font-medium"
       style={{
-        backgroundColor: CHERRY,
+        backgroundColor: BURGUNDY,
         paddingTop: "max(0.5rem, env(safe-area-inset-top))",
       }}
     >

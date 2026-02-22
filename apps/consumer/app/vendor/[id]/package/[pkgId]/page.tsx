@@ -304,8 +304,8 @@ export default function PackageDetailPage() {
           className="fixed right-5 z-50 h-11 px-5 rounded-full font-medium text-sm text-white flex items-center gap-1.5 shadow-md active:scale-[0.98] transition-transform"
           style={{
             bottom: "calc(1.5rem + env(safe-area-inset-bottom, 0px))",
-            backgroundColor: CHERRY,
-            boxShadow: `0 2px 12px ${CHERRY}40`,
+            backgroundColor: "#3F0810",
+            boxShadow: "0 2px 12px rgba(63, 8, 16, 0.25)",
           }}
         >
           Book now
@@ -424,7 +424,7 @@ export default function PackageDetailPage() {
                 type="button"
                 onClick={handleBookClick}
                 className="w-full h-12 rounded-full font-semibold text-base text-white flex items-center justify-center gap-2 active:scale-[0.98]"
-                style={{ backgroundColor: CHERRY }}
+                style={{ backgroundColor: "#3F0810" }}
               >
                 Continue to select event
                 <CaretRight size={22} weight="bold" />
@@ -473,7 +473,7 @@ export default function PackageDetailPage() {
                   <Link
                     href="/events/create"
                     className="inline-flex items-center gap-2 py-3 px-5 rounded-full font-medium text-sm text-white"
-                    style={{ backgroundColor: CHERRY }}
+                    style={{ backgroundColor: "#3F0810" }}
                   >
                     Create event
                     <CaretRight size={18} weight="bold" />

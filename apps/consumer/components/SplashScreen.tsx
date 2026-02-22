@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 
-const CHERRY = "#6D0D35";
+const BURGUNDY = "#3F0810";
 
 export function SplashScreen() {
   return (
@@ -20,19 +20,19 @@ export function SplashScreen() {
           priority
           sizes="100vw"
         />
-        {/* Primary color overlay */}
+        {/* Burgundy overlay */}
         <div
           className="absolute inset-0"
-          style={{ backgroundColor: `${CHERRY}E6` }}
+          style={{ backgroundColor: `${BURGUNDY}E6` }}
         />
       </div>
       {/* Content */}
       <div className="relative z-10 flex flex-col items-center gap-4">
         <span
           className="font-logo text-white drop-shadow-lg"
-          style={{ fontSize: "clamp(6rem, 28vw, 12rem)", lineHeight: 1 }}
+          style={{ fontSize: "clamp(9rem, 40vw, 18rem)", lineHeight: 1 }}
         >
-          G
+          g
         </span>
         <span
           className="font-logo text-white text-4xl md:text-6xl font-normal tracking-tight drop-shadow-md"

@@ -5,10 +5,9 @@ import { AppleLogo, Phone, Envelope } from "@phosphor-icons/react";
 import { AuthScreenWrapper } from "@/components/auth/AuthScreenWrapper";
 import { BrandHeading } from "@/components/auth/BrandHeading";
 
-const CHERRY = "#6D0D35";
+const BURGUNDY = "#3F0810";
 const LIGHT_BG = "#FFFFFF";
 const BURGUNDY_LIGHT = "#e8d4d8";
-const SWEET_CHERRY = "#6D0D35";
 
 export default function GetStartedPage() {
   return (
@@ -22,7 +21,7 @@ export default function GetStartedPage() {
       <div className="flex flex-col gap-6">
         <h1
           className="text-2xl font-semibold text-center"
-          style={{ color: CHERRY }}
+          style={{ color: BURGUNDY }}
         >
           Get Started
         </h1>
@@ -33,12 +32,12 @@ export default function GetStartedPage() {
             style={{ borderColor: BURGUNDY_LIGHT }}
             disabled
           >
-            <span className="flex items-center justify-center w-6 h-6 shrink-0" style={{ color: SWEET_CHERRY }}>
+            <span className="flex items-center justify-center w-6 h-6 shrink-0" style={{ color: BURGUNDY }}>
               <AppleLogo size={22} weight="regular" />
             </span>
             <span
               className="font-semibold text-[15px]"
-              style={{ color: CHERRY }}
+              style={{ color: BURGUNDY }}
             >
               Continue with Apple
             </span>
@@ -49,12 +48,12 @@ export default function GetStartedPage() {
             style={{ borderColor: BURGUNDY_LIGHT }}
             disabled
           >
-            <span className="flex items-center justify-center w-6 h-6 shrink-0" style={{ color: SWEET_CHERRY }}>
+            <span className="flex items-center justify-center w-6 h-6 shrink-0" style={{ color: BURGUNDY }}>
               <Phone size={22} weight="regular" />
             </span>
             <span
               className="font-semibold text-[15px]"
-              style={{ color: CHERRY }}
+              style={{ color: BURGUNDY }}
             >
               Continue with Phone
             </span>
@@ -63,9 +62,9 @@ export default function GetStartedPage() {
             href="/register"
             className="w-full h-[56px] rounded-full flex items-center justify-center gap-4 px-6 active:scale-[0.98] transition-all shadow-lg"
             style={{
-              backgroundColor: SWEET_CHERRY,
+              backgroundColor: BURGUNDY,
               color: LIGHT_BG,
-              boxShadow: "0 10px 15px -3px rgba(109, 13, 53, 0.2)",
+              boxShadow: "0 10px 15px -3px rgba(63, 8, 16, 0.2)",
             }}
           >
             <span className="flex items-center justify-center w-6 h-6 shrink-0">
@@ -82,7 +81,7 @@ export default function GetStartedPage() {
           <Link
             href="#"
             className="font-semibold hover:underline"
-            style={{ color: SWEET_CHERRY }}
+            style={{ color: BURGUNDY }}
           >
             Terms
           </Link>{" "}
@@ -90,7 +89,7 @@ export default function GetStartedPage() {
           <Link
             href="#"
             className="font-semibold hover:underline"
-            style={{ color: SWEET_CHERRY }}
+            style={{ color: BURGUNDY }}
           >
             Privacy Policy
           </Link>

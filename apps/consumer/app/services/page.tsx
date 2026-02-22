@@ -84,7 +84,7 @@ export default function ServicesPage() {
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full h-12 pl-12 pr-5 font-normal text-text-primary placeholder:text-text-tertiary bg-white border border-slate-200 rounded-2xl focus:ring-2 focus:ring-[#6D0D35]/20 focus:border-[#6D0D35]/40 outline-none transition-all duration-200"
+              className="w-full h-12 pl-12 pr-5 font-normal text-text-primary placeholder:text-text-tertiary bg-white border border-slate-200 rounded-2xl focus:ring-2 focus:ring-[#3F0810]/20 focus:border-[#3F0810]/40 outline-none transition-all duration-200"
               style={{ fontSize: "16px" }}
               placeholder="Search venues, catering, music..."
             />
@@ -189,13 +189,13 @@ export default function ServicesPage() {
                       <div className="p-4">
                         <div className="flex items-center gap-3">
                           {vendor.logoUrl && (
-                            <div className="relative w-10 h-10 shrink-0 rounded-lg overflow-hidden bg-white border border-slate-100">
+                            <div className="relative w-14 h-14 shrink-0 rounded-xl overflow-hidden bg-white border border-slate-100">
                               <Image
                                 src={vendor.logoUrl}
                                 alt=""
                                 fill
-                                className="object-contain p-1"
-                                sizes="40px"
+                                className="object-contain p-1.5"
+                                sizes="56px"
                               />
                             </div>
                           )}
