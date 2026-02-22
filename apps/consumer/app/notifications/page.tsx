@@ -147,7 +147,7 @@ export default function NotificationsPage() {
         </div>
       </header>
 
-      <main className="p-6 pb-32">
+      <main className="p-6 pb-40">
         {loading ? (
           <div className="space-y-4">
             {[1, 2, 3].map((i) => (

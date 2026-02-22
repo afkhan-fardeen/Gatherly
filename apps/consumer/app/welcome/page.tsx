@@ -11,7 +11,7 @@ export default function WelcomePage() {
     <div
       className="fixed inset-0 flex flex-col overflow-hidden min-h-[100dvh] h-[100dvh] w-full pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)]"
       style={{
-        background: "#F9F2E7",
+        background: "#FFFFFF",
       }}
     >
       {/* Top half: Image */}

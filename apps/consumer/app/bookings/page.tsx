@@ -4,12 +4,13 @@ import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
-import { CalendarCheck, ForkKnife, CreditCard } from "@phosphor-icons/react";
+import Image from "next/image";
+import { CalendarCheck, ForkKnife, CreditCard, CaretRight } from "@phosphor-icons/react";
 import { AppLayout } from "@/components/AppLayout";
 import { PullToRefresh } from "@/components/PullToRefresh";
 import { getBookingStatusStyle } from "@/components/ui/Tag";
 import { getBookingStatusLine } from "@/lib/bookingStatus";
-import { ELEVATION, ROUND, TYPO } from "@/lib/events-ui";
+import { TYPO } from "@/lib/events-ui";
 
 import { API_URL, parseApiError } from "@/lib/api";
 
@@ -204,7 +205,7 @@ export default function BookingsPage() {
         </div>
       </header>
 
-      <main className="p-6 pb-32">
+      <main className="p-6 pb-40">
         {loading ? (
           <div className="space-y-4">
             {[1, 2, 3].map((i) => (
@@ -233,75 +234,86 @@ export default function BookingsPage() {
               <Link
                 key={booking.id}
                 href={`/bookings/${booking.id}`}
-                className={`flex gap-4 p-4 ${ROUND} border border-slate-100 bg-white hover:border-slate-200 transition-colors ${ELEVATION.LEVEL_2} min-h-[130px]`}
+                className="block overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-elevation-1 transition-all hover:border-slate-300 active:scale-[0.99]"
               >
-                <div className={`w-[100px] h-[100px] shrink-0 rounded-l-radius-md bg-slate-100 flex items-center justify-center overflow-hidden`}>
-                  {booking.package.imageUrl ? (
-                    <img
-                      src={booking.package.imageUrl}
-                      alt=""
-                      className="w-full h-full object-cover"
-                      loading="lazy"
-                    />
-                  ) : booking.vendor.logoUrl ? (
-                    <img
-                      src={booking.vendor.logoUrl}
-                      alt=""
-                      className="w-full h-full object-cover"
-                      loading="lazy"
-                    />
-                  ) : (
-                    <ForkKnife size={24} weight="regular" className="text-slate-400" />
-                  )}
-                </div>
-                <div className="flex-1 min-w-0 relative">
-                  <span
-                    className={`absolute top-0 right-0 px-2 py-0.5 rounded-radius-xs text-[9px] font-semibold uppercase tracking-wide ${getBookingStatusStyle(
-                      booking.status
-                    )}`}
-                  >
-                    {booking.status.replace(/_/g, " ")}
-                  </span>
-                  <h3 className={`${TYPO.CARD_TITLE} line-clamp-1 pr-16`}>
-                    {booking.event.name}
-                  </h3>
-                  <p className={`${TYPO.SUBTEXT} line-clamp-1 mt-0.5`}>
-                    {booking.package.name} · {booking.vendor.businessName}
-                  </p>
-                  <p className={`${TYPO.CAPTION} mt-1`}>
-                    {new Date(booking.event.date).toLocaleDateString()} · {Number(booking.totalAmount).toFixed(2)} BD
-                  </p>
-                  <div className="flex gap-2 mt-2" onClick={(e) => e.preventDefault()}>
-                    {booking.status === "confirmed" &&
-                      (booking.paymentStatus || "unpaid") === "unpaid" && (
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          e.stopPropagation();
-                          openPayModal(booking);
-                        }}
-                        disabled={payingId === booking.id}
-                        className="flex items-center gap-1 px-3 py-1 rounded-md bg-primary text-white text-xs font-semibold hover:bg-primary/90 disabled:opacity-50"
-                      >
-                        <CreditCard size={14} weight="bold" />
-                        Pay
-                      </button>
+                <div className="flex min-h-[88px]">
+                  <div className="relative w-24 min-h-full shrink-0 bg-slate-100 self-stretch">
+                    {booking.package.imageUrl ? (
+                      <Image
+                        src={booking.package.imageUrl}
+                        alt=""
+                        fill
+                        className="object-cover"
+                        sizes="96px"
+                        unoptimized
+                      />
+                    ) : booking.vendor.logoUrl ? (
+                      <Image
+                        src={booking.vendor.logoUrl}
+                        alt=""
+                        fill
+                        className="object-cover"
+                        sizes="96px"
+                        unoptimized
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center">
+                        <ForkKnife size={24} weight="regular" className="text-slate-400" />
+                      </div>
                     )}
-                    {(booking.status === "completed" || booking.status === "delivered") &&
-                      (!booking.reviews || booking.reviews.length === 0) && (
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          e.stopPropagation();
-                          setReviewModal(booking);
-                        }}
-                        className="px-3 py-1 rounded-md bg-slate-100 text-slate-700 text-xs font-semibold hover:bg-slate-200"
-                      >
-                        Leave review
-                      </button>
-                    )}
+                  </div>
+                  <div className="flex-1 min-w-0 p-4 flex flex-col justify-center relative">
+                    <span
+                      className={`absolute top-3 right-4 px-2 py-0.5 rounded-radius-xs text-[9px] font-semibold uppercase tracking-wide ${getBookingStatusStyle(
+                        booking.status
+                      )}`}
+                    >
+                      {booking.status.replace(/_/g, " ")}
+                    </span>
+                    <h3 className={`${TYPO.CARD_TITLE} line-clamp-1 pr-16`}>
+                      {booking.event.name}
+                    </h3>
+                    <p className={`${TYPO.SUBTEXT} line-clamp-1 mt-0.5`}>
+                      {booking.package.name} · {booking.vendor.businessName}
+                    </p>
+                    <p className={`${TYPO.CAPTION} mt-1`}>
+                      {new Date(booking.event.date).toLocaleDateString()} · {Number(booking.totalAmount).toFixed(2)} BD
+                    </p>
+                    <div className="flex gap-2 mt-2" onClick={(e) => e.preventDefault()}>
+                      {booking.status === "confirmed" &&
+                        (booking.paymentStatus || "unpaid") === "unpaid" && (
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            openPayModal(booking);
+                          }}
+                          disabled={payingId === booking.id}
+                          className="flex items-center gap-1 px-3 py-1 rounded-md bg-primary text-white text-xs font-semibold hover:bg-primary/90 disabled:opacity-50"
+                        >
+                          <CreditCard size={14} weight="bold" />
+                          Pay
+                        </button>
+                      )}
+                      {(booking.status === "completed" || booking.status === "delivered") &&
+                        (!booking.reviews || booking.reviews.length === 0) && (
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            setReviewModal(booking);
+                          }}
+                          className="px-3 py-1 rounded-md bg-slate-100 text-slate-700 text-xs font-semibold hover:bg-slate-200"
+                        >
+                          Leave review
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                  <div className="flex items-center pr-3">
+                    <CaretRight size={20} weight="bold" className="text-text-tertiary" />
                   </div>
                 </div>
               </Link>
@@ -312,7 +324,7 @@ export default function BookingsPage() {
 
       {payModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
-          <div className="bg-white rounded-radius-md p-6 max-w-sm w-full shadow-elevation-4">
+          <div className="form-no-zoom bg-white rounded-radius-md p-6 max-w-sm w-full shadow-elevation-4">
             <h3 className={`${TYPO.H2} mb-4`}>Pay {Number(payModal.totalAmount).toFixed(2)} BD</h3>
             <p className={`${TYPO.SUBTEXT} mb-4`}>
               {payModal.vendor.businessName} · {payModal.package.name}
@@ -395,7 +407,7 @@ export default function BookingsPage() {
 
       {reviewModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
-          <div className="bg-white rounded-radius-md p-6 max-w-sm w-full shadow-elevation-4">
+          <div className="form-no-zoom bg-white rounded-radius-md p-6 max-w-sm w-full shadow-elevation-4">
             <h3 className={`${TYPO.H2} mb-4`}>Leave a review</h3>
             <p className={`${TYPO.SUBTEXT} mb-4`}>
               {reviewModal.vendor.businessName} · {reviewModal.package.name}

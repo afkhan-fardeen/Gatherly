@@ -89,7 +89,7 @@ export function InstallPrompt() {
     <div
       className="fixed bottom-0 left-0 right-0 z-[9998] p-4 shadow-elevation-4"
       style={{
-        backgroundColor: "#F9F2E7",
+        backgroundColor: "#FFFFFF",
         paddingBottom: "max(1rem, env(safe-area-inset-bottom))",
       }}
     >

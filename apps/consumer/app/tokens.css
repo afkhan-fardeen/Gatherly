@@ -13,7 +13,7 @@
   --_cream:       #F9F2E7;
 
   /* BACKGROUNDS */
-  --bg-app:           #F9F2E7;
+  --bg-app:           #FFFFFF;
   --bg-surface:       #FFFFFF;
   --bg-surface-warm:  #FDFAF5;
   --bg-section-alt:   #F3EBD8;
@@ -28,7 +28,7 @@
   --text-body:        #5A1E2C;
   --text-secondary:   #8C5A68;
   --text-tertiary:    #BF9AA8;
-  --text-inverse:     #F9F2E7;
+  --text-inverse:     #FFFFFF;
   --text-accent:      #6D0D35;
 
   /* PRIMARY */

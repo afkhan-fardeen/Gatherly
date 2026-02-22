@@ -6,7 +6,7 @@ import { AuthScreenWrapper } from "@/components/auth/AuthScreenWrapper";
 import { BrandHeading } from "@/components/auth/BrandHeading";
 
 const CHERRY = "#6D0D35";
-const LIGHT_CREAM = "#F9F2E7";
+const LIGHT_BG = "#FFFFFF";
 const BURGUNDY_LIGHT = "#e8d4d8";
 const SWEET_CHERRY = "#6D0D35";
 
@@ -64,7 +64,7 @@ export default function GetStartedPage() {
             className="w-full h-[56px] rounded-full flex items-center justify-center gap-4 px-6 active:scale-[0.98] transition-all shadow-lg"
             style={{
               backgroundColor: SWEET_CHERRY,
-              color: LIGHT_CREAM,
+              color: LIGHT_BG,
               boxShadow: "0 10px 15px -3px rgba(109, 13, 53, 0.2)",
             }}
           >

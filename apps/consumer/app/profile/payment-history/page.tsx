@@ -53,7 +53,7 @@ export default function PaymentHistoryPage() {
         </div>
       </header>
 
-      <main className="p-6 pb-32 bg-[var(--bg-app)]">
+      <main className="p-6 pb-40 bg-[var(--bg-app)]">
         {loading ? (
           <div className="space-y-2">
             {[1, 2, 3].map((i) => (

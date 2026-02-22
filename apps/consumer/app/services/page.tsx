@@ -6,14 +6,10 @@ import Image from "next/image";
 import {
   MagnifyingGlass,
   ForkKnife,
-  Star,
-  MusicNotes,
-  Camera,
-  Confetti,
   CaretRight,
 } from "@phosphor-icons/react";
 import { AppLayout } from "@/components/AppLayout";
-import { CHERRY, INPUT, ROUND, SOFT_LILAC, SOFT_LILAC_DARK, TYPO } from "@/lib/events-ui";
+import { ROUND, SOFT_LILAC, SOFT_LILAC_DARK, TYPO } from "@/lib/events-ui";
 
 import { API_URL } from "@/lib/api";
 
@@ -27,28 +23,29 @@ interface Vendor {
   ratingCount: number;
   logoUrl: string | null;
   featuredImageUrl: string | null;
-  packages: { basePrice: number }[];
+  packages: { basePrice: number; priceType?: string }[];
 }
 
 const CATEGORIES = [
-  { id: "all", name: "All", businessType: "" },
-  { id: "catering", name: "Catering", businessType: "catering" },
-  { id: "venues", name: "Venues", businessType: "venues" },
-  { id: "music", name: "Music", businessType: "music" },
-  { id: "decor", name: "Decor", businessType: "decor" },
+  { id: "catering", name: "Catering", businessType: "catering", imageSlug: "catering" },
+  { id: "decor", name: "Decor", businessType: "decor", imageSlug: "decor" },
+  { id: "entertainment", name: "Entertainment", businessType: "entertainment", imageSlug: "entertainment" },
+  { id: "photography", name: "Photography", businessType: "photography", imageSlug: "photography" },
+  { id: "rentals", name: "Rentals", businessType: "rentals", imageSlug: "rentals" },
 ];
 
 const BROWSE_CATEGORIES = [
-  { slug: "catering", name: "Catering", desc: "Food & beverage", icon: ForkKnife, href: "/services/catering", available: true },
-  { slug: "entertainment", name: "Bands & DJs", desc: "Music & entertainment", icon: MusicNotes, href: "/services/coming-soon/entertainment", available: false },
-  { slug: "photography", name: "Photography", desc: "Photos & videography", icon: Camera, href: "/services/coming-soon/photography", available: false },
-  { slug: "decor", name: "Decor", desc: "Florals & styling", icon: Confetti, href: "/services/coming-soon/decor", available: false },
+  { slug: "catering", name: "Catering", desc: "Food & beverage", imageSlug: "catering", href: "/services/catering", available: true },
+  { slug: "decor", name: "Decor", desc: "Florals & styling", imageSlug: "decor", href: "/services/coming-soon/decor", available: false },
+  { slug: "entertainment", name: "Entertainment", desc: "Music & entertainment", imageSlug: "entertainment", href: "/services/coming-soon/entertainment", available: false },
+  { slug: "photography", name: "Photography", desc: "Photos & videography", imageSlug: "photography", href: "/services/coming-soon/photography", available: false },
+  { slug: "rentals", name: "Rentals", desc: "Chairs, tables & more", imageSlug: "rentals", href: "/services/coming-soon/rentals", available: false },
 ];
 
 export default function ServicesPage() {
   const [vendors, setVendors] = useState<Vendor[]>([]);
   const [search, setSearch] = useState("");
-  const [category, setCategory] = useState("all");
+  const [category, setCategory] = useState("catering");
   const [loading, setLoading] = useState(true);
 
   const selectedCat = CATEGORIES.find((c) => c.id === category);
@@ -75,9 +72,9 @@ export default function ServicesPage() {
           <h1 className={`${TYPO.H1} text-text-primary`}>Discover</h1>
           <p className={`${TYPO.SUBTEXT} mt-0.5`}>Find venues, catering & more</p>
         </header>
-        <main className="px-6 pb-32 space-y-8">
-          {/* Search bar */}
-          <div className="relative">
+        <main className="px-6 pb-40 space-y-6">
+          {/* Search bar - form-no-zoom prevents iOS zoom on focus */}
+          <div className="form-no-zoom relative">
             <MagnifyingGlass
               size={20}
               weight="regular"
@@ -87,37 +84,52 @@ export default function ServicesPage() {
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className={`${INPUT.SEARCH} pl-12`}
+              className="w-full h-12 pl-12 pr-5 font-normal text-text-primary placeholder:text-text-tertiary bg-white border border-slate-200 rounded-2xl focus:ring-2 focus:ring-[#6D0D35]/20 focus:border-[#6D0D35]/40 outline-none transition-all duration-200"
+              style={{ fontSize: "16px" }}
               placeholder="Search venues, catering, music..."
             />
           </div>
 
-          {/* Category pills */}
-          <div className="flex overflow-x-auto gap-3 scrollbar-hide -mx-6 px-6">
-            {CATEGORIES.map((c) => (
-              <button
-                key={c.id}
-                type="button"
-                onClick={() => setCategory(c.id)}
-                className={`flex-shrink-0 px-5 py-3 rounded-full text-sm font-normal transition-colors ${
-                  category === c.id
-                    ? "text-white"
-                    : "bg-white text-text-secondary border border-slate-200"
-                }`}
-                style={
-                  category === c.id
-                    ? { backgroundColor: CHERRY, boxShadow: `${CHERRY}33 0 4px 12px` }
-                    : undefined
-                }
-              >
-                {c.name}
-              </button>
-            ))}
+          {/* Category tabs - square image cards */}
+          <div className="flex gap-2 overflow-x-auto scrollbar-hide overscroll-x-contain -mx-6 px-6 pb-1">
+            {CATEGORIES.map((c) => {
+              const isActive = category === c.id;
+              return (
+                <button
+                  key={c.id}
+                  type="button"
+                  onClick={() => setCategory(c.id)}
+                  className="shrink-0 w-[72px] flex flex-col items-center gap-1.5 transition-all active:scale-[0.98]"
+                >
+                  <div
+                    className={`relative w-[72px] h-[72px] rounded-lg overflow-hidden shrink-0 ${
+                      isActive ? "border-2 border-primary" : "border border-slate-200 bg-slate-100"
+                    }`}
+                  >
+                    <Image
+                      src={`/images/services/${c.imageSlug}.jpg`}
+                      alt={c.name}
+                      fill
+                      className="object-cover"
+                      sizes="72px"
+                      unoptimized
+                    />
+                  </div>
+                  <span
+                    className={`text-[10px] font-medium truncate w-full text-center ${
+                      isActive ? "text-primary" : "text-text-secondary"
+                    }`}
+                  >
+                    {c.name}
+                  </span>
+                </button>
+              );
+            })}
           </div>
 
           {/* Top Rated Partners */}
           <section>
-            <div className="mb-4">
+            <div className="mb-3">
               <h3 className="text-caption font-medium text-primary uppercase tracking-wider">
                 Handpicked
               </h3>
@@ -140,20 +152,19 @@ export default function ServicesPage() {
               >
                 <ForkKnife size={40} weight="regular" className="text-slate-300 mx-auto" />
                 <p className={`${TYPO.BODY} mt-4 font-medium`}>
-                  {category === "all" || category === "catering"
-                    ? "No vendors found"
-                    : "Coming soon"}
+                  {category === "catering" ? "No vendors found" : "Coming soon"}
                 </p>
                 <p className={`${TYPO.SUBTEXT} mt-1`}>
-                  {category === "all" || category === "catering"
-                    ? "Try a different search"
-                    : "We're adding partners in this category"}
+                  {category === "catering" ? "Try a different search" : "We're adding partners in this category"}
                 </p>
               </div>
             ) : (
               <div className="grid grid-cols-1 gap-4">
                 {topVendors.map((vendor) => {
-                  const minPrice = vendor.packages[0]?.basePrice;
+                  const pkg = vendor.packages[0];
+                  const minPrice = pkg?.basePrice;
+                  const priceType = pkg?.priceType || "per_person";
+                  const priceSuffix = priceType === "per_person" ? "/ person" : "/ event";
                   return (
                     <Link
                       key={vendor.id}
@@ -187,7 +198,7 @@ export default function ServicesPage() {
                             ) : (
                               <span className="text-text-tertiary">—</span>
                             )}
-                            {minPrice != null && <span className={`${TYPO.CAPTION} ml-1`}>/ event</span>}
+                            {minPrice != null && <span className={`${TYPO.CAPTION} ml-1`}>{priceSuffix}</span>}
                           </p>
                           <span className={`${TYPO.LINK} text-primary`}>View</span>
                         </div>
@@ -199,39 +210,40 @@ export default function ServicesPage() {
             )}
           </section>
 
-          {/* Browse by Category */}
+          {/* Browse by Category - list layout with images */}
           <section>
-            <h3 className="text-caption font-medium text-primary uppercase tracking-wider mb-4">
+            <h3 className="text-caption font-medium text-primary uppercase tracking-wider mb-3">
               Browse by Category
             </h3>
-              <div
-                className={`bg-white border overflow-hidden divide-y divide-slate-100 ${ROUND}`}
-                style={{ borderColor: "rgba(0,0,0,0.06)" }}
-              >
+            <div
+              className={`bg-white border overflow-hidden divide-y divide-slate-100 ${ROUND}`}
+              style={{ borderColor: "rgba(0,0,0,0.06)" }}
+            >
               {BROWSE_CATEGORIES.map((item) => (
                 <Link
                   key={item.slug}
                   href={item.href}
-                  className="flex items-center gap-4 p-4 hover:bg-slate-50/50 transition-colors"
+                  className="flex items-center gap-3 p-3 hover:bg-slate-50/50 transition-colors"
                 >
                   <div
-                    className={`w-12 h-12 rounded-full flex items-center justify-center shrink-0 ${
-                      item.available ? "" : "bg-slate-100"
+                    className={`relative w-12 h-12 rounded-lg overflow-hidden shrink-0 ${
+                      item.available ? "" : "opacity-60"
                     }`}
-                    style={item.available ? { backgroundColor: SOFT_LILAC } : undefined}
                   >
-                    <item.icon
-                      size={22}
-                      weight="regular"
-                      className={item.available ? "" : "text-text-tertiary"}
-                      style={item.available ? { color: SOFT_LILAC_DARK } : undefined}
+                    <Image
+                      src={`/images/services/${item.imageSlug}.jpg`}
+                      alt={item.name}
+                      fill
+                      className="object-cover"
+                      sizes="48px"
+                      unoptimized
                     />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className={TYPO.CARD_TITLE}>{item.name}</p>
-                    <p className={`${TYPO.SUBTEXT} mt-0.5`}>{item.desc}</p>
+                    <p className="text-body font-medium text-text-primary">{item.name}</p>
+                    <p className="text-body-sm font-normal text-text-secondary mt-0.5">{item.desc}</p>
                   </div>
-                  <div className="flex items-center gap-2 shrink-0">
+                  <div className="flex items-center gap-1.5 shrink-0">
                     {item.available ? (
                       <span
                         className="text-[9px] font-semibold uppercase tracking-wide px-2 py-0.5 rounded-full"
@@ -240,14 +252,17 @@ export default function ServicesPage() {
                         Available
                       </span>
                     ) : (
-                      <span className={TYPO.CAPTION}>Coming soon</span>
+                      <span className="text-caption-sm font-light text-text-tertiary">Coming soon</span>
                     )}
-                    <CaretRight size={18} weight="regular" className="text-text-tertiary" />
+                    <CaretRight size={16} weight="regular" className="text-text-tertiary" />
                   </div>
                 </Link>
               ))}
             </div>
           </section>
+
+          {/* Bottom spacing */}
+          <div className="h-8" aria-hidden />
         </main>
       </div>
     </AppLayout>

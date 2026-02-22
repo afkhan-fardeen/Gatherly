@@ -143,8 +143,8 @@ export default function EditProfilePage() {
         </div>
       </header>
 
-      <main className="p-6 pb-32 bg-[var(--bg-app)]">
-        <form onSubmit={handleSubmit} className="space-y-6">
+      <main className="p-6 pb-40 bg-[var(--bg-app)]">
+        <form onSubmit={handleSubmit} className="form-no-zoom space-y-6">
           {/* Profile image */}
           <div className="flex flex-col items-center">
             <label className={`${TYPO.FORM_LABEL} mb-2`}>Profile photo</label>

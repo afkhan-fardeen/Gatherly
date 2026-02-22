@@ -127,7 +127,7 @@
 }
 
 :root {
-  --background: #F9F2E7;
+  --background: #FFFFFF;
   --foreground: #1A1A1A;
   --primary: #6D0D35;
 }
@@ -183,11 +183,18 @@ body {
   -webkit-overflow-scrolling: touch;
 }
 
-/* Prevent zoom on input focus (iOS) — 16px on form pages */
+/* Prevent zoom on input focus (iOS) — 16px required to avoid zoom */
 .form-no-zoom input,
 .form-no-zoom select,
 .form-no-zoom textarea {
   font-size: 16px !important;
+}
+
+/* Prevent zoom globally on all form elements (touch devices) */
+@media (pointer: coarse) {
+  input, select, textarea {
+    font-size: 16px !important;
+  }
 }
 
 .ios-blur {

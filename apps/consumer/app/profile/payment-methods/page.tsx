@@ -108,12 +108,12 @@ export default function PaymentMethodsPage() {
         </div>
       </header>
 
-      <main className="p-6 pb-32 space-y-6 bg-[var(--bg-app)]">
+      <main className="p-6 pb-40 space-y-6 bg-[var(--bg-app)]">
         <p className={TYPO.SUBTEXT}>
           Add cards for quick checkout. Use dummy numbers like 4242424242424242.
         </p>
 
-        <form onSubmit={handleAddCard} className="flex gap-2">
+        <form onSubmit={handleAddCard} className="form-no-zoom flex gap-2">
           <input
             type="text"
             inputMode="numeric"

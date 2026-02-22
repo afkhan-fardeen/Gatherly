@@ -237,7 +237,7 @@ export default function BookingDetailPage() {
         <div className="flex items-center gap-3">
           <Link
             href="/bookings"
-            className="w-11 h-11 min-w-[44px] min-h-[44px] rounded-radius-sm bg-slate-100 flex items-center justify-center shrink-0"
+            className="w-11 h-11 min-w-[44px] min-h-[44px] rounded-full bg-slate-100 flex items-center justify-center shrink-0"
           >
             <ArrowLeft size={22} weight="regular" className="text-slate-600" />
           </Link>
@@ -252,7 +252,7 @@ export default function BookingDetailPage() {
         </div>
       </header>
 
-      <main className="p-6 pb-32 space-y-6">
+      <main className="p-6 pb-40 space-y-6">
         {/* Cancelled banner */}
         {booking.status === "cancelled" && (
           <div className="p-4 rounded-md bg-cancelled/10 border border-cancelled/20">
@@ -388,7 +388,7 @@ export default function BookingDetailPage() {
       {/* Pay modal */}
       {payModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
-          <div className="bg-white rounded-md p-6 max-w-sm w-full shadow-xl">
+          <div className="form-no-zoom bg-white rounded-md p-6 max-w-sm w-full shadow-xl">
             <h3 className={`${TYPO.H2} mb-4`}>Pay {Number(booking.totalAmount).toFixed(2)} BD</h3>
             <p className={`${TYPO.SUBTEXT} mb-4`}>
               {booking.vendor.businessName} · {booking.package.name}
@@ -472,7 +472,7 @@ export default function BookingDetailPage() {
       {/* Review modal */}
       {reviewModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
-          <div className="bg-white rounded-md p-6 max-w-sm w-full shadow-xl">
+          <div className="form-no-zoom bg-white rounded-md p-6 max-w-sm w-full shadow-xl">
             <h3 className={`${TYPO.H2} mb-4`}>Leave a review</h3>
             <p className={`${TYPO.SUBTEXT} mb-4`}>
               {booking.vendor.businessName} · {booking.package.name}

@@ -231,27 +231,27 @@ export default function PackageDetailPage() {
             )}
 
             <div>
-              <h2 className={TYPO.H2}>{pkg.name}</h2>
+              <h2 className="text-typo-h2 font-medium text-text-primary">{pkg.name}</h2>
               {pkg.description && (
-                <p className={`${TYPO.BODY} mt-2 leading-relaxed`}>{pkg.description}</p>
+                <p className="text-body font-normal text-text-body mt-2 leading-relaxed">{pkg.description}</p>
               )}
             </div>
 
-            <div className={`p-6 bg-white border border-slate-200 ${ROUND} shadow-elevation-2`}>
-              <p className={`${TYPO.BODY_MEDIUM} text-typo-h1 text-primary`}>
+            <div className={`p-5 bg-white border border-slate-200 ${ROUND} shadow-elevation-2`}>
+              <p className="text-body font-medium text-primary">
                 {pkg.priceType === "per_person"
                   ? `From ${Number(pkg.basePrice).toFixed(2)} BD per person`
                   : `${Number(pkg.basePrice).toFixed(2)} BD fixed`}
               </p>
               {(pkg.minGuests || pkg.maxGuests) && (
-                <p className={`${TYPO.BODY} mt-1`}>
+                <p className="text-body-sm font-normal text-text-secondary mt-1">
                   {pkg.minGuests && `Min ${pkg.minGuests} guests`}
                   {pkg.minGuests && pkg.maxGuests && " · "}
                   {pkg.maxGuests && `Max ${pkg.maxGuests} guests`}
                 </p>
               )}
               {pkg.setupFee != null && Number(pkg.setupFee) > 0 && (
-                <p className={`${TYPO.BODY} mt-1`}>
+                <p className="text-body-sm font-normal text-text-secondary mt-1">
                   Setup fee: {Number(pkg.setupFee).toFixed(2)} BD
                 </p>
               )}
@@ -259,29 +259,29 @@ export default function PackageDetailPage() {
 
             {pkg.packageItems.length > 0 && (
               <div>
-                <h3 className={`${TYPO.H3} text-text-tertiary mb-3`}>
+                <h3 className="text-caption font-medium text-text-tertiary uppercase tracking-wider mb-2">
                   Menu items
                 </h3>
                 <div className="space-y-2">
                   {pkg.packageItems.map((item, i) => (
                     <div
                       key={i}
-                      className={`flex items-center gap-3 p-4 border border-slate-100 bg-white ${ROUND}`}
+                      className={`flex items-center gap-3 p-3 border border-slate-100 bg-white ${ROUND}`}
                     >
                       {item.imageUrl ? (
-                        <div className={`w-12 h-12 overflow-hidden bg-slate-100 shrink-0 ${ROUND}`}>
+                        <div className={`w-10 h-10 overflow-hidden bg-slate-100 shrink-0 ${ROUND}`}>
                           {/* eslint-disable-next-line @next/next/no-img-element */}
                           <img src={item.imageUrl} alt="" className="w-full h-full object-cover" />
                         </div>
                       ) : (
                         <div
-                          className={`w-12 h-12 bg-slate-100 flex items-center justify-center shrink-0 ${ROUND}`}
+                          className={`w-10 h-10 bg-slate-100 flex items-center justify-center shrink-0 ${ROUND}`}
                         >
-                          <ForkKnife size={22} weight="regular" className="text-text-tertiary" />
+                          <ForkKnife size={18} weight="regular" className="text-text-tertiary" />
                         </div>
                       )}
-                      <span className={TYPO.CARD_TITLE}>{item.name}</span>
-                      <CheckCircle size={18} weight="fill" className="text-emerald-500 ml-auto shrink-0" />
+                      <span className="text-body font-normal text-text-body flex-1 min-w-0">{item.name}</span>
+                      <CheckCircle size={16} weight="fill" className="text-emerald-500 shrink-0" />
                     </div>
                   ))}
                 </div>
@@ -325,7 +325,7 @@ export default function PackageDetailPage() {
               aria-label="Close"
             />
             <div
-              className="relative bg-white w-full max-w-md rounded-t-2xl sm:rounded-2xl p-6 overflow-y-auto animate-modal-slide-up flex flex-col"
+              className="form-no-zoom relative bg-white w-full max-w-md rounded-t-2xl sm:rounded-2xl p-6 overflow-y-auto animate-modal-slide-up flex flex-col"
               style={{
                 maxHeight: "min(calc(100vh - 2rem - env(safe-area-inset-bottom, 0px)), 500px)",
                 paddingBottom: "calc(2rem + env(safe-area-inset-bottom, 0px))",
@@ -448,7 +448,7 @@ export default function PackageDetailPage() {
               aria-label="Close"
             />
             <div
-              className="relative bg-white w-full max-w-md rounded-t-2xl sm:rounded-2xl p-6 overflow-y-auto animate-modal-slide-up flex flex-col"
+              className="form-no-zoom relative bg-white w-full max-w-md rounded-t-2xl sm:rounded-2xl p-6 overflow-y-auto animate-modal-slide-up flex flex-col"
               style={{
                 maxHeight: "min(calc(100vh - 2rem - env(safe-area-inset-bottom, 0px)), 500px)",
                 paddingBottom: "calc(2rem + env(safe-area-inset-bottom, 0px))",

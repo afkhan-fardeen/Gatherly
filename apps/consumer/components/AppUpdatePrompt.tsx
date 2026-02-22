@@ -5,6 +5,14 @@ import { ArrowClockwise } from "@phosphor-icons/react";
 import toast from "react-hot-toast";
 
 const CHERRY = "#6D0D35";
+const UPDATE_CHECK_INTERVAL_MS = 60_000;
+
+function checkForUpdates() {
+  if (typeof window === "undefined" || !("serviceWorker" in navigator)) return;
+  navigator.serviceWorker.getRegistration().then((registration) => {
+    registration?.update();
+  });
+}
 
 export function AppUpdatePrompt() {
   const [updateAvailable, setUpdateAvailable] = useState(false);
@@ -15,7 +23,6 @@ export function AppUpdatePrompt() {
     if (!reg) return;
     reg.then((registration) => {
       if (!registration) return;
-      // Check for new version when app opens
       registration.update();
       registration.addEventListener("updatefound", () => {
         const newWorker = registration.installing;
@@ -27,9 +34,21 @@ export function AppUpdatePrompt() {
         });
       });
     });
-    navigator.serviceWorker.addEventListener("controllerchange", () => {
+    const onControllerChange = () => {
       setUpdateAvailable(false);
-    });
+      window.location.reload();
+    };
+    navigator.serviceWorker.addEventListener("controllerchange", onControllerChange);
+    const onVisibilityChange = () => {
+      if (document.visibilityState === "visible") checkForUpdates();
+    };
+    document.addEventListener("visibilitychange", onVisibilityChange);
+    const interval = setInterval(checkForUpdates, UPDATE_CHECK_INTERVAL_MS);
+    return () => {
+      navigator.serviceWorker.removeEventListener("controllerchange", onControllerChange);
+      document.removeEventListener("visibilitychange", onVisibilityChange);
+      clearInterval(interval);
+    };
   }, []);
 
   useEffect(() => {

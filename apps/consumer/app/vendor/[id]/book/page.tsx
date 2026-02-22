@@ -237,8 +237,8 @@ export default function BookVendorPage() {
         </div>
       </header>
 
-      <main className="p-6 pb-32">
-        <form onSubmit={handleSubmit} className="space-y-6">
+      <main className="p-6 pb-40">
+        <form onSubmit={handleSubmit} className="form-no-zoom space-y-6">
           {error && (
             <div className="p-3 rounded-xl bg-red-50 text-red-600 text-sm border border-red-100">
               {error}

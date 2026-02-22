@@ -34,7 +34,7 @@ export default function ComingSoonPage() {
         <div className="flex items-center gap-4">
           <Link
             href="/services"
-            className="w-11 h-11 min-w-[44px] min-h-[44px] rounded-radius-sm bg-slate-100 flex items-center justify-center"
+            className="w-11 h-11 min-w-[44px] min-h-[44px] rounded-full bg-slate-100 flex items-center justify-center shrink-0"
           >
 <ArrowLeft size={22} weight="regular" className="text-slate-600" />
           </Link>
@@ -44,7 +44,7 @@ export default function ComingSoonPage() {
         </div>
       </header>
 
-      <main className="p-6 pb-32 flex flex-col items-center justify-center min-h-[50vh]">
+      <main className="p-6 pb-40 flex flex-col items-center justify-center min-h-[50vh]">
         <div className="w-20 h-20 rounded-full bg-slate-100 flex items-center justify-center mb-6">
           <service.Icon size={40} weight="regular" className="text-slate-400" />
         </div>

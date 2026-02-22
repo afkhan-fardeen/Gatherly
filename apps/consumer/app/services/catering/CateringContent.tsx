@@ -7,7 +7,7 @@ import { useSearchParams } from "next/navigation";
 import { ArrowLeft, MagnifyingGlass, ForkKnife } from "@phosphor-icons/react";
 import { AppLayout } from "@/components/AppLayout";
 import { PullToRefresh } from "@/components/PullToRefresh";
-import { INPUT, ROUND, TYPO } from "@/lib/events-ui";
+import { ROUND, TYPO } from "@/lib/events-ui";
 
 import { API_URL } from "@/lib/api";
 
@@ -62,7 +62,7 @@ export function CateringContent() {
               <p className={TYPO.CAPTION}>Find the best caterers</p>
             </div>
           </div>
-          <div className="relative">
+          <div className="form-no-zoom relative">
             <MagnifyingGlass
               size={20}
               weight="regular"
@@ -72,13 +72,14 @@ export function CateringContent() {
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className={`${INPUT.SEARCH} pl-12`}
+              className="w-full h-12 pl-12 pr-5 font-normal text-text-primary placeholder:text-text-tertiary bg-white border border-slate-200 rounded-2xl focus:ring-2 focus:ring-[#6D0D35]/20 focus:border-[#6D0D35]/40 outline-none transition-all duration-200"
+              style={{ fontSize: "16px" }}
               placeholder="Search caterers..."
             />
           </div>
         </header>
 
-        <main className="px-6 pb-32">
+        <main className="px-6 pb-40">
           {loading ? (
             <div className="space-y-4">
               {[1, 2].map((i) => (

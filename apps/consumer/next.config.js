@@ -3,6 +3,22 @@ const { PHASE_PRODUCTION_BUILD } = require("next/constants");
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
+  async headers() {
+    return [
+      {
+        source: "/sw.js",
+        headers: [{ key: "Cache-Control", value: "no-cache, no-store, must-revalidate" }],
+      },
+      {
+        source: "/workbox-:path*",
+        headers: [{ key: "Cache-Control", value: "no-cache, no-store, must-revalidate" }],
+      },
+      {
+        source: "/worker-:path*",
+        headers: [{ key: "Cache-Control", value: "no-cache, no-store, must-revalidate" }],
+      },
+    ];
+  },
   images: {
     remotePatterns: [
       {
@@ -27,7 +43,7 @@ module.exports = (phase) => {
     const withPWA = require("@ducanh2912/next-pwa").default({
       dest: "public",
       workboxOptions: {
-        cacheId: "gatherlii-v1",
+        cacheId: "gatherlii-v2",
       },
     });
     return withPWA(nextConfig);

@@ -12,7 +12,7 @@ export function AuthLayout({ title, children, footer }: AuthLayoutProps) {
   return (
     <div
         className="h-screen min-h-screen flex flex-col items-center justify-center px-8 py-10 overflow-hidden"
-        style={{ backgroundColor: "#F9F2E7" }}
+        style={{ backgroundColor: "#FFFFFF" }}
       >
       <div className="w-full max-w-md flex flex-col">
         <div className="flex flex-col items-center mb-10">

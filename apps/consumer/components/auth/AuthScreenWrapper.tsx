@@ -13,7 +13,7 @@ export function AuthScreenWrapper({ children, showPill = true, centered = true }
   return (
     <div
       className={`fixed inset-0 min-h-[100dvh] h-[100dvh] flex p-6 overflow-y-auto overflow-x-hidden pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)] ${centered ? "items-center justify-center" : "flex-col items-center pt-8"}`}
-      style={{ backgroundColor: "#F9F2E7" }}
+      style={{ backgroundColor: "#FFFFFF" }}
     >
       {/* Organic blur shapes - signin.html positions */}
       <div

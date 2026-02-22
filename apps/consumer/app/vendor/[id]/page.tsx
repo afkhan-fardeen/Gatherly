@@ -125,7 +125,7 @@ export default function VendorProfilePage() {
           ) : (
             <div
               className="w-full h-full flex items-center justify-center"
-              style={{ backgroundColor: "#F9F2E7" }}
+              style={{ backgroundColor: "#FFFFFF" }}
             >
               <ForkKnife size={40} weight="regular" className="text-primary" />
             </div>
@@ -213,42 +213,50 @@ export default function VendorProfilePage() {
                   <Link
                     key={pkg.id}
                     href={eventId ? `/vendor/${id}/package/${pkg.id}?eventId=${eventId}` : `/vendor/${id}/package/${pkg.id}`}
-                    className={`block p-4 rounded-2xl border bg-white transition-all active:scale-[0.99] ${
-                      isPopular ? "border-primary ring-1 ring-primary/20" : "border-slate-200"
+                    className={`block overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-elevation-1 transition-all active:scale-[0.99] ${
+                      isPopular ? "ring-1 ring-primary/20" : ""
                     }`}
                   >
-                    <div className="flex justify-between items-start gap-3">
-                      <div className="min-w-0 flex-1">
-                        <div className="flex items-center gap-2">
-                          <h4 className={TYPO.CARD_TITLE}>{pkg.name}</h4>
-                          {isPopular && (
-                            <span className="text-[9px] font-semibold uppercase tracking-wide px-2 py-0.5 rounded-full bg-primary/10 text-primary">
-                              Popular
-                            </span>
-                          )}
-                        </div>
-                        {pkg.description && (
-                          <p className={`${TYPO.CAPTION} mt-1 line-clamp-2`}>{pkg.description}</p>
+                    <div className="flex min-h-[88px]">
+                      {/* Package image */}
+                      <div className="relative w-24 min-h-full shrink-0 bg-slate-100 self-stretch">
+                        {pkg.imageUrl ? (
+                          <Image
+                            src={pkg.imageUrl}
+                            alt={pkg.name}
+                            fill
+                            className="object-cover"
+                            sizes="96px"
+                            unoptimized
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center">
+                            <ForkKnife size={22} weight="regular" className="text-text-tertiary" />
+                          </div>
                         )}
+                      </div>
+                      {/* Content */}
+                      <div className="flex-1 min-w-0 p-4 flex flex-col justify-center">
+                        <div className="flex items-center justify-between gap-2">
+                          <h4 className="text-body font-medium text-text-primary truncate">{pkg.name}</h4>
+                          <p className="text-body-sm font-medium text-primary shrink-0">
+                            {Number(pkg.basePrice).toFixed(0)} BD
+                            {priceSuffix && <span className="text-caption-sm text-text-tertiary ml-0.5">{priceSuffix}</span>}
+                          </p>
+                        </div>
                         {pkg.packageItems.length > 0 && (
-                          <ul className="mt-2 space-y-1">
+                          <ul className="mt-1.5 space-y-0.5">
                             {pkg.packageItems.slice(0, 3).map((item, i) => (
-                              <li key={i} className={`flex items-center ${TYPO.CAPTION}`}>
-                                <CheckCircle size={12} weight="fill" className="text-emerald-500 mr-1.5 shrink-0" />
+                              <li key={i} className="flex items-center text-caption-sm font-normal text-text-tertiary">
+                                <CheckCircle size={11} weight="fill" className="text-emerald-500 mr-1.5 shrink-0" />
                                 {item.name}
                               </li>
                             ))}
                           </ul>
                         )}
                       </div>
-                      <div className="shrink-0 flex flex-col items-end">
-                        <p className={`${TYPO.BODY_MEDIUM} text-primary`}>
-                          {Number(pkg.basePrice).toFixed(0)} BD
-                          {priceSuffix && <span className={`${TYPO.CAPTION} text-text-tertiary ml-0.5`}>{priceSuffix}</span>}
-                        </p>
-                        <span className={`${TYPO.LINK} text-primary mt-2 flex items-center gap-0.5`}>
-                          View <CaretRight size={16} weight="bold" />
-                        </span>
+                      <div className="flex items-center pr-3">
+                        <CaretRight size={20} weight="bold" className="text-text-tertiary" />
                       </div>
                     </div>
                   </Link>
