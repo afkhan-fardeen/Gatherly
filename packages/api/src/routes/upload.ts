@@ -44,7 +44,11 @@ uploadRouter.post("/image", upload.single("file"), async (req: Request, res) => 
 
   try {
     const dataUri = `data:${req.file.mimetype};base64,${req.file.buffer.toString("base64")}`;
-    const result = await cloudinary.uploader.upload(dataUri, { folder });
+    const result = await cloudinary.uploader.upload(dataUri, {
+      folder,
+      quality: "auto",
+      fetch_format: "auto",
+    });
     res.json({ url: result.secure_url });
   } catch (err) {
     console.error("Cloudinary upload error:", err);

@@ -2,10 +2,9 @@
 
 import { useState, useEffect } from "react";
 import { ArrowClockwise } from "@phosphor-icons/react";
-import toast from "react-hot-toast";
 
 const CHERRY = "#6D0D35";
-const UPDATE_CHECK_INTERVAL_MS = 60_000;
+const UPDATE_CHECK_INTERVAL_MS = 30_000; // Check every 30s for quick updates
 
 function checkForUpdates() {
   if (typeof window === "undefined" || !("serviceWorker" in navigator)) return;
@@ -51,37 +50,37 @@ export function AppUpdatePrompt() {
     };
   }, []);
 
-  useEffect(() => {
-    if (!updateAvailable) return;
-    toast(
-      (t) => (
-        <div className="flex items-center gap-3">
-          <span className="text-sm font-medium">New version available</span>
-          <button
-            onClick={() => {
-              window.location.reload();
-              toast.dismiss(t.id);
-            }}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold text-white"
-            style={{ backgroundColor: CHERRY }}
-          >
-            <ArrowClockwise size={14} weight="bold" />
-            Refresh
-          </button>
-          <button
-            onClick={() => toast.dismiss(t.id)}
-            className="text-slate-500 hover:text-slate-700 text-xs"
-          >
-            Later
-          </button>
-        </div>
-      ),
-      { duration: Infinity, id: "app-update" }
-    );
-    return () => {
-      toast.dismiss("app-update");
-    };
-  }, [updateAvailable]);
+  if (!updateAvailable) return null;
 
-  return null;
+  return (
+    <div
+      className="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-white/95 backdrop-blur-sm p-6"
+      aria-modal="true"
+      aria-labelledby="update-title"
+      role="dialog"
+    >
+      <div className="max-w-sm w-full text-center">
+        <div
+          className="w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center"
+          style={{ backgroundColor: `${CHERRY}15` }}
+        >
+          <ArrowClockwise size={32} weight="bold" className="text-primary" />
+        </div>
+        <h2 id="update-title" className="text-xl font-semibold text-slate-900 mb-2">
+          Update available
+        </h2>
+        <p className="text-slate-600 text-sm mb-6">
+          A new version of Gatherlii is ready. Please update to continue using the app.
+        </p>
+        <button
+          onClick={() => window.location.reload()}
+          className="w-full py-3 px-4 rounded-xl text-white font-semibold text-base flex items-center justify-center gap-2"
+          style={{ backgroundColor: CHERRY }}
+        >
+          <ArrowClockwise size={20} weight="bold" />
+          Update now
+        </button>
+      </div>
+    </div>
+  );
 }

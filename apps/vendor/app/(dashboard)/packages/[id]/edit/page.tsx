@@ -12,6 +12,7 @@ import { StepIndicator } from "@/components/ui/StepIndicator";
 import { ConfirmModal } from "@/components/ConfirmModal";
 
 import { API_URL } from "@/lib/api";
+import { compressImage } from "@/lib/compress-image";
 
 const inputClass =
   "w-full px-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-900 placeholder:text-slate-400 form-input-focus";
@@ -131,18 +132,23 @@ function MenuItemsSection({
                 onChange={async (e) => {
                   const file = e.target.files?.[0];
                   if (!file || !token) return;
-                  const fd = new FormData();
-                  fd.append("file", file);
                   try {
+                    const compressed = await compressImage(file).catch(() => file);
+                    const fd = new FormData();
+                    fd.append("file", compressed);
                     const res = await fetch(`${API_URL}/api/upload/image?folder=menu-items`, {
                       method: "POST",
                       headers: { Authorization: `Bearer ${token}` },
                       body: fd,
                     });
-                    const data = await res.json();
-                    if (res.ok && data.url) updateItem(item.id, { imageUrl: data.url });
-                  } catch {
-                    toast.error("Upload failed");
+                    const data = await res.json().catch(() => ({}));
+                    if (res.ok && data.url) {
+                      updateItem(item.id, { imageUrl: data.url });
+                    } else {
+                      toast.error(data?.error || `Upload failed${res.status === 401 ? " – please sign in again" : ""}`);
+                    }
+                  } catch (err) {
+                    toast.error(err instanceof Error ? err.message : "Upload failed");
                   }
                   e.target.value = "";
                 }}
@@ -417,18 +423,20 @@ export default function EditPackagePage() {
                       if (!file) return;
                       const token = localStorage.getItem("token");
                       if (!token) return;
-                      const fd = new FormData();
-                      fd.append("file", file);
                       try {
+                        const compressed = await compressImage(file).catch(() => file);
+                        const fd = new FormData();
+                        fd.append("file", compressed);
                         const res = await fetch(`${API_URL}/api/upload/image?folder=packages`, {
                           method: "POST",
                           headers: { Authorization: `Bearer ${token}` },
                           body: fd,
                         });
-                        const data = await res.json();
+                        const data = await res.json().catch(() => ({}));
                         if (res.ok && data.url) setForm((f) => ({ ...f, imageUrl: data.url }));
-                      } catch {
-                        toast.error("Upload failed");
+                        else toast.error(data?.error || "Upload failed");
+                      } catch (err) {
+                        toast.error(err instanceof Error ? err.message : "Upload failed");
                       }
                       e.target.value = "";
                     }}

@@ -11,6 +11,7 @@ import { AuthButton } from "@/components/ui/AuthButton";
 import { StepIndicator } from "@/components/ui/StepIndicator";
 
 import { API_URL } from "@/lib/api";
+import { compressImage } from "@/lib/compress-image";
 
 const inputClass =
   "w-full px-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-900 placeholder:text-slate-400 form-input-focus";
@@ -174,18 +175,20 @@ export default function NewPackagePage() {
                       if (!file) return;
                       const token = localStorage.getItem("token");
                       if (!token) return;
-                      const fd = new FormData();
-                      fd.append("file", file);
                       try {
+                        const compressed = await compressImage(file).catch(() => file);
+                        const fd = new FormData();
+                        fd.append("file", compressed);
                         const res = await fetch(`${API_URL}/api/upload/image?folder=packages`, {
                           method: "POST",
                           headers: { Authorization: `Bearer ${token}` },
                           body: fd,
                         });
-                        const data = await res.json();
+                        const data = await res.json().catch(() => ({}));
                         if (res.ok && data.url) setForm((f) => ({ ...f, imageUrl: data.url }));
-                      } catch {
-                        toast.error("Upload failed");
+                        else toast.error(data?.error || "Upload failed");
+                      } catch (err) {
+                        toast.error(err instanceof Error ? err.message : "Upload failed");
                       }
                       e.target.value = "";
                     }}

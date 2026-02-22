@@ -111,13 +111,13 @@ export function CateringContent() {
                     href={href}
                     className="bg-white overflow-hidden border border-slate-200 rounded-2xl shadow-elevation-1 transition-all hover:border-slate-300 active:scale-[0.99]"
                   >
-                    <div className="relative w-full h-28 bg-white">
-                      {vendor.logoUrl ? (
+                    <div className="relative w-full h-28 bg-slate-100">
+                      {(vendor.featuredImageUrl || vendor.logoUrl) ? (
                         <Image
-                          src={vendor.logoUrl}
+                          src={vendor.featuredImageUrl || vendor.logoUrl || ""}
                           alt={vendor.businessName}
                           fill
-                          className="object-contain p-4"
+                          className="object-cover"
                           sizes="(max-width: 430px) 100vw, 400px"
                         />
                       ) : (
@@ -127,10 +127,25 @@ export function CateringContent() {
                       )}
                     </div>
                     <div className="p-4">
-                      <h4 className={TYPO.CARD_TITLE}>{vendor.businessName}</h4>
-                      <p className={`${TYPO.SUBTEXT} mt-0.5`}>
-                        {vendor.cuisineTypes?.slice(0, 2).join(", ") || "Catering"}
-                      </p>
+                      <div className="flex items-center gap-3">
+                        {vendor.logoUrl && (
+                          <div className="relative w-10 h-10 shrink-0 rounded-lg overflow-hidden bg-white border border-slate-100">
+                            <Image
+                              src={vendor.logoUrl}
+                              alt=""
+                              fill
+                              className="object-contain p-1"
+                              sizes="40px"
+                            />
+                          </div>
+                        )}
+                        <div className="min-w-0">
+                          <h4 className={TYPO.CARD_TITLE}>{vendor.businessName}</h4>
+                          <p className={`${TYPO.SUBTEXT} mt-0.5`}>
+                            {vendor.cuisineTypes?.slice(0, 2).join(", ") || "Catering"}
+                          </p>
+                        </div>
+                      </div>
                       <div className="mt-3 flex items-center justify-between pt-3 border-t border-slate-100">
                         <p className={TYPO.BODY_MEDIUM}>
                           {minPrice != null ? (
