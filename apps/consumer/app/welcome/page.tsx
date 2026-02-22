@@ -45,7 +45,7 @@ export default function WelcomePage() {
       <div className="flex-1 min-h-0 flex flex-col items-center justify-center w-full max-w-[400px] px-6 pb-6 mx-auto">
         <div className="text-center space-y-2">
           <h1
-            className="text-4xl font-normal tracking-tight"
+            className="font-logo text-4xl font-normal tracking-tight"
             style={{ color: CHERRY }}
           >
             Welcome to Gatherlii

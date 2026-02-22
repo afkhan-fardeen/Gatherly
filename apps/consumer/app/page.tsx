@@ -3,7 +3,8 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Sparkle, MagnifyingGlass, Palette, CheckCircle } from "@phosphor-icons/react";
+import { MagnifyingGlass, Palette, CheckCircle } from "@phosphor-icons/react";
+import { Logo } from "@/components/Logo";
 import { validateSession, getToken } from "@/lib/session";
 
 export default function HomePage() {
@@ -31,12 +32,7 @@ export default function HomePage() {
       {/* Sticky Navigation */}
       <nav className="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-slate-200 shrink-0">
         <div className="w-full max-w-7xl mx-auto px-6 md:px-8 h-16 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2.5">
-            <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center shadow-lg shadow-primary/20">
-              <Sparkle size={22} weight="fill" className="text-white" />
-            </div>
-            <span className="text-xl font-bold tracking-tight text-slate-900">Gatherlii</span>
-          </Link>
+          <Logo href="/" className="text-xl md:text-2xl text-primary" />
           <div className="flex items-center gap-3">
             {checking ? null : token ? (
               <Link
@@ -112,7 +108,7 @@ export default function HomePage() {
               <div className="hidden lg:block relative mt-12 lg:mt-0">
                 <div className="absolute -inset-4 bg-primary/5 rounded-[2rem] rotate-3" />
                 <div className="relative aspect-square rounded-[1.5rem] overflow-hidden bg-gradient-to-br from-primary/20 to-primary/5 border border-slate-200/50 flex items-center justify-center">
-                  <Sparkle size={120} weight="fill" className="text-primary/30" />
+                  <span className="font-logo text-[8rem] text-primary/30">G</span>
                 </div>
               </div>
             </div>
@@ -193,12 +189,7 @@ export default function HomePage() {
         {/* Footer */}
         <footer className="bg-white border-t border-slate-200 py-12 px-6 md:px-8 shrink-0">
           <div className="w-full max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
-            <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-                <Sparkle size={16} weight="fill" className="text-white" />
-              </div>
-              <span className="text-lg font-bold text-slate-900">Gatherlii</span>
-            </div>
+            <Logo href="/" className="text-lg md:text-xl text-primary" />
             <p className="text-sm text-slate-500">
               © {new Date().getFullYear()} Gatherlii. All rights reserved.
             </p>

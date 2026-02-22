@@ -16,7 +16,7 @@ export function AuthLayout({ title, children, footer }: AuthLayoutProps) {
       >
       <div className="w-full max-w-md flex flex-col">
         <div className="flex flex-col items-center mb-10">
-          <Logo href="/welcome" className="mb-6 text-3xl" />
+          <Logo href="/welcome" className="mb-6 text-3xl text-primary" />
           <h1
           className="text-[28px] font-bold tracking-tight leading-tight text-center"
           style={{ color: BURGUNDY }}
