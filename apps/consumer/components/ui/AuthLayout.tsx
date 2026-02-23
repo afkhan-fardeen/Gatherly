@@ -18,7 +18,7 @@ export function AuthLayout({ title, children, footer }: AuthLayoutProps) {
         <div className="flex flex-col items-center mb-10">
           <Logo href="/welcome" className="mb-6 text-3xl text-primary" />
           <h1
-          className="font-serif text-[28px] font-normal tracking-tight leading-tight text-center"
+          className="font-serif text-[28px] font-medium tracking-tight leading-tight text-center"
           style={{ color: CHERRY }}
         >
             {title}

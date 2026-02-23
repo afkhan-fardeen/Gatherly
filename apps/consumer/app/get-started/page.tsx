@@ -20,7 +20,7 @@ export default function GetStartedPage() {
 
       <div className="flex flex-col gap-6">
         <h1
-          className="font-serif text-2xl font-normal text-center"
+          className="font-serif text-2xl font-medium text-center"
           style={{ color: CHERRY }}
         >
           Get Started

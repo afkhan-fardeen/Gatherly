@@ -254,7 +254,7 @@ export default function PackageDetailPage() {
             )}
 
             <div>
-              <h2 className="font-serif text-typo-h2 font-normal text-text-primary">{pkg.name}</h2>
+              <h2 className="font-serif text-typo-h2 font-medium text-text-primary">{pkg.name}</h2>
               {pkg.description && (
                 <p className="text-body font-normal text-text-body mt-2 leading-relaxed">{pkg.description}</p>
               )}

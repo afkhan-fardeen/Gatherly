@@ -100,7 +100,7 @@ export default function EventsPage() {
           >
             <div className="flex items-start justify-between">
               <div>
-                <h1 className="font-serif text-[34px] font-normal leading-none tracking-[-0.8px] text-[#1e0f14]">
+                <h1 className="font-serif text-[34px] font-medium leading-none tracking-[-0.8px] text-[#1e0f14]">
                   My <span className="italic font-normal text-primary">Events</span>
                 </h1>
                 <p className="text-[12.5px] font-light text-[#9e8085] mt-1 tracking-wide">
@@ -168,7 +168,7 @@ export default function EventsPage() {
                 >
                   <Calendar size={26} weight="regular" />
                 </div>
-                <h3 className="font-serif text-[22px] font-normal text-[#1e0f14] mb-1.5">
+                <h3 className="font-serif text-[22px] font-medium text-[#1e0f14] mb-1.5">
                   {tab === "upcoming" ? "No upcoming events" : "No past events"}
                 </h3>
                 <p className="text-[13px] font-light text-[#9e8085]">
@@ -216,7 +216,7 @@ export default function EventsPage() {
                             <span className="text-[9px] font-semibold uppercase tracking-[1.5px] text-primary">
                               {d.toLocaleDateString("en-US", { month: "short" })}
                             </span>
-                            <span className="font-serif text-[28px] font-normal leading-none text-[#1e0f14]">
+                            <span className="font-serif text-[28px] font-medium leading-none text-[#1e0f14]">
                               {d.getDate()}
                             </span>
                             <span className="text-[9px] font-light text-[#a0888d]">
@@ -227,7 +227,7 @@ export default function EventsPage() {
                           {/* Event body */}
                           <div className="flex-1 min-w-0 py-3.5 px-4 flex flex-col gap-1.5">
                             <div className="flex items-start justify-between gap-2">
-                              <h3 className="font-serif text-[18px] font-normal text-[#1e0f14] tracking-[-0.2px] truncate">
+                              <h3 className="font-serif text-[18px] font-medium text-[#1e0f14] tracking-[-0.2px] truncate">
                                 {event.name}
                               </h3>
                               <CaretRight size={14} weight="bold" className="text-[#9e8085] shrink-0 mt-0.5 transition-all group-hover:translate-x-0.5 group-hover:text-primary" />

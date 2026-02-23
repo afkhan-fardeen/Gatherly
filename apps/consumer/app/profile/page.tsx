@@ -180,7 +180,7 @@ export default function ProfilePage() {
           >
             <ArrowLeft size={16} weight="regular" className="text-text-primary" />
           </Link>
-          <h1 className="font-serif text-[20px] font-normal text-text-primary tracking-tight">Profile</h1>
+          <h1 className="font-serif text-[20px] font-medium text-text-primary tracking-tight">Profile</h1>
         </header>
 
         <main className="px-4 pb-32 space-y-6">

@@ -189,7 +189,7 @@ export default function VendorProfilePage() {
                 <Check size={10} weight="bold" /> Verified
               </span>
             </div>
-            <h1 className="font-serif text-[28px] font-normal text-[#1e0f14] tracking-[-0.4px] leading-tight mb-2">
+            <h1 className="font-serif text-[28px] font-medium text-[#1e0f14] tracking-[-0.4px] leading-tight mb-2">
               {vendor.businessName}
             </h1>
             <div className="flex flex-wrap items-center gap-3 text-[12.5px] font-light text-[#a0888d]">
@@ -272,11 +272,11 @@ export default function VendorProfilePage() {
                           />
                         </div>
                         <div className="flex-1 min-w-0">
-                          <h3 className="font-serif text-[18px] font-normal text-[#1e0f14] tracking-[-0.2px] mb-0.5">{pkg.name}</h3>
+                          <h3 className="font-serif text-[18px] font-medium text-[#1e0f14] tracking-[-0.2px] mb-0.5">{pkg.name}</h3>
                           <p className="text-[11.5px] font-light text-[#a0888d]">{capLabel || "—"}</p>
                         </div>
                         <div className="text-right shrink-0">
-                          <div className="font-serif text-[22px] font-normal text-primary leading-none">{Number(pkg.basePrice).toFixed(0)} BD</div>
+                          <div className="font-serif text-[22px] font-medium text-primary leading-none">{Number(pkg.basePrice).toFixed(0)} BD</div>
                           <div className="text-[10px] font-light text-[#a0888d]">{priceSuffix}</div>
                         </div>
                       </div>

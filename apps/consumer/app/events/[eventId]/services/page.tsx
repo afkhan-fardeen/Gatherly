@@ -68,7 +68,7 @@ export default function EventServicesPage() {
               <ArrowLeft size={15} weight="regular" />
             </Link>
             <div>
-              <h1 className="font-serif text-[22px] font-normal text-[#1e0f14] tracking-[-0.3px]">
+              <h1 className="font-serif text-[22px] font-medium text-[#1e0f14] tracking-[-0.3px]">
                 Select services for <span className="italic font-normal text-primary">{event.name}</span>
               </h1>
               <p className="text-[12.5px] font-light text-[#a0888d] mt-0.5">

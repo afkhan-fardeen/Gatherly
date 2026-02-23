@@ -38,7 +38,7 @@ export default function ComingSoonPage() {
           >
 <ArrowLeft size={22} weight="regular" className="text-slate-600" />
           </Link>
-          <h1 className="font-serif text-xl font-normal tracking-tight">
+          <h1 className="font-serif text-xl font-medium tracking-tight">
             {service.name}
           </h1>
         </div>

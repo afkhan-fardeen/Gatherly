@@ -22,20 +22,20 @@ export const TEXT_TERTIARY = "#9E9E9E";
 /** Typography – Cormorant Garamond for headings, Poppins for body */
 export const TYPO = {
   /** Page title – H1 20px, Cormorant. Primary text */
-  H1: "font-serif text-typo-h1 font-normal tracking-tight text-text-primary",
+  H1: "font-serif text-typo-h1 font-medium tracking-tight text-text-primary",
   /** Compact page title – 16px, Cormorant */
-  H1_SM: "font-serif text-body-lg font-normal tracking-tight text-text-primary",
+  H1_SM: "font-serif text-body-lg font-medium tracking-tight text-text-primary",
   /** Large page title – 20px (greeting), Cormorant. Primary text */
-  H1_LARGE: "font-serif text-typo-h1 font-normal tracking-tight text-text-primary",
+  H1_LARGE: "font-serif text-typo-h1 font-medium tracking-tight text-text-primary",
   /** Section heading – H2 17px, Cormorant. Primary text */
-  H2: "font-serif text-typo-h2 font-normal text-text-primary",
+  H2: "font-serif text-typo-h2 font-medium text-text-primary",
   /** Subsection – H3 15px, Cormorant. Primary text */
-  H3: "font-serif text-typo-h3 font-normal text-text-primary",
+  H3: "font-serif text-typo-h3 font-medium text-text-primary",
   /** Label / Badge – 12px, 500 (hard floor). Primary text */
   LABEL: "text-caption font-medium text-text-primary",
   H3_LABEL: "text-caption font-medium uppercase tracking-wider text-text-primary",
   /** Card title – H3 15px, Cormorant. Primary text */
-  CARD_TITLE: "font-serif text-typo-h3 font-normal text-text-primary",
+  CARD_TITLE: "font-serif text-typo-h3 font-medium text-text-primary",
   /** Body – 14px, 400. Body text */
   BODY: "text-body font-normal text-text-body",
   /** Body medium – 14px, 500 (prices, ETA, key data). Secondary text */

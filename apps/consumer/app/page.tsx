@@ -174,7 +174,7 @@ export default function HomePage() {
               <span className="text-[10px] font-medium uppercase tracking-[2px] text-primary">Premium Event Planning</span>
             </div>
 
-            <h1 className="font-serif text-[clamp(40px,5vw,72px)] font-normal leading-[1.05] tracking-[-1.5px] mb-5" style={{ color: TEXT }}>
+            <h1 className="font-serif text-[clamp(40px,5vw,72px)] font-medium leading-[1.05] tracking-[-1.5px] mb-5" style={{ color: TEXT }}>
               Elegance
               <br />
               in Every

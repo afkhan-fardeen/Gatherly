@@ -235,7 +235,7 @@ function CreateEventContent() {
           >
             <X size={14} weight="bold" />
           </Link>
-          <h1 className="font-serif text-[22px] font-normal text-[#1e0f14] tracking-[-0.3px]">
+          <h1 className="font-serif text-[22px] font-medium text-[#1e0f14] tracking-[-0.3px]">
             New Event
           </h1>
           <button type="button" onClick={handleSaveDraft} className="text-[13px] font-medium text-primary opacity-60 hover:opacity-100 transition-opacity">

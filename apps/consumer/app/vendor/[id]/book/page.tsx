@@ -241,7 +241,7 @@ export default function BookVendorPage() {
             <ArrowLeft size={22} weight="regular" className="text-slate-600" />
           </Link>
           <div>
-            <h1 className="font-serif text-xl font-normal tracking-tight">Request Booking</h1>
+            <h1 className="font-serif text-xl font-medium tracking-tight">Request Booking</h1>
             <p className="text-slate-500 text-xs">{vendor.businessName} · {pkg.name}</p>
           </div>
         </div>

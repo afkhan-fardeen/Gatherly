@@ -86,7 +86,7 @@ export default function ServicesPage() {
             background: "linear-gradient(to bottom, #f4ede5 80%, transparent)",
           }}
         >
-          <h1 className="font-serif text-[34px] font-normal leading-none tracking-[-0.8px] text-[#1e0f14]">
+          <h1 className="font-serif text-[34px] font-medium leading-none tracking-[-0.8px] text-[#1e0f14]">
             Dis<span className="italic font-normal text-primary">cover</span>
           </h1>
           <p className="text-[12.5px] font-light text-[#9e8085] mb-4">Find venues, catering & more</p>
@@ -152,7 +152,7 @@ export default function ServicesPage() {
             <div className="flex items-end justify-between mb-3.5">
               <div>
                 <p className="font-serif text-[9.5px] font-semibold uppercase tracking-[2px] text-primary mb-0.5">Editor&apos;s Choice</p>
-                <h2 className="font-serif text-[22px] font-normal text-[#1e0f14] tracking-[-0.3px] leading-tight">Top Rated</h2>
+                <h2 className="font-serif text-[22px] font-medium text-[#1e0f14] tracking-[-0.3px] leading-tight">Top Rated</h2>
               </div>
               <Link href="/services/catering" className="text-xs text-primary font-normal opacity-80 hover:opacity-100 transition-opacity pb-0.5 border-b border-primary/20">
                 See all
@@ -222,14 +222,14 @@ export default function ServicesPage() {
                             {rating.toFixed(1)} ({count})
                           </span>
                         </div>
-                        <h3 className="font-serif text-[17px] font-normal text-[#1e0f14] tracking-[-0.2px] truncate mb-0.5">
+                        <h3 className="font-serif text-[17px] font-medium text-[#1e0f14] tracking-[-0.2px] truncate mb-0.5">
                           {vendor.businessName}
                         </h3>
                         <p className="text-[11.5px] font-light text-[#9e8085] mb-3 truncate">
                           {vendor.cuisineTypes?.slice(0, 2).join(" · ") || "Catering"}
                         </p>
                         <div className="flex items-center justify-between pt-2.5 border-t border-primary/5">
-                          <span className="font-serif text-[20px] font-normal text-primary leading-none">
+                          <span className="font-serif text-[20px] font-medium text-primary leading-none">
                             {minPrice != null ? `${minPrice} BD` : "—"}
                             <span className="text-[11px] font-light text-[#9e8085] ml-0.5">{minPrice != null ? priceSuffix : ""}</span>
                           </span>
@@ -254,7 +254,7 @@ export default function ServicesPage() {
             <div className="flex items-end justify-between mb-3.5">
               <div>
                 <p className="font-serif text-[9.5px] font-semibold uppercase tracking-[2px] text-primary mb-0.5">Handpicked</p>
-                <h2 className="font-serif text-[22px] font-normal text-[#1e0f14] tracking-[-0.3px] leading-tight">All Partners</h2>
+                <h2 className="font-serif text-[22px] font-medium text-[#1e0f14] tracking-[-0.3px] leading-tight">All Partners</h2>
               </div>
               <Link href="/services/catering" className="text-xs text-primary font-normal opacity-80 hover:opacity-100 transition-opacity pb-0.5 border-b border-primary/20">
                 Filter
@@ -330,7 +330,7 @@ export default function ServicesPage() {
                       </div>
                       <div className="p-3.5 px-4 pb-4">
                         <div className="flex items-start justify-between gap-2 mb-1.5">
-                          <h3 className="font-serif text-[20px] font-normal text-[#1e0f14] tracking-[-0.3px] leading-tight line-clamp-2">
+                          <h3 className="font-serif text-[20px] font-medium text-[#1e0f14] tracking-[-0.3px] leading-tight line-clamp-2">
                             {vendor.businessName}
                           </h3>
                           <button
@@ -356,7 +356,7 @@ export default function ServicesPage() {
                         <div className="flex items-center justify-between pt-2.5 border-t border-primary/5">
                           <div>
                             <span className="text-[9.5px] font-normal uppercase tracking-wider text-[#9e8085]">From</span>
-                            <div className="font-serif text-[24px] font-normal text-primary leading-none">
+                            <div className="font-serif text-[24px] font-medium text-primary leading-none">
                               {minPrice != null ? `${minPrice} BD` : "—"}
                               <span className="text-[11px] font-light text-[#9e8085]"> {minPrice != null ? priceSuffix : ""}</span>
                             </div>
