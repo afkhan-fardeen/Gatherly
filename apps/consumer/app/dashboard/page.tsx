@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback, useRef } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
@@ -99,9 +99,6 @@ interface Vendor {
   featuredImageUrl: string | null;
 }
 
-const STACK_OFFSET = 8;
-const STACK_SCALE = 0.96;
-
 export default function DashboardPage() {
   const router = useRouter();
   const [user, setUser] = useState<{ name: string } | null>(null);
@@ -109,10 +106,6 @@ export default function DashboardPage() {
   const [vendors, setVendors] = useState<Vendor[]>([]);
   const [spotlight, setSpotlight] = useState<SpotlightItem[]>([]);
   const [loading, setLoading] = useState(true);
-  const [stackIndex, setStackIndex] = useState(0);
-  const [swipeOffset, setSwipeOffset] = useState(0);
-  const [touchStart, setTouchStart] = useState<number | null>(null);
-  const justSwiped = useRef(false);
 
   useEffect(() => {
     if (!getToken()) {
@@ -157,37 +150,6 @@ export default function DashboardPage() {
     .slice(0, 5);
 
   const firstName = user?.name?.trim()?.split(" ")[0] || "there";
-  const visibleCount = Math.min(3, upcomingEvents.length);
-
-  const handleSwipeStart = useCallback((clientX: number) => {
-    setTouchStart(clientX);
-    setSwipeOffset(0);
-  }, []);
-
-  const handleSwipeMove = useCallback((clientX: number) => {
-    if (touchStart === null) return;
-    setSwipeOffset(clientX - touchStart);
-  }, [touchStart]);
-
-  const handleSwipeEnd = useCallback(() => {
-    if (touchStart === null) return;
-    const threshold = 80;
-    if (swipeOffset < -threshold && stackIndex < upcomingEvents.length - 1) {
-      justSwiped.current = true;
-      setStackIndex((i) => i + 1);
-      setTimeout(() => { justSwiped.current = false; }, 300);
-    } else if (swipeOffset > threshold && stackIndex > 0) {
-      justSwiped.current = true;
-      setStackIndex((i) => i - 1);
-      setTimeout(() => { justSwiped.current = false; }, 300);
-    }
-    setTouchStart(null);
-    setSwipeOffset(0);
-  }, [touchStart, swipeOffset, stackIndex, upcomingEvents.length]);
-
-  useEffect(() => {
-    setStackIndex(0);
-  }, [upcomingEvents.length]);
 
   if (loading) {
     return (
@@ -230,109 +192,59 @@ export default function DashboardPage() {
             </Link>
           </div>
           {upcomingEvents.length > 0 ? (
-            <div className="relative h-[130px] -mx-1">
-              {/* Stacked cards - render from back to front, top card = stackIndex */}
-              {[...Array(visibleCount)].map((_, i) => {
-                const idx = stackIndex + i;
-                const e = upcomingEvents[idx];
-                if (!e) return null;
-                const depth = visibleCount - 1 - i;
-                const isTop = i === visibleCount - 1;
+            <div className="space-y-3">
+              {upcomingEvents.map((e) => {
                 const { month, day, weekday } = formatEventDate(e.date);
                 const timeStr = formatTimeStart(e.timeStart);
-                const scale = Math.pow(STACK_SCALE, depth);
-                const translateY = depth * STACK_OFFSET;
-                const zIndex = i;
-                const dragX = isTop ? swipeOffset : 0;
-
                 return (
-                  <div
+                  <Link
                     key={e.id}
-                    className="absolute inset-x-0 top-0 transition-transform duration-200 ease-out"
-                    style={{
-                      transform: `translateY(${translateY}px) scale(${scale}) translateX(${dragX}px)`,
-                      transformOrigin: "top center",
-                      zIndex,
-                    }}
+                    href={`/events/${e.id}`}
+                    className="flex overflow-hidden rounded-[18px] border border-primary/10 bg-[#fdfaf7] transition-all hover:shadow-[0_6px_24px_rgba(109,13,53,0.08)] active:scale-[0.99]"
                   >
-                    <Link
-                      href={`/events/${e.id}`}
-                      className="flex overflow-hidden rounded-[18px] border border-primary/10 bg-[#fdfaf7] shadow-[0_4px_20px_rgba(109,13,53,0.08)] block active:scale-[0.99] touch-pan-y"
-                      onTouchStart={(ev) => handleSwipeStart(ev.touches[0].clientX)}
-                      onTouchMove={(ev) => handleSwipeMove(ev.touches[0].clientX)}
-                      onTouchEnd={handleSwipeEnd}
-                      onTouchCancel={handleSwipeEnd}
-                      onMouseDown={(ev) => handleSwipeStart(ev.clientX)}
-                      onMouseMove={(ev) => ev.buttons === 1 && handleSwipeMove(ev.clientX)}
-                      onMouseUp={handleSwipeEnd}
-                      onMouseLeave={handleSwipeEnd}
-                      onClick={(ev) => {
-                        if (justSwiped.current) {
-                          ev.preventDefault();
-                          justSwiped.current = false;
-                        }
-                      }}
+                    <div
+                      className="w-[68px] shrink-0 flex flex-col items-center justify-center gap-0.5 py-3 px-2 border-r border-primary/10"
+                      style={{ backgroundColor: "#CFD7F2" }}
                     >
-                      <div
-                        className="w-[68px] shrink-0 flex flex-col items-center justify-center gap-0.5 py-3 px-2 border-r border-primary/10"
-                        style={{ backgroundColor: "#CFD7F2" }}
-                      >
-                        <span className="text-[9px] font-semibold uppercase tracking-[1.5px] text-primary">
-                          {month}
-                        </span>
-                        <span className="font-serif text-[28px] font-medium text-[#1e0f14] leading-none">
-                          {day}
-                        </span>
-                        <span className="text-[9px] font-light text-[#a0888d]">{weekday}</span>
+                      <span className="text-[10px] font-medium uppercase tracking-wider text-primary">
+                        {month}
+                      </span>
+                      <span className="font-serif text-[24px] font-medium text-[#1e0f14] leading-none">
+                        {day}
+                      </span>
+                      <span className="text-[10px] font-normal text-[#a0888d]">{weekday}</span>
+                    </div>
+                    <div className="flex-1 min-w-0 p-3.5 pl-4">
+                      <div className="flex items-start justify-between gap-2 mb-1">
+                        <h3 className="font-serif text-[15px] font-medium text-[#1e0f14] tracking-tight truncate">
+                          {e.name}
+                        </h3>
+                        <StatusBadge
+                          status={(e.status || "draft") as "draft" | "in_progress" | "completed" | "cancelled"}
+                          className="shrink-0"
+                        />
                       </div>
-                      <div className="flex-1 min-w-0 p-3.5 pl-4">
-                        <div className="flex items-start justify-between gap-2 mb-1">
-                          <h3 className="font-serif text-[18px] font-medium text-[#1e0f14] tracking-[-0.2px] truncate">
-                            {e.name}
-                          </h3>
-                          <StatusBadge
-                            status={(e.status || "draft") as "draft" | "in_progress" | "completed" | "cancelled"}
-                            className="shrink-0"
-                          />
-                        </div>
-                        <div className="flex flex-col gap-0.5">
-                          {timeStr && (
-                            <div className="flex items-center gap-1.5 text-[12px] font-light text-[#a0888d]">
-                              <Clock size={11} weight="regular" className="opacity-50 shrink-0" />
-                              {timeStr}
-                            </div>
-                          )}
-                          {e.location && (
-                            <div className="flex items-center gap-1.5 text-[12px] font-light text-[#a0888d]">
-                              <MapPin size={11} weight="regular" className="opacity-50 shrink-0" />
-                              <span className="truncate">{e.location}</span>
-                            </div>
-                          )}
-                        </div>
+                      <div className="flex flex-col gap-0.5">
+                        {timeStr && (
+                          <div className="flex items-center gap-1.5 text-[12px] font-normal text-[#a0888d]">
+                            <Clock size={11} weight="regular" className="opacity-50 shrink-0" />
+                            {timeStr}
+                          </div>
+                        )}
+                        {e.location && (
+                          <div className="flex items-center gap-1.5 text-[12px] font-normal text-[#a0888d]">
+                            <MapPin size={11} weight="regular" className="opacity-50 shrink-0" />
+                            <span className="truncate">{e.location}</span>
+                          </div>
+                        )}
                       </div>
-                      <div className="flex items-center pr-3">
-                        <CaretRight size={22} weight="bold" className="text-[#a0888d] shrink-0" />
-                      </div>
-                    </Link>
-                  </div>
+                    </div>
+                    <div className="flex items-center pr-3">
+                      <CaretRight size={20} weight="bold" className="text-[#a0888d] shrink-0" />
+                    </div>
+                  </Link>
                 );
               })}
-              {/* Dots indicator */}
-              {upcomingEvents.length > 1 && (
-                <div className="absolute bottom-0 left-0 right-0 flex justify-center gap-1.5 pt-2">
-                  {upcomingEvents.map((_, i) => (
-                    <button
-                      key={i}
-                      type="button"
-                      onClick={() => setStackIndex(i)}
-                      className={`w-1.5 h-1.5 rounded-full transition-colors ${
-                        i === stackIndex ? "bg-primary" : "bg-primary/25"
-                      }`}
-                      aria-label={`Go to event ${i + 1}`}
-                    />
-                  ))}
-                </div>
-              )}
             </div>
           ) : (
             <Link
