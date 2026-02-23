@@ -2,17 +2,16 @@
 
 import { Suspense, useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 import { User, Envelope, Lock } from "@phosphor-icons/react";
 import { AuthScreenWrapper } from "@/components/auth/AuthScreenWrapper";
-import { BrandHeading } from "@/components/auth/BrandHeading";
-import { GlassCard } from "@/components/auth/GlassCard";
 import { AuthInput } from "@/components/ui/AuthInput";
 import { AuthButton } from "@/components/ui/AuthButton";
 import { API_URL, parseJsonResponse } from "@/lib/api";
 import { validateSession, setSession } from "@/lib/session";
 
-const BURGUNDY = "#3F0810";
+const CHERRY = "#6D0D35";
 
 function RegisterForm() {
   const router = useRouter();
@@ -65,30 +64,37 @@ function RegisterForm() {
 
   if (checkingAuth) {
     return (
-      <AuthScreenWrapper>
-        <div className="flex items-center justify-center min-h-[200px]">Loading...</div>
+      <AuthScreenWrapper backgroundColor="#f9f2e7">
+        <div className="flex items-center justify-center min-h-[200px] text-sm font-normal">Loading...</div>
       </AuthScreenWrapper>
     );
   }
 
   return (
-    <AuthScreenWrapper>
+    <AuthScreenWrapper backgroundColor="#f9f2e7">
       <header className="text-center">
-        <div className="flex justify-center">
-          <BrandHeading />
+        <div className="flex justify-center mb-2">
+          <Image
+            src="/logo/logo1.png"
+            alt="Gatherlii"
+            width={280}
+            height={72}
+            className="h-20 w-auto object-contain"
+            priority
+          />
         </div>
       </header>
 
-      <GlassCard>
-        <div className="mb-8">
+      <div className="flex flex-col gap-6">
+        <div>
           <h2
-            className="text-2xl font-semibold leading-tight mb-2"
-            style={{ color: BURGUNDY }}
+            className="text-xl font-medium leading-tight mb-2"
+            style={{ color: CHERRY }}
           >
             Create your account
           </h2>
           <p
-            className="text-sm font-medium"
+            className="text-xs font-normal"
             style={{ color: "#4B5563" }}
           >
             Sign up to get started
@@ -127,18 +133,18 @@ function RegisterForm() {
             <AuthButton loading={loading}>Sign Up</AuthButton>
           </div>
         </form>
-      </GlassCard>
+      </div>
 
       <footer className="text-center">
         <p
-          className="text-sm font-medium"
+          className="text-xs font-normal"
           style={{ color: "#4B5563" }}
         >
           Already have an account?{" "}
           <Link
             href={redirectTo !== "/dashboard" ? `/login?redirect=${encodeURIComponent(redirectTo)}` : "/login"}
-            className="font-semibold hover:underline underline-offset-4"
-            style={{ color: BURGUNDY }}
+            className="font-medium hover:underline underline-offset-4 text-xs"
+            style={{ color: CHERRY }}
           >
             Sign in
           </Link>
@@ -150,7 +156,7 @@ function RegisterForm() {
 
 export default function RegisterPage() {
   return (
-    <Suspense fallback={<AuthScreenWrapper><div className="flex items-center justify-center min-h-[200px]">Loading...</div></AuthScreenWrapper>}>
+    <Suspense fallback={<AuthScreenWrapper backgroundColor="#f9f2e7"><div className="flex items-center justify-center min-h-[200px]">Loading...</div></AuthScreenWrapper>}>
       <RegisterForm />
     </Suspense>
   );

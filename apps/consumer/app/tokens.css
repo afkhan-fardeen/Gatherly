@@ -5,7 +5,7 @@
 
 :root {
   /* RAW BRAND PALETTE */
-  --_burgundy:    #3F0810;
+  --_burgundy:    #6D0D35;
   --_cherry:      #6D0D35;
   --_lilac:       #CFD7F2;
   --_peach:       #FFBE90;
@@ -23,18 +23,18 @@
   --bg-section-cherry:#F9EEF3;
 
   /* TEXT */
-  --text-heading:     #2D0A12;
-  --text-title:       #3F0810;
+  --text-heading:     #5A0B2C;
+  --text-title:       #6D0D35;
   --text-body:        #5A1E2C;
   --text-secondary:   #8C5A68;
   --text-tertiary:    #BF9AA8;
   --text-inverse:     #FFFFFF;
-  --text-accent:      #3F0810;
+  --text-accent:      #6D0D35;
 
-  /* PRIMARY — Burgundy */
-  --primary:          #3F0810;
-  --primary-hover:    #2D0610;
-  --primary-pressed:  #1A0408;
+  /* PRIMARY — Cherry */
+  --primary:          #6D0D35;
+  --primary-hover:    #5A0B2C;
+  --primary-pressed:  #4A0923;
   --primary-subtle:   #F5ECF0;
   --primary-light:    #FAF0F4;
 
@@ -42,14 +42,14 @@
   --border-default:   #EAE0D0;
   --border-strong:    #D4C4AD;
   --border-subtle:    #F2EAD8;
-  --border-cherry:    #3F0810;
+  --border-cherry:    #6D0D35;
 
-  /* SHADOWS — warm burgundy, never cold grey */
-  --shadow-xs:     0 1px 3px rgba(63, 8, 16, 0.05);
-  --shadow-sm:     0 2px 8px rgba(63, 8, 16, 0.07);
-  --shadow-md:     0 4px 16px rgba(63, 8, 16, 0.09);
-  --shadow-lg:     0 8px 28px rgba(63, 8, 16, 0.11);
-  --shadow-xl:     0 16px 48px rgba(63, 8, 16, 0.13);
+  /* SHADOWS — warm cherry, never cold grey */
+  --shadow-xs:     0 1px 3px rgba(109, 13, 53, 0.05);
+  --shadow-sm:     0 2px 8px rgba(109, 13, 53, 0.07);
+  --shadow-md:     0 4px 16px rgba(109, 13, 53, 0.09);
+  --shadow-lg:     0 8px 28px rgba(109, 13, 53, 0.11);
+  --shadow-xl:     0 16px 48px rgba(109, 13, 53, 0.13);
   --shadow-focus:  0 0 0 3px rgba(109, 13, 53, 0.18);
   --shadow-cherry: 0 4px 14px rgba(109, 13, 53, 0.35);
 

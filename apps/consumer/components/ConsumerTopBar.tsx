@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { Bell } from "@phosphor-icons/react";
-import { Logo } from "./Logo";
 
 import { API_URL } from "@/lib/api";
 
@@ -36,7 +36,16 @@ export function ConsumerTopBar() {
             boxShadow: "var(--shadow-xs)",
           }}
         >
-        <Logo href="/dashboard" className="text-4xl md:text-5xl text-primary" />
+        <Link href="/dashboard" className="flex items-center shrink-0">
+          <Image
+            src="/logo/logo1.png"
+            alt="Gatherlii"
+            width={120}
+            height={40}
+            className="h-9 w-auto object-contain"
+            priority
+          />
+        </Link>
         <Link
           href="/notifications"
           className="relative flex items-center justify-center min-w-[44px] min-h-[44px] w-11 h-11 transition-colors hover:opacity-80"

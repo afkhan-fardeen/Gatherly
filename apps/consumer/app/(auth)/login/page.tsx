@@ -2,17 +2,16 @@
 
 import { Suspense, useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Envelope, Lock } from "@phosphor-icons/react";
 import { AuthScreenWrapper } from "@/components/auth/AuthScreenWrapper";
-import { BrandHeading } from "@/components/auth/BrandHeading";
-import { GlassCard } from "@/components/auth/GlassCard";
 import { AuthInput } from "@/components/ui/AuthInput";
 import { AuthButton } from "@/components/ui/AuthButton";
 import { API_URL, parseJsonResponse } from "@/lib/api";
 import { validateSession, setSession } from "@/lib/session";
 
-const BURGUNDY = "#3F0810";
+const CHERRY = "#6D0D35";
 
 function LoginForm() {
   const router = useRouter();
@@ -52,8 +51,8 @@ function LoginForm() {
       if (!res.ok) throw new Error(data.error || "Login failed");
       if (!data.token || !data.user) throw new Error("Invalid response from server");
       setSession(data.token, data.user);
-      router.push(redirectTo.startsWith("/") ? redirectTo : `/${redirectTo}`);
-      router.refresh();
+      const to = redirectTo.startsWith("/") ? redirectTo : `/${redirectTo}`;
+      window.location.href = to;
     } catch (err) {
       const msg = err instanceof Error ? err.message : "Login failed";
       setError(msg === "Failed to fetch" ? "Unable to connect. Please try again." : msg);
@@ -64,33 +63,40 @@ function LoginForm() {
 
   if (checkingAuth) {
     return (
-      <AuthScreenWrapper>
-        <div className="flex items-center justify-center min-h-[200px]">Loading...</div>
+      <AuthScreenWrapper backgroundColor="#f9f2e7">
+        <div className="flex items-center justify-center min-h-[200px] text-sm font-normal">Loading...</div>
       </AuthScreenWrapper>
     );
   }
 
   return (
-    <AuthScreenWrapper>
+    <AuthScreenWrapper backgroundColor="#f9f2e7">
       <header className="text-center">
-        <div className="flex justify-center">
-          <BrandHeading />
+        <div className="flex justify-center mb-2">
+          <Image
+            src="/logo/logo1.png"
+            alt="Gatherlii"
+            width={280}
+            height={72}
+            className="h-20 w-auto object-contain"
+            priority
+          />
         </div>
       </header>
 
-      <GlassCard>
-        <div className="mb-8">
+      <div className="flex flex-col gap-6">
+        <div>
           <h2
-            className="text-2xl font-semibold leading-tight mb-2"
-            style={{ color: BURGUNDY }}
+            className="text-xl font-medium leading-tight mb-2"
+            style={{ color: CHERRY }}
           >
             Welcome Back
           </h2>
           <p
-            className="text-sm font-medium"
+            className="text-xs font-normal"
             style={{ color: "#4B5563" }}
           >
-            Sign in to continue
+            Sign in to continue your journey
           </p>
         </div>
         <form onSubmit={handleSubmit} className="form-no-zoom space-y-5">
@@ -113,22 +119,31 @@ function LoginForm() {
             required
             icon={<Lock size={22} weight="regular" />}
           />
+          <div className="flex justify-end -mt-1">
+            <Link
+              href="/forgot-password"
+              className="text-[11px] font-normal hover:underline"
+              style={{ color: CHERRY }}
+            >
+              Forgot password?
+            </Link>
+          </div>
           <div className="mt-4">
             <AuthButton loading={loading}>Sign In</AuthButton>
           </div>
         </form>
-      </GlassCard>
+      </div>
 
       <footer className="text-center">
         <p
-          className="text-sm font-medium"
+          className="text-xs font-normal"
           style={{ color: "#4B5563" }}
         >
           Don&apos;t have an account?{" "}
           <Link
             href="/register"
-            className="font-semibold hover:underline underline-offset-4"
-            style={{ color: BURGUNDY }}
+            className="font-medium hover:underline underline-offset-4 text-xs"
+            style={{ color: CHERRY }}
           >
             Sign up
           </Link>
@@ -140,7 +155,7 @@ function LoginForm() {
 
 export default function LoginPage() {
   return (
-    <Suspense fallback={<AuthScreenWrapper><div className="flex items-center justify-center min-h-[200px]">Loading...</div></AuthScreenWrapper>}>
+    <Suspense fallback={<AuthScreenWrapper backgroundColor="#f9f2e7"><div className="flex items-center justify-center min-h-[200px]">Loading...</div></AuthScreenWrapper>}>
       <LoginForm />
     </Suspense>
   );

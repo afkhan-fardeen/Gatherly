@@ -26,19 +26,26 @@ export function setSession(token: string, user: unknown): void {
   localStorage.setItem(USER_KEY, JSON.stringify(user));
 }
 
+const VALIDATE_TIMEOUT_MS = 5000;
+
 /**
  * Validates token via /api/auth/me.
  * Returns user if valid, null if invalid/expired.
  * Clears session automatically on 401.
+ * Times out after 5s if API is unreachable to avoid infinite loading.
  */
 export async function validateSession(): Promise<{ valid: true; user: unknown } | { valid: false }> {
   const token = getToken();
   if (!token) return { valid: false };
 
   try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), VALIDATE_TIMEOUT_MS);
     const res = await fetch(`${API_URL}/api/auth/me`, {
       headers: { Authorization: `Bearer ${token}` },
+      signal: controller.signal,
     });
+    clearTimeout(timeoutId);
     if (res.status === 401) {
       clearSession();
       return { valid: false };

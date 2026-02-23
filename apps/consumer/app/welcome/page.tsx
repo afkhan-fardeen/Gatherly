@@ -3,7 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 
-const BURGUNDY = "#3F0810";
+const CHERRY = "#6D0D35";
 const BODY_COLOR = "#4B5563";
 
 export default function WelcomePage() {
@@ -45,8 +45,8 @@ export default function WelcomePage() {
       <div className="flex-1 min-h-0 flex flex-col items-center justify-center w-full max-w-[400px] px-6 pb-6 mx-auto">
         <div className="text-center space-y-2">
           <h1
-            className="font-logo text-4xl font-normal tracking-tight"
-            style={{ color: BURGUNDY }}
+            className="font-serif text-4xl font-normal tracking-tight"
+            style={{ color: CHERRY }}
           >
             Welcome to Gatherlii
           </h1>
@@ -69,7 +69,7 @@ export default function WelcomePage() {
           href="/get-started"
           className="w-full h-12 mt-6 flex items-center justify-center font-semibold rounded-full text-white transition-all active:scale-[0.98]"
           style={{
-            backgroundColor: BURGUNDY,
+            backgroundColor: CHERRY,
               boxShadow: "0 10px 15px -3px rgba(109, 13, 53, 0.2)",
           }}
         >

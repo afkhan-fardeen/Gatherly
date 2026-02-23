@@ -1,6 +1,6 @@
 import { Logo } from "../Logo";
 
-const BURGUNDY = "#3F0810";
+const CHERRY = "#6D0D35";
 
 interface AuthLayoutProps {
   title: string;
@@ -18,8 +18,8 @@ export function AuthLayout({ title, children, footer }: AuthLayoutProps) {
         <div className="flex flex-col items-center mb-10">
           <Logo href="/welcome" className="mb-6 text-3xl text-primary" />
           <h1
-          className="text-[28px] font-bold tracking-tight leading-tight text-center"
-          style={{ color: BURGUNDY }}
+          className="font-serif text-[28px] font-normal tracking-tight leading-tight text-center"
+          style={{ color: CHERRY }}
         >
             {title}
           </h1>

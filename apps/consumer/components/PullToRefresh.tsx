@@ -3,7 +3,7 @@
 import { useCallback, useRef, useState } from "react";
 import { ArrowClockwise } from "@phosphor-icons/react";
 
-const BURGUNDY = "#3F0810";
+const CHERRY = "#6D0D35";
 const THRESHOLD = 70;
 
 interface PullToRefreshProps {
@@ -58,7 +58,7 @@ export function PullToRefresh({ children, onRefresh }: PullToRefreshProps) {
         <div
           className="flex items-center justify-center py-3 text-sm font-medium transition-opacity"
           style={{
-            color: BURGUNDY,
+            color: CHERRY,
             height: refreshing ? 48 : Math.min(pullY, THRESHOLD),
             opacity: refreshing ? 1 : pullY / THRESHOLD,
           }}

@@ -1,6 +1,6 @@
 /** Shared design tokens (guidelines.md reference) */
-/** Primary brand color — Burgundy */
-export const CHERRY = "#3F0810";
+/** Primary brand color — Cherry */
+export const CHERRY = "#6D0D35";
 /** 14px radius for cards (guideline radius-md) */
 export const ROUND = "rounded-radius-md";
 
@@ -19,23 +19,23 @@ export const TEXT_BODY = "#2D2D2D";
 export const TEXT_SECONDARY = "#6B6B6B";
 export const TEXT_TERTIARY = "#9E9E9E";
 
-/** Typography – 500 headlines, 400 body, 300 captions (Plus Jakarta Sans) */
+/** Typography – Cormorant Garamond for headings, Poppins for body */
 export const TYPO = {
-  /** Page title – H1 20px, 500. Primary text */
-  H1: "text-typo-h1 font-medium tracking-tight text-text-primary",
-  /** Compact page title – 16px */
-  H1_SM: "text-body-lg font-medium tracking-tight text-text-primary",
-  /** Large page title – 20px (greeting). Primary text */
-  H1_LARGE: "text-typo-h1 font-medium tracking-tight text-text-primary",
-  /** Section heading – H2 17px, 500. Primary text */
-  H2: "text-typo-h2 font-medium text-text-primary",
-  /** Subsection – H3 15px, 500. Primary text */
-  H3: "text-typo-h3 font-medium text-text-primary",
+  /** Page title – H1 20px, Cormorant. Primary text */
+  H1: "font-serif text-typo-h1 font-normal tracking-tight text-text-primary",
+  /** Compact page title – 16px, Cormorant */
+  H1_SM: "font-serif text-body-lg font-normal tracking-tight text-text-primary",
+  /** Large page title – 20px (greeting), Cormorant. Primary text */
+  H1_LARGE: "font-serif text-typo-h1 font-normal tracking-tight text-text-primary",
+  /** Section heading – H2 17px, Cormorant. Primary text */
+  H2: "font-serif text-typo-h2 font-normal text-text-primary",
+  /** Subsection – H3 15px, Cormorant. Primary text */
+  H3: "font-serif text-typo-h3 font-normal text-text-primary",
   /** Label / Badge – 12px, 500 (hard floor). Primary text */
   LABEL: "text-caption font-medium text-text-primary",
   H3_LABEL: "text-caption font-medium uppercase tracking-wider text-text-primary",
-  /** Card title – H3 15px, 500. Primary text */
-  CARD_TITLE: "text-typo-h3 font-medium text-text-primary",
+  /** Card title – H3 15px, Cormorant. Primary text */
+  CARD_TITLE: "font-serif text-typo-h3 font-normal text-text-primary",
   /** Body – 14px, 400. Body text */
   BODY: "text-body font-normal text-text-body",
   /** Body medium – 14px, 500 (prices, ETA, key data). Secondary text */
@@ -59,13 +59,17 @@ export const MINTY_LIME = "#a8e6cf";
 export const MINTY_LIME_DARK = "#5cb87a";
 export const WARM_PEACH = "#ffdab9";
 export const WARM_PEACH_DARK = "#d4845c";
-/** Burgundy variants (replacing purple) */
-export const BURGUNDY_LIGHT = "#e8d4d8";
-export const BURGUNDY_DARK = "#8B3A4A";
-/** @deprecated Use BURGUNDY_LIGHT */
-export const SOFT_LILAC = "#e8d4d8";
-/** @deprecated Use BURGUNDY_DARK */
-export const SOFT_LILAC_DARK = "#8B3A4A";
+/** Cherry variants */
+export const CHERRY_LIGHT = "#f0d4e0";
+export const CHERRY_DARK = "#8A1045";
+/** @deprecated Use CHERRY_LIGHT */
+export const BURGUNDY_LIGHT = "#f0d4e0";
+/** @deprecated Use CHERRY_DARK */
+export const BURGUNDY_DARK = "#8A1045";
+/** @deprecated Use CHERRY_LIGHT */
+export const SOFT_LILAC = "#f0d4e0";
+/** @deprecated Use CHERRY_DARK */
+export const SOFT_LILAC_DARK = "#8A1045";
 /** Use for icon buttons and pill-shaped buttons */
 export const ROUND_FULL = "rounded-full";
 
@@ -88,13 +92,13 @@ export const BUTTON = {
 /** Input size stack – 44px min, 48px search, 52px default. All pill-shaped. */
 export const INPUT = {
   /** Primary input: 52px, pill */
-  PRIMARY: "w-full h-[52px] px-5 text-sm font-normal text-text-primary placeholder:text-text-tertiary bg-white border border-slate-200 rounded-full focus:ring-2 focus:ring-[#3F0810]/20 focus:border-[#3F0810]/40 outline-none transition-all duration-200",
+  PRIMARY: "w-full h-[52px] px-5 text-sm font-normal text-text-primary placeholder:text-text-tertiary bg-white border border-slate-200 rounded-full focus:ring-2 focus:ring-primary/20 focus:border-primary/40 outline-none transition-all duration-200",
   /** Search bar: 48px, pill */
-  SEARCH: "w-full h-12 pl-5 pr-5 text-sm font-normal text-text-primary placeholder:text-text-tertiary bg-white border border-slate-200 rounded-full focus:ring-2 focus:ring-[#3F0810]/20 focus:border-[#3F0810]/40 outline-none transition-all duration-200",
+  SEARCH: "w-full h-12 pl-5 pr-5 text-sm font-normal text-text-primary placeholder:text-text-tertiary bg-white border border-slate-200 rounded-full focus:ring-2 focus:ring-primary/20 focus:border-primary/40 outline-none transition-all duration-200",
   /** Compact: 44px, pill */
-  COMPACT: "w-full h-11 px-4 text-sm font-normal text-text-primary placeholder:text-text-tertiary bg-white border border-slate-200 rounded-full focus:ring-2 focus:ring-[#3F0810]/20 focus:border-[#3F0810]/40 outline-none transition-all duration-200",
+  COMPACT: "w-full h-11 px-4 text-sm font-normal text-text-primary placeholder:text-text-tertiary bg-white border border-slate-200 rounded-full focus:ring-2 focus:ring-primary/20 focus:border-primary/40 outline-none transition-all duration-200",
   /** Textarea: min 96px, rounded-xl (not full pill) */
-  TEXTAREA: "w-full min-h-[96px] px-5 py-4 text-sm font-normal text-text-primary placeholder:text-text-tertiary bg-white border border-slate-200 rounded-2xl focus:ring-2 focus:ring-[#3F0810]/20 focus:border-[#3F0810]/40 outline-none transition-all duration-200 resize-none",
+  TEXTAREA: "w-full min-h-[96px] px-5 py-4 text-sm font-normal text-text-primary placeholder:text-text-tertiary bg-white border border-slate-200 rounded-2xl focus:ring-2 focus:ring-primary/20 focus:border-primary/40 outline-none transition-all duration-200 resize-none",
 } as const;
 
 /** @deprecated Use BUTTON.PRIMARY */

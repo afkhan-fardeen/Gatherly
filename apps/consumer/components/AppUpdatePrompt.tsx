@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { ArrowClockwise } from "@phosphor-icons/react";
 
-const BURGUNDY = "#3F0810";
+const CHERRY = "#6D0D35";
 const UPDATE_CHECK_INTERVAL_MS = 30_000; // Check every 30s for quick updates
 
 function checkForUpdates() {
@@ -62,7 +62,7 @@ export function AppUpdatePrompt() {
       <div className="max-w-sm w-full text-center">
         <div
           className="w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center"
-          style={{ backgroundColor: `${BURGUNDY}15` }}
+          style={{ backgroundColor: `${CHERRY}15` }}
         >
           <ArrowClockwise size={32} weight="bold" className="text-primary" />
         </div>
@@ -75,7 +75,7 @@ export function AppUpdatePrompt() {
         <button
           onClick={() => window.location.reload()}
           className="w-full py-3 px-4 rounded-xl text-white font-semibold text-base flex items-center justify-center gap-2"
-          style={{ backgroundColor: BURGUNDY }}
+          style={{ backgroundColor: CHERRY }}
         >
           <ArrowClockwise size={20} weight="bold" />
           Update now

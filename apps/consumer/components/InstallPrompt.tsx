@@ -8,7 +8,7 @@ import { X } from "@phosphor-icons/react";
 const INSTALL_PROMPT_ROUTES = ["/", "/welcome", "/get-started", "/dashboard"];
 const DASHBOARD_ONCE_KEY = "installPromptDashboardShown";
 
-const BURGUNDY = "#3F0810";
+const CHERRY = "#6D0D35";
 const DISMISS_KEY = "installPromptDismissed";
 
 function isIOS(): boolean {
@@ -95,7 +95,7 @@ export function InstallPrompt() {
     >
       <div className="max-w-[400px] mx-auto flex items-start gap-3">
         <div className="flex-1 min-w-0">
-          <p className="text-sm font-semibold" style={{ color: BURGUNDY }}>
+          <p className="text-sm font-semibold" style={{ color: CHERRY }}>
             Install the app
           </p>
           <p className="text-xs mt-0.5" style={{ color: "#4B5563" }}>
@@ -121,7 +121,7 @@ export function InstallPrompt() {
             onClick={handleInstall}
             className="flex-1 h-[52px] rounded-xl font-semibold text-base text-white transition-all active:scale-[0.98]"
             style={{
-              backgroundColor: BURGUNDY,
+              backgroundColor: CHERRY,
               boxShadow: "0 4px 12px rgba(109, 13, 53, 0.2)",
             }}
           >
@@ -131,7 +131,7 @@ export function InstallPrompt() {
             type="button"
             onClick={handleDismiss}
             className="flex-1 h-12 rounded-xl font-semibold text-sm border transition-all active:scale-[0.98]"
-            style={{ borderColor: BURGUNDY, color: BURGUNDY }}
+            style={{ borderColor: CHERRY, color: CHERRY }}
           >
             Not now
           </button>

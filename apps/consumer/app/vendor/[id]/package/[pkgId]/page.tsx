@@ -21,7 +21,8 @@ import {
   draftMatchesVendorPackage,
 } from "@/lib/booking-draft";
 
-import { API_URL } from "@/lib/api";
+import { API_URL, fetchAuth } from "@/lib/api";
+import { getToken } from "@/lib/session";
 
 interface Package {
   id: string;
@@ -120,7 +121,7 @@ export default function PackageDetailPage() {
   };
 
   const handleBookClick = () => {
-    const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
+    const token = getToken();
     if (!token) {
       router.push("/login");
       return;
@@ -136,16 +137,29 @@ export default function PackageDetailPage() {
     }
     setGuestError("");
     setShowBookModal(false);
+
+    // If we have eventId from URL (e.g. from event services flow), go straight to book page
+    if (eventIdFromUrl) {
+      const clamped = Math.max(minG, Math.min(n, maxG === Infinity ? 9999 : maxG));
+      saveBookingDraft({ vendorId: id, packageId: pkgId, guestCount: clamped, eventId: eventIdFromUrl });
+      router.push(`/vendor/${id}/book?packageId=${pkgId}&eventId=${eventIdFromUrl}&guestCount=${clamped}`);
+      return;
+    }
+
     setShowEventPicker(true);
     setEventsLoading(true);
-    fetch(`${API_URL}/api/events`, { headers: { Authorization: `Bearer ${token}` } })
-      .then((res) => (res.ok ? res.json() : []))
-      .then((list: Event[]) => {
-        const upcoming = list.filter((e) => new Date(e.date) >= new Date());
+    fetchAuth(`${API_URL}/api/events`)
+      .then((res) => (res.ok ? res.json() : Promise.resolve([])))
+      .then((data: unknown) => {
+        const list = Array.isArray(data) ? data : [];
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const upcoming = list.filter((e: Event) => {
+          const d = new Date(e.date);
+          d.setHours(0, 0, 0, 0);
+          return d >= today;
+        });
         setEvents(upcoming);
-        if (eventIdFromUrl && upcoming.some((e) => e.id === eventIdFromUrl)) {
-          selectEvent(eventIdFromUrl);
-        }
       })
       .catch(() => setEvents([]))
       .finally(() => setEventsLoading(false));
@@ -240,7 +254,7 @@ export default function PackageDetailPage() {
             )}
 
             <div>
-              <h2 className="text-typo-h2 font-medium text-text-primary">{pkg.name}</h2>
+              <h2 className="font-serif text-typo-h2 font-normal text-text-primary">{pkg.name}</h2>
               {pkg.description && (
                 <p className="text-body font-normal text-text-body mt-2 leading-relaxed">{pkg.description}</p>
               )}
@@ -299,7 +313,7 @@ export default function PackageDetailPage() {
           </div>
         </main>
 
-        {/* Floating Book now button */}
+        {/* Floating Request booking button */}
         <button
           type="button"
           onClick={() => {
@@ -313,11 +327,11 @@ export default function PackageDetailPage() {
           className="fixed right-5 z-50 h-11 px-5 rounded-full font-medium text-sm text-white flex items-center gap-1.5 shadow-md active:scale-[0.98] transition-transform"
           style={{
             bottom: "calc(1.5rem + env(safe-area-inset-bottom, 0px))",
-            backgroundColor: "#3F0810",
+            backgroundColor: "#6D0D35",
             boxShadow: "0 2px 12px rgba(63, 8, 16, 0.25)",
           }}
         >
-          Book now
+          Request booking
           <CaretRight size={18} weight="bold" />
         </button>
 
@@ -433,7 +447,7 @@ export default function PackageDetailPage() {
                 type="button"
                 onClick={handleBookClick}
                 className="w-full h-12 rounded-full font-semibold text-base text-white flex items-center justify-center gap-2 active:scale-[0.98]"
-                style={{ backgroundColor: "#3F0810" }}
+                style={{ backgroundColor: "#6D0D35" }}
               >
                 Continue to select event
                 <CaretRight size={22} weight="bold" />
@@ -482,7 +496,7 @@ export default function PackageDetailPage() {
                   <Link
                     href="/events/create"
                     className="inline-flex items-center gap-2 py-3 px-5 rounded-full font-medium text-sm text-white"
-                    style={{ backgroundColor: "#3F0810" }}
+                    style={{ backgroundColor: "#6D0D35" }}
                   >
                     Create event
                     <CaretRight size={18} weight="bold" />

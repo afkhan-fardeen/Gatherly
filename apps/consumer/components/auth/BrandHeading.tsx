@@ -1,6 +1,6 @@
 "use client";
 
-const BURGUNDY = "#3F0810";
+const CHERRY = "#6D0D35";
 
 interface BrandHeadingProps {
   className?: string;
@@ -9,8 +9,8 @@ interface BrandHeadingProps {
 export function BrandHeading({ className = "" }: BrandHeadingProps) {
   return (
     <h1
-      className={`font-logo text-6xl font-normal tracking-tight ${className}`}
-      style={{ color: BURGUNDY }}
+      className={`font-serif text-6xl font-normal tracking-tight ${className}`}
+      style={{ color: CHERRY }}
     >
       Gatherlii
     </h1>
