@@ -31,3 +31,6 @@ coverage
 
 # Misc
 *.tsbuildinfo
+
+# Font source (fonts are in apps/consumer/public/fonts/)
+Lora_Font_Family*/

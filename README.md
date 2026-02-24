@@ -90,15 +90,18 @@ Postgres stays on the host at `localhost:5432`; the API and consumer both bind t
 ```
 gatherly-v1/
 ├── apps/
-│   └── consumer/     # Consumer web app (Next.js)
+│   ├── consumer/     # Consumer PWA (Next.js) — event planning, bookings
+│   └── vendor/       # Vendor dashboard (Next.js)
 ├── packages/
 │   ├── api/          # Backend (Express + Prisma)
 │   └── shared/       # Shared types & schemas
-├── docs/
-│   ├── plans/        # Saved plans
-│   └── plan-changes.md
+├── docs/             # PRD, features, plans, migration guides
+├── scripts/          # test-api.sh, etc.
 └── docker-compose.yml
 ```
+
+- **Consumer:** `apps/consumer/DOCS.md` — PWA, routes, components
+- **API:** `packages/api/` — Prisma schema, routes
 
 ## API endpoints
 
