@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Poppins, Dancing_Script, Cormorant_Garamond } from "next/font/google";
+import { Poppins, Dancing_Script } from "next/font/google";
 import { Toaster } from "react-hot-toast";
 import { PageTransition } from "@/components/PageTransition";
 import { AppBootstrap } from "@/components/AppBootstrap";
@@ -19,14 +19,6 @@ const dancingScript = Dancing_Script({
   weight: ["400", "500", "600", "700"],
   display: "swap",
   variable: "--font-dancing",
-});
-
-const cormorant = Cormorant_Garamond({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-  style: ["normal", "italic"],
-  display: "swap",
-  variable: "--font-cormorant",
 });
 
 export const metadata: Metadata = {
@@ -59,7 +51,7 @@ export default function RootLayout({
           content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"
         />
       </head>
-      <body className={`antialiased min-h-screen ${poppins.className} ${dancingScript.variable} ${cormorant.variable}`}>
+      <body className={`antialiased min-h-screen ${poppins.className} ${dancingScript.variable}`}>
         <OfflineBanner />
         <AppBootstrap>
           <PageTransition>{children}</PageTransition>

@@ -19,23 +19,23 @@ export const TEXT_BODY = "#2D2D2D";
 export const TEXT_SECONDARY = "#6B6B6B";
 export const TEXT_TERTIARY = "#9E9E9E";
 
-/** Typography – Cormorant Garamond for headings, Poppins for body */
+/** Typography – Lora for headings, Poppins for body */
 export const TYPO = {
-  /** Page title – H1 20px, Cormorant. Primary text */
-  H1: "font-serif text-typo-h1 font-medium tracking-tight text-text-primary",
-  /** Compact page title – 16px, Cormorant */
-  H1_SM: "font-serif text-body-lg font-medium tracking-tight text-text-primary",
-  /** Large page title – 20px (greeting), Cormorant. Primary text */
-  H1_LARGE: "font-serif text-typo-h1 font-medium tracking-tight text-text-primary",
-  /** Section heading – H2 17px, Cormorant. Primary text */
-  H2: "font-serif text-typo-h2 font-medium text-text-primary",
-  /** Subsection – H3 15px, Cormorant. Primary text */
-  H3: "font-serif text-typo-h3 font-medium text-text-primary",
+  /** Page title – H1 20px, Lora. Primary text */
+  H1: "font-serif text-typo-h1 font-semibold tracking-tight text-text-primary",
+  /** Compact page title – 16px, Lora */
+  H1_SM: "font-serif text-body-lg font-semibold tracking-tight text-text-primary",
+  /** Large page title – 20px (greeting), Lora. Primary text */
+  H1_LARGE: "font-serif text-typo-h1 font-semibold tracking-tight text-text-primary",
+  /** Section heading – H2 17px, Lora. Primary text */
+  H2: "font-serif text-typo-h2 font-semibold text-text-primary",
+  /** Subsection – H3 15px, Lora. Primary text */
+  H3: "font-serif text-typo-h3 font-semibold text-text-primary",
   /** Label / Badge – 12px, 500 (hard floor). Primary text */
   LABEL: "text-caption font-medium text-text-primary",
   H3_LABEL: "text-caption font-medium uppercase tracking-wider text-text-primary",
-  /** Card title – H3 15px, Cormorant. Primary text */
-  CARD_TITLE: "font-serif text-typo-h3 font-medium text-text-primary",
+  /** Card title – H3 15px, Lora. Primary text */
+  CARD_TITLE: "font-serif text-typo-h3 font-semibold text-text-primary",
   /** Body – 14px, 400. Body text */
   BODY: "text-body font-normal text-text-body",
   /** Body medium – 14px, 500 (prices, ETA, key data). Secondary text */
@@ -62,14 +62,6 @@ export const WARM_PEACH_DARK = "#d4845c";
 /** Cherry variants */
 export const CHERRY_LIGHT = "#f0d4e0";
 export const CHERRY_DARK = "#8A1045";
-/** @deprecated Use CHERRY_LIGHT */
-export const BURGUNDY_LIGHT = "#f0d4e0";
-/** @deprecated Use CHERRY_DARK */
-export const BURGUNDY_DARK = "#8A1045";
-/** @deprecated Use CHERRY_LIGHT */
-export const SOFT_LILAC = "#f0d4e0";
-/** @deprecated Use CHERRY_DARK */
-export const SOFT_LILAC_DARK = "#8A1045";
 /** Use for icon buttons and pill-shaped buttons */
 export const ROUND_FULL = "rounded-full";
 
@@ -101,12 +93,6 @@ export const INPUT = {
   TEXTAREA: "w-full min-h-[96px] px-5 py-4 text-sm font-normal text-text-primary placeholder:text-text-tertiary bg-white border border-slate-200 rounded-2xl focus:ring-2 focus:ring-primary/20 focus:border-primary/40 outline-none transition-all duration-200 resize-none",
 } as const;
 
-/** @deprecated Use BUTTON.PRIMARY */
-export const BUTTON_CLASS = BUTTON.PRIMARY;
-
-/** @deprecated Use INPUT.PRIMARY or INPUT.SEARCH */
-export const INPUT_CLASS = INPUT.PRIMARY;
-
 export const LABEL_CLASS =
   "block text-body font-bold uppercase tracking-wider text-[#5cb87a]";
 
@@ -116,5 +102,3 @@ export const CARD = {
   PADDING: "p-5",
   HOVER: "transition-all hover:border-slate-300 hover:shadow-elevation-2 active:scale-[0.99]",
 } as const;
-/** @deprecated Use CARD.BASE + CARD.PADDING */
-export const CARD_CLASS = `bg-white border border-slate-200 rounded-2xl p-5 shadow-elevation-1`;

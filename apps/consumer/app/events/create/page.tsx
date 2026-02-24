@@ -20,6 +20,7 @@ import {
 import { AppLayout } from "@/components/AppLayout";
 import { parseApiError, API_URL, getNetworkErrorMessage } from "@/lib/api";
 import { compressImage } from "@/lib/compress-image";
+import { formatDateShort, formatTimeFromHHMM } from "@/lib/date-utils";
 import { getEventCreateDraft, saveEventCreateDraft, clearEventCreateDraft } from "@/lib/event-create-draft";
 import toast from "react-hot-toast";
 
@@ -144,19 +145,12 @@ function CreateEventContent() {
   const progressPct = Math.max(10, (progressSteps.filter(Boolean).length / 4) * 100);
 
   const datePreview = form.date
-    ? new Date(form.date + "T00:00:00").toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) +
-      (form.timeStart ? " · " + formatTime(form.timeStart) : "")
+    ? formatDateShort(form.date + "T00:00:00") +
+      (form.timeStart ? " · " + formatTimeFromHHMM(form.timeStart) : "")
     : "— — —";
 
   const locationPreview = form.location || "—";
   const guestPreview = form.guestCount > 0 ? `${form.guestCount} guests` : "—";
-
-  function formatTime(t: string) {
-    if (!t) return "";
-    const [h, m] = t.split(":");
-    const hr = parseInt(h || "0", 10) % 12 || 12;
-    return `${hr}:${m || "00"} ${parseInt(h || "0", 10) < 12 ? "AM" : "PM"}`;
-  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();

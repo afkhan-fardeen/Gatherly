@@ -213,15 +213,15 @@ export default function VendorProfilePage() {
           {/* Stats */}
           <div className="flex py-4 border-b border-primary/8 animate-fade-in-up" style={{ animationDelay: "0.05s" }}>
             <div className="flex-1 text-center relative">
-              <span className="text-[22px] font-medium text-primary leading-none block mb-1">{capacityStr}</span>
+              <span className="font-serif text-[22px] font-semibold text-primary leading-none block mb-1">{capacityStr}</span>
               <span className="text-[9px] font-normal uppercase tracking-wider text-[#a0888d]">Capacity</span>
             </div>
             <div className="flex-1 text-center border-l border-primary/10">
-              <span className="text-[22px] font-medium text-primary leading-none block mb-1">{vendor.businessType || "Catering"}</span>
+              <span className="font-serif text-[22px] font-semibold text-primary leading-none block mb-1">{vendor.businessType || "Catering"}</span>
               <span className="text-[9px] font-normal uppercase tracking-wider text-[#a0888d]">Category</span>
             </div>
             <div className="flex-1 text-center border-l border-primary/10">
-              <span className="text-[22px] font-medium text-primary leading-none block mb-1">{minPrice != null ? `${minPrice} BD` : "—"}</span>
+              <span className="font-serif text-[22px] font-semibold text-primary leading-none block mb-1">{minPrice != null ? `${minPrice} BD` : "—"}</span>
               <span className="text-[9px] font-normal uppercase tracking-wider text-[#a0888d]">From</span>
             </div>
           </div>
@@ -272,11 +272,11 @@ export default function VendorProfilePage() {
                           />
                         </div>
                         <div className="flex-1 min-w-0">
-                          <h3 className="font-serif text-[18px] font-medium text-[#1e0f14] tracking-[-0.2px] mb-0.5">{pkg.name}</h3>
+                          <h3 className="font-serif text-[16px] font-semibold text-[#1e0f14] tracking-[-0.2px] mb-0.5">{pkg.name}</h3>
                           <p className="text-[11.5px] font-light text-[#a0888d]">{capLabel || "—"}</p>
                         </div>
                         <div className="text-right shrink-0">
-                          <div className="font-serif text-[22px] font-medium text-primary leading-none">{Number(pkg.basePrice).toFixed(0)} BD</div>
+                          <div className="font-serif text-[22px] font-semibold text-primary leading-none">{Number(pkg.basePrice).toFixed(0)} BD</div>
                           <div className="text-[10px] font-light text-[#a0888d]">{priceSuffix}</div>
                         </div>
                       </div>

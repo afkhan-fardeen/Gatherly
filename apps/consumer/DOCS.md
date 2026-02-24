@@ -149,7 +149,6 @@ apps/consumer/
 │   └── auth/
 │       ├── AuthScreenWrapper.tsx
 │       ├── BrandHeading.tsx
-│       ├── GlassCard.tsx
 │       └── ...
 ├── hooks/
 │   └── useDisplayMode.ts

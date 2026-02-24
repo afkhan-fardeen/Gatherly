@@ -14,6 +14,7 @@ import {
   Calendar,
 } from "@phosphor-icons/react";
 import { validateSession, getToken } from "@/lib/session";
+import { HomePageSkeleton } from "@/components/HomePageSkeleton";
 
 const PRIMARY = "#6D0D35";
 const TEXT = "#1e0f14";
@@ -66,16 +67,12 @@ export default function HomePage() {
     return () => observer.disconnect();
   }, []);
 
+  if (checking) {
+    return <HomePageSkeleton />;
+  }
+
   return (
     <div className="min-h-screen bg-white" style={{ color: TEXT }}>
-      {checking && (
-        <div className="fixed inset-0 z-[200] flex items-center justify-center bg-white">
-          <div className="flex flex-col items-center gap-3">
-            <div className="w-8 h-8 rounded-full border-2 border-primary border-t-transparent animate-spin" />
-            <span className="text-[14px] font-medium text-primary">Loading...</span>
-          </div>
-        </div>
-      )}
       {/* Noise overlay */}
       <div
         className="fixed inset-0 pointer-events-none z-[9999] opacity-[0.025]"

@@ -15,6 +15,7 @@ import {
 import { AppLayout } from "@/components/AppLayout";
 import { PullToRefresh } from "@/components/PullToRefresh";
 import { API_URL } from "@/lib/api";
+import { formatTime } from "@/lib/date-utils";
 
 interface Event {
   id: string;
@@ -31,19 +32,6 @@ interface Event {
 }
 
 type Tab = "upcoming" | "past";
-
-function formatTime(timeStart: string | { toISOString?: () => string } | null): string {
-  if (!timeStart) return "";
-  const str = typeof timeStart === "string" ? timeStart : (timeStart as { toISOString?: () => string })?.toISOString?.();
-  if (!str) return "";
-  try {
-    const iso = str.includes("T") ? str : `1970-01-01T${str}`;
-    const t = new Date(iso);
-    return t.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", hour12: true });
-  } catch {
-    return "";
-  }
-}
 
 function getStatusDisplay(status: string | undefined, isPast: boolean): { label: string; className: string } {
   const s = status || "draft";
@@ -168,7 +156,7 @@ export default function EventsPage() {
                 >
                   <Calendar size={26} weight="regular" />
                 </div>
-                <h3 className="font-serif text-[22px] font-medium text-[#1e0f14] mb-1.5">
+                <h3 className="font-serif text-[20px] font-semibold text-[#1e0f14] mb-1.5">
                   {tab === "upcoming" ? "No upcoming events" : "No past events"}
                 </h3>
                 <p className="text-[13px] font-light text-[#9e8085]">
@@ -188,7 +176,7 @@ export default function EventsPage() {
               </div>
             ) : (
               <>
-                <p className="font-serif text-[10px] font-semibold uppercase tracking-[2px] text-[#5c3d47] mb-3 pl-0.5">
+                <p className="font-serif text-[11px] font-semibold uppercase tracking-[2px] text-[#5c3d47] mb-3 pl-0.5">
                   {tab === "upcoming" ? "Upcoming Events" : "Past Events"}
                 </p>
                 <div className="flex flex-col gap-3 md:grid md:grid-cols-2 md:gap-4">
@@ -213,13 +201,13 @@ export default function EventsPage() {
                             className="w-[72px] shrink-0 flex flex-col items-center justify-center gap-0.5 py-4 px-2 border-r border-primary/10"
                             style={{ background: i % 2 === 0 ? "#E5EDBF" : "#CFD7F2" }}
                           >
-                            <span className="text-[9px] font-semibold uppercase tracking-[1.5px] text-primary">
+                            <span className="font-serif text-[10px] font-semibold uppercase tracking-[1.5px] text-primary">
                               {d.toLocaleDateString("en-US", { month: "short" })}
                             </span>
-                            <span className="font-serif text-[28px] font-medium leading-none text-[#1e0f14]">
+                            <span className="font-serif text-[26px] font-semibold leading-none text-[#1e0f14]">
                               {d.getDate()}
                             </span>
-                            <span className="text-[9px] font-light text-[#a0888d]">
+                            <span className="font-serif text-[10px] font-semibold text-[#a0888d]">
                               {d.toLocaleDateString("en-US", { weekday: "short" })}
                             </span>
                           </div>
@@ -227,7 +215,7 @@ export default function EventsPage() {
                           {/* Event body */}
                           <div className="flex-1 min-w-0 py-3.5 px-4 flex flex-col gap-1.5">
                             <div className="flex items-start justify-between gap-2">
-                              <h3 className="font-serif text-[18px] font-medium text-[#1e0f14] tracking-[-0.2px] truncate">
+                              <h3 className="font-serif text-[15px] font-semibold text-[#1e0f14] tracking-[-0.2px] truncate">
                                 {event.name}
                               </h3>
                               <CaretRight size={14} weight="bold" className="text-[#9e8085] shrink-0 mt-0.5 transition-all group-hover:translate-x-0.5 group-hover:text-primary" />

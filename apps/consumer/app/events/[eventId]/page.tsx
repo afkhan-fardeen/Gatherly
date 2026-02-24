@@ -19,6 +19,7 @@ import {
 import { AppLayout } from "@/components/AppLayout";
 import { StatusBadge } from "@/components/ui/StatusBadge";
 import { API_URL } from "@/lib/api";
+import { formatDateLong, formatTime } from "@/lib/date-utils";
 import { ROUND, TYPO } from "@/lib/events-ui";
 
 interface Event {
@@ -130,21 +131,7 @@ export default function EventDetailPage() {
   }
 
   const isPast = new Date(event.date) < new Date();
-  const dateStr = new Date(event.date).toLocaleDateString("en-US", {
-    weekday: "long",
-    month: "long",
-    day: "numeric",
-    year: "numeric",
-  });
-  function formatTime(t: string | null | undefined): string {
-    if (!t) return "";
-    try {
-      const d = new Date(t.includes("T") ? t : `1970-01-01T${t}`);
-      return d.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", hour12: true });
-    } catch {
-      return String(t);
-    }
-  }
+  const dateStr = formatDateLong(event.date);
   const timeStr = event.timeStart
     ? event.timeEnd
       ? `${formatTime(event.timeStart)} – ${formatTime(event.timeEnd)}`

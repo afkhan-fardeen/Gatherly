@@ -10,10 +10,10 @@ const config: Config = {
     extend: {
       fontFamily: {
         sans: ["Poppins", "-apple-system", "BlinkMacSystemFont", "sans-serif"],
-        display: ["var(--font-cormorant)", "Cormorant Garamond", "serif"],
+        display: ["var(--font-lora)", "Lora", "Georgia", "serif"],
         logo: ["Bright", "serif"],
         cursive: ["var(--font-dancing)", "Dancing Script", "cursive"],
-        serif: ["var(--font-cormorant)", "Cormorant Garamond", "serif"],
+        serif: ["var(--font-lora)", "Lora", "Georgia", "serif"],
       },
       colors: {
         /** Text hierarchy – guideline */

@@ -29,15 +29,7 @@ const EVENT_TYPE_OPTIONS = [
   { value: "other", label: "Other", subtitle: "Custom Category", Icon: DotsThree },
 ];
 
-function formatDateForInput(d: Date) {
-  return d.toISOString().slice(0, 10);
-}
-
-function formatTimeForInput(d: Date | null) {
-  if (!d) return "";
-  const pad = (n: number) => String(n).padStart(2, "0");
-  return `${pad(d.getHours())}:${pad(d.getMinutes())}`;
-}
+import { formatDateForInput, formatTimeForInput } from "@/lib/date-utils";
 
 export default function EditEventPage() {
   const params = useParams();

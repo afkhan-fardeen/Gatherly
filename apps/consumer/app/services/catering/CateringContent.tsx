@@ -30,14 +30,9 @@ interface Vendor {
   maxCapacity?: number | null;
 }
 
-const FILTER_CHIPS = ["All", "Italian", "Arabic", "Mediterranean", "Asian", "Organic", "Buffet"];
+import { CARD_GRADIENTS } from "@/lib/gradients";
 
-const CARD_GRADIENTS = [
-  "linear-gradient(135deg, #d4a574 0%, #8a5020 100%)",
-  "linear-gradient(135deg, #1a1010 0%, #4a2010 100%)",
-  "linear-gradient(135deg, #c09060 0%, #705030 100%)",
-  "linear-gradient(135deg, #2a1a0a 0%, #5a3010 100%)",
-];
+const FILTER_CHIPS = ["All", "Italian", "Arabic", "Mediterranean", "Asian", "Organic", "Buffet"];
 
 function fitsCapacity(guestCount: number, minCap: number | null | undefined, maxCap: number | null | undefined): boolean {
   if (minCap != null && guestCount < minCap) return false;
@@ -249,7 +244,7 @@ export function CateringContent() {
                         </div>
                       </div>
                       <div className="p-4 pt-3.5">
-                        <h3 className="font-serif text-[20px] font-medium text-[#1e0f14] tracking-[-0.3px] leading-tight mb-2.5">
+                        <h3 className="font-serif text-[17px] font-semibold text-[#1e0f14] tracking-[-0.3px] leading-tight mb-2.5">
                           {vendor.businessName}
                         </h3>
                         <div className="flex flex-wrap gap-1.5 mb-2.5">
@@ -265,7 +260,7 @@ export function CateringContent() {
                         </div>
                         <div className="flex items-center justify-between pt-2.5 border-t border-primary/10">
                           <div>
-                            <div className="font-serif text-[22px] font-medium text-primary leading-none">
+                            <div className="font-serif text-[22px] font-semibold text-primary leading-none">
                               {minPrice != null ? `${minPrice} BD` : "—"}
                               <span className="text-[11px] font-light text-[#a0888d]"> {minPrice != null ? priceSuffix : ""}</span>
                             </div>

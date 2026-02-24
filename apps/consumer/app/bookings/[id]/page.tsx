@@ -18,6 +18,7 @@ import { OrderProgress } from "@/components/OrderProgress";
 import { TYPO } from "@/lib/events-ui";
 
 import { API_URL } from "@/lib/api";
+import { formatTime, formatDateLong } from "@/lib/date-utils";
 
 interface BookingDetail {
   id: string;
@@ -45,15 +46,6 @@ interface BookingDetail {
     packageItems: { name: string; description: string | null; category: string | null }[];
   };
   reviews: { id: string }[];
-}
-
-function formatTime(iso: string | null): string {
-  if (!iso) return "";
-  try {
-    return new Date(iso).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-  } catch {
-    return "";
-  }
 }
 
 export default function BookingDetailPage() {
@@ -221,12 +213,7 @@ export default function BookingDetailPage() {
     (booking.status === "completed" || booking.status === "delivered") &&
     (!booking.reviews || booking.reviews.length === 0);
 
-  const dateStr = new Date(booking.event.date).toLocaleDateString("en-US", {
-    weekday: "long",
-    month: "long",
-    day: "numeric",
-    year: "numeric",
-  });
+  const dateStr = formatDateLong(booking.event.date);
   const timeStart = formatTime(booking.event.timeStart);
   const timeEnd = formatTime(booking.event.timeEnd);
   const timeStr = timeStart && timeEnd ? `${timeStart} – ${timeEnd}` : timeStart || timeEnd || null;

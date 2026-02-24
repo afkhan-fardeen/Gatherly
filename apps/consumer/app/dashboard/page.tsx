@@ -19,6 +19,8 @@ import { StatusBadge } from "@/components/ui/StatusBadge";
 import { API_URL, fetchAuth } from "@/lib/api";
 import { getToken } from "@/lib/session";
 import { CHERRY } from "@/lib/events-ui";
+import { formatDateFull, formatTime, formatEventDate } from "@/lib/date-utils";
+import { PARTNER_GRADIENTS, SPOTLIGHT_GRADIENTS } from "@/lib/gradients";
 
 function getGreeting(): string {
   const h = new Date().getHours();
@@ -26,48 +28,6 @@ function getGreeting(): string {
   if (h >= 12 && h < 17) return "Good Afternoon";
   return "Good Evening";
 }
-
-function formatDateFull(): string {
-  return new Date().toLocaleDateString("en-US", {
-    weekday: "long",
-    month: "long",
-    day: "numeric",
-    year: "numeric",
-  });
-}
-
-function formatTimeStart(timeStart?: string | null): string {
-  if (!timeStart) return "";
-  try {
-    const iso = timeStart.includes("T") ? timeStart : `1970-01-01T${timeStart}`;
-    const t = new Date(iso);
-    return t.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", hour12: true });
-  } catch {
-    return "";
-  }
-}
-
-function formatEventDate(dateStr: string): { month: string; day: string; weekday: string } {
-  const d = new Date(dateStr);
-  return {
-    month: d.toLocaleDateString("en-US", { month: "short" }),
-    day: d.getDate().toString(),
-    weekday: d.toLocaleDateString("en-US", { weekday: "short" }),
-  };
-}
-
-const PARTNER_GRADIENTS = [
-  "linear-gradient(135deg, #d4a574 0%, #8a5020 100%)",
-  "linear-gradient(135deg, #1a1010 0%, #4a2010 100%)",
-  "linear-gradient(135deg, #2a3a5a 0%, #4a6a9a 100%)",
-  "linear-gradient(135deg, #2a3a2a 0%, #4a7a4a 100%)",
-];
-
-const SPOTLIGHT_GRADIENTS = [
-  "linear-gradient(160deg, #2a1510 0%, #7a3510 100%)",
-  "linear-gradient(160deg, #102030 0%, #204060 100%)",
-  "linear-gradient(160deg, #1a2a1a 0%, #305030 100%)",
-];
 
 interface Event {
   id: string;
@@ -181,7 +141,7 @@ export default function DashboardPage() {
         {/* Upcoming Events */}
         <section className="animate-fade-in-up" style={{ animationDelay: "0.05s" }}>
           <div className="flex justify-between items-center mb-3">
-            <span className="font-serif text-[10px] font-semibold uppercase tracking-[2px] text-[#5c3d47]">
+            <span className="font-serif text-[11px] font-semibold uppercase tracking-[2px] text-[#5c3d47]">
               Upcoming Events
             </span>
             <Link
@@ -195,7 +155,7 @@ export default function DashboardPage() {
             <div className="space-y-3">
               {upcomingEvents.map((e) => {
                 const { month, day, weekday } = formatEventDate(e.date);
-                const timeStr = formatTimeStart(e.timeStart);
+                const timeStr = formatTime(e.timeStart);
                 return (
                   <Link
                     key={e.id}
@@ -206,17 +166,17 @@ export default function DashboardPage() {
                       className="w-[68px] shrink-0 flex flex-col items-center justify-center gap-0.5 py-3 px-2 border-r border-primary/10"
                       style={{ backgroundColor: "#CFD7F2" }}
                     >
-                      <span className="text-[10px] font-medium uppercase tracking-wider text-primary">
+                      <span className="font-serif text-[10px] font-semibold uppercase tracking-wider text-primary">
                         {month}
                       </span>
-                      <span className="font-serif text-[24px] font-medium text-[#1e0f14] leading-none">
+                      <span className="font-serif text-[24px] font-semibold text-[#1e0f14] leading-none">
                         {day}
                       </span>
-                      <span className="text-[10px] font-normal text-[#a0888d]">{weekday}</span>
+                      <span className="font-serif text-[10px] font-semibold text-[#a0888d]">{weekday}</span>
                     </div>
                     <div className="flex-1 min-w-0 p-3.5 pl-4">
                       <div className="flex items-start justify-between gap-2 mb-1">
-                        <h3 className="font-serif text-[15px] font-medium text-[#1e0f14] tracking-tight truncate">
+                        <h3 className="font-serif text-[15px] font-semibold text-[#1e0f14] tracking-tight truncate">
                           {e.name}
                         </h3>
                         <StatusBadge
@@ -261,7 +221,7 @@ export default function DashboardPage() {
         {/* Featured Partners */}
         <section className="animate-fade-in-up" style={{ animationDelay: "0.1s" }}>
           <div className="flex justify-between items-center mb-3">
-            <span className="font-serif text-[10px] font-semibold uppercase tracking-[2px] text-[#5c3d47]">
+            <span className="font-serif text-[11px] font-semibold uppercase tracking-[2px] text-[#5c3d47]">
               Featured Partners
             </span>
             <Link
@@ -291,18 +251,18 @@ export default function DashboardPage() {
                         className="object-cover"
                         sizes="48px"
                         fallback={
-                          <span className="absolute inset-0 flex items-center justify-center font-serif text-[22px] font-medium text-white/70">
+                          <span className="absolute inset-0 flex items-center justify-center font-serif text-[20px] font-semibold text-white/70">
                             {vendor.businessName.charAt(0)}
                           </span>
                         }
                       />
                     ) : (
-                      <span className="absolute inset-0 flex items-center justify-center font-serif text-[22px] font-medium text-white/70">
+                      <span className="absolute inset-0 flex items-center justify-center font-serif text-[20px] font-semibold text-white/70">
                         {vendor.businessName.charAt(0)}
                       </span>
                     )}
                   </div>
-                  <p className="font-serif text-[11.5px] font-medium text-[#1e0f14] truncate">{vendor.businessName}</p>
+                  <p className="font-serif text-[12px] font-semibold text-[#1e0f14] truncate">{vendor.businessName}</p>
                   <p className="text-[10px] font-light text-[#a0888d]">
                     {vendor.businessType || vendor.cuisineTypes?.[0] || "Catering"}
                   </p>
@@ -330,8 +290,8 @@ export default function DashboardPage() {
         {spotlight.length > 0 && (
           <section className="animate-fade-in-up" style={{ animationDelay: "0.15s" }}>
             <div className="flex justify-between items-center mb-3">
-              <span className="font-serif text-[10px] font-semibold uppercase tracking-[2px] text-[#5c3d47]">
-                What&apos;s New · <span className="text-primary font-medium tracking-wide">Spotlight</span>
+              <span className="font-serif text-[11px] font-semibold uppercase tracking-[2px] text-[#5c3d47]">
+                What&apos;s New · <span className="text-primary font-semibold tracking-wide">Spotlight</span>
               </span>
               <Link
                 href="/services/catering"
@@ -379,7 +339,7 @@ export default function DashboardPage() {
                     <p className="text-[9px] font-semibold uppercase tracking-[1.5px] text-white/60 mb-1">
                       Catering
                     </p>
-                    <h3 className="font-serif text-[17px] font-medium text-white leading-tight mb-2">
+                    <h3 className="font-serif text-[16px] font-semibold text-white leading-tight mb-2">
                       {item.name}
                     </h3>
                     <span
@@ -398,7 +358,7 @@ export default function DashboardPage() {
         {/* Quick Actions */}
         <section className="animate-fade-in-up" style={{ animationDelay: "0.2s" }}>
           <div className="mb-3">
-            <span className="font-serif text-[10px] font-semibold uppercase tracking-[2px] text-[#5c3d47]">
+            <span className="font-serif text-[11px] font-semibold uppercase tracking-[2px] text-[#5c3d47]">
               Quick Actions
             </span>
           </div>
@@ -414,7 +374,7 @@ export default function DashboardPage() {
                 <CalendarBlank size={17} weight="regular" />
               </div>
               <div>
-                <p className="text-[13px] font-medium text-[#1e0f14]">New Event</p>
+                <p className="font-serif text-[13px] font-semibold text-[#1e0f14]">New Event</p>
                 <p className="text-[11px] font-light text-[#a0888d] -mt-1">Start planning</p>
               </div>
             </Link>
@@ -429,7 +389,7 @@ export default function DashboardPage() {
                 <ForkKnife size={17} weight="regular" />
               </div>
               <div>
-                <p className="text-[13px] font-medium text-[#1e0f14]">Browse Catering</p>
+                <p className="font-serif text-[13px] font-semibold text-[#1e0f14]">Browse Catering</p>
                 <p className="text-[11px] font-light text-[#a0888d] -mt-1">Find vendors</p>
               </div>
             </Link>
@@ -444,7 +404,7 @@ export default function DashboardPage() {
                 <CreditCard size={17} weight="regular" />
               </div>
               <div>
-                <p className="text-[13px] font-medium text-[#1e0f14]">Payments</p>
+                <p className="font-serif text-[13px] font-semibold text-[#1e0f14]">Payments</p>
                 <p className="text-[11px] font-light text-[#a0888d] -mt-1">History & cards</p>
               </div>
             </Link>
@@ -459,7 +419,7 @@ export default function DashboardPage() {
                 <Users size={17} weight="regular" />
               </div>
               <div>
-                <p className="text-[13px] font-medium text-[#1e0f14]">Guest Lists</p>
+                <p className="font-serif text-[13px] font-semibold text-[#1e0f14]">Guest Lists</p>
                 <p className="text-[11px] font-light text-[#a0888d] -mt-1">Manage invites</p>
               </div>
             </Link>
