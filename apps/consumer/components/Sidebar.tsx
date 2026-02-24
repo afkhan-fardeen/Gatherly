@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { House, Calendar, Plus, Compass } from "@phosphor-icons/react";
+import { House, Calendar, Plus, Compass, User } from "@phosphor-icons/react";
 import { Logo } from "./Logo";
 
 
@@ -11,6 +11,7 @@ const navItems = [
   { href: "/events", Icon: Calendar, label: "Events" },
   { href: "/events/create", Icon: Plus, label: "Create" },
   { href: "/services", Icon: Compass, label: "Discover" },
+  { href: "/profile", Icon: User, label: "Profile" },
 ];
 
 export function Sidebar() {

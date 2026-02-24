@@ -93,7 +93,7 @@ export default function EventsPage() {
         <div className="min-h-full bg-cream">
           {/* Topbar - matches gatherlii-events */}
           <header
-            className="sticky top-0 z-20 px-5 pt-[max(1rem,env(safe-area-inset-top))] pb-4"
+            className="sticky top-0 z-20 px-5 md:px-8 pt-[max(1rem,env(safe-area-inset-top))] pb-4"
             style={{
               background: "linear-gradient(to bottom, #f4ede5 75%, transparent)",
             }}
@@ -153,9 +153,9 @@ export default function EventsPage() {
             </div>
           </header>
 
-          <main className="px-4 pb-32">
+          <main className="px-4 md:px-8 pb-32">
             {loading ? (
-              <div className="space-y-3">
+              <div className="space-y-3 md:grid md:grid-cols-2 md:gap-4 md:space-y-0">
                 {[1, 2, 3].map((i) => (
                   <div key={i} className="h-24 bg-white/60 rounded-[20px] border border-primary/5 animate-pulse" />
                 ))}
@@ -191,7 +191,7 @@ export default function EventsPage() {
                 <p className="font-serif text-[10px] font-semibold uppercase tracking-[2px] text-[#5c3d47] mb-3 pl-0.5">
                   {tab === "upcoming" ? "Upcoming Events" : "Past Events"}
                 </p>
-                <div className="flex flex-col gap-3">
+                <div className="flex flex-col gap-3 md:grid md:grid-cols-2 md:gap-4">
                   {filtered.map((event, i) => {
                     const d = new Date(event.date);
                     const isPast = d < today;

@@ -81,7 +81,7 @@ export default function ServicesPage() {
       <div className="min-h-full bg-cream">
         {/* Topbar */}
         <header
-          className="sticky top-0 z-20 px-5 pt-[max(1rem,env(safe-area-inset-top))] pb-3.5"
+          className="sticky top-0 z-20 px-5 md:px-8 pt-[max(1rem,env(safe-area-inset-top))] pb-3.5"
           style={{
             background: "linear-gradient(to bottom, #f4ede5 80%, transparent)",
           }}
@@ -113,15 +113,15 @@ export default function ServicesPage() {
           </div>
         </header>
 
-        <main className="px-4 pb-32 space-y-7">
+        <main className="px-4 md:px-8 pb-32 space-y-7">
           {/* Categories */}
-          <div className="overflow-x-auto scrollbar-hide overscroll-x-contain -mx-4 py-4">
-            <div className="flex gap-3 pl-4 pr-5 py-2 min-w-min">
+          <div className="overflow-x-auto scrollbar-hide overscroll-x-contain -mx-4 md:overflow-visible md:mx-0 py-4">
+            <div className="flex gap-3 pl-4 pr-5 py-2 min-w-min md:grid md:grid-cols-3 lg:grid-cols-6 md:gap-4 md:min-w-0 md:pl-0 md:pr-0">
               {CATEGORIES.map((cat, i) => (
                 <Link
                 key={cat.id}
                   href={cat.href}
-                  className="shrink-0 w-[72px] flex flex-col items-center gap-2"
+                  className="shrink-0 w-[72px] md:shrink md:w-auto flex flex-col items-center gap-2"
                 >
                   <div
                     className="relative w-[72px] h-[72px] rounded-[20px] overflow-hidden border-2 border-transparent transition-all hover:-translate-y-0.5 hover:shadow-lg"
@@ -160,9 +160,9 @@ export default function ServicesPage() {
             </div>
 
             {loading ? (
-              <div className="flex gap-3.5 overflow-hidden">
+              <div className="flex gap-3.5 overflow-hidden md:grid md:grid-cols-3 md:gap-6">
                 {[1, 2, 3].map((i) => (
-                  <div key={i} className="shrink-0 w-[240px] h-[280px] rounded-[22px] bg-white/60 border border-primary/10 animate-pulse" />
+                  <div key={i} className="shrink-0 w-[240px] md:w-auto h-[280px] rounded-[22px] bg-white/60 border border-primary/10 animate-pulse" />
                 ))}
               </div>
             ) : featuredVendors.length === 0 ? (
@@ -172,8 +172,8 @@ export default function ServicesPage() {
                 <p className="text-xs font-light text-[#9e8085] mt-1">We&apos;re adding partners soon</p>
               </div>
             ) : (
-              <div className="overflow-x-auto scrollbar-hide -mx-4 py-2">
-                <div className="flex gap-3.5 pl-4 pr-5 py-2 min-w-min">
+              <div className="overflow-x-auto scrollbar-hide -mx-4 md:overflow-visible md:mx-0 py-2">
+                <div className="flex gap-3.5 pl-4 pr-5 py-2 min-w-min md:grid md:grid-cols-3 md:gap-6 md:min-w-0 md:pl-0 md:pr-0">
                 {featuredVendors.map((vendor, i) => {
                   const pkg = vendor.packages[0];
                   const minPrice = pkg?.basePrice;
@@ -186,7 +186,7 @@ export default function ServicesPage() {
                     <Link
                       key={vendor.id}
                       href={`/vendor/${vendor.id}`}
-                      className="shrink-0 w-[240px] bg-white rounded-[22px] border border-primary/10 overflow-hidden transition-all hover:-translate-y-1 hover:shadow-xl"
+                      className="shrink-0 w-[240px] md:shrink md:w-auto bg-white rounded-[22px] border border-primary/10 overflow-hidden transition-all hover:-translate-y-1 hover:shadow-xl"
                     >
                       <div className="w-full h-[150px] relative overflow-hidden">
                         <RemoteImage
@@ -262,7 +262,7 @@ export default function ServicesPage() {
             </div>
 
             {loading ? (
-              <div className="space-y-3">
+              <div className="space-y-3 md:grid md:grid-cols-2 lg:grid-cols-3 md:gap-4 md:space-y-0">
                 {[1, 2, 3].map((i) => (
                   <div key={i} className="h-64 rounded-[20px] bg-white/60 border border-primary/10 animate-pulse" />
                 ))}
@@ -274,7 +274,7 @@ export default function ServicesPage() {
                 <p className="text-xs font-light text-[#9e8085] mt-1">Try a different search</p>
               </div>
             ) : (
-              <div className="flex flex-col gap-3">
+              <div className="flex flex-col gap-3 md:grid md:grid-cols-2 lg:grid-cols-3 md:gap-4">
                 {allVendors.map((vendor, i) => {
                   const pkg = vendor.packages[0];
                   const minPrice = pkg?.basePrice;

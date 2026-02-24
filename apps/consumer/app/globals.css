@@ -58,6 +58,12 @@
   animation: modalScaleIn 0.3s cubic-bezier(0.32, 0.72, 0, 1) forwards;
 }
 
+@media (min-width: 640px) {
+  .sm\:animate-modal-scale-in {
+    animation: modalScaleIn 0.3s cubic-bezier(0.32, 0.72, 0, 1) forwards;
+  }
+}
+
 /* Entrance animations — simple, delightful */
 @keyframes fadeInUp {
   from {
@@ -145,6 +151,7 @@
   .animate-modal-backdrop,
   .animate-modal-slide-up,
   .animate-modal-scale-in,
+  .sm\:animate-modal-scale-in,
   .animate-fade-in-up,
   .animate-fade-in,
   .animate-slide-in-up {
@@ -164,6 +171,14 @@
   --foreground: #1A1A1A;
   --primary: #6D0D35;
 }
+
+/* Cormorant Garamond reads thin — bump weights for better legibility */
+.font-serif { font-weight: 600; }
+.font-serif.font-light { font-weight: 500; }
+.font-serif.font-normal { font-weight: 600; }
+.font-serif.font-medium { font-weight: 600; }
+.font-serif.font-semibold { font-weight: 700; }
+.font-serif.font-bold { font-weight: 700; }
 
 html {
   scroll-behavior: smooth;
@@ -202,6 +217,11 @@ body::-webkit-scrollbar {
 }
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
+}
+
+/* Add padding when install prompt is visible so content can scroll above it */
+body.install-prompt-visible main {
+  padding-bottom: 140px !important;
 }
 
 body {

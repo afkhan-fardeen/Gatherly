@@ -348,7 +348,7 @@ export default function PackageDetailPage() {
               aria-label="Close"
             />
             <div
-              className="form-no-zoom relative bg-white w-full max-w-md rounded-t-2xl sm:rounded-2xl p-6 overflow-y-auto animate-modal-slide-up flex flex-col"
+              className="form-no-zoom relative bg-white w-full max-w-md rounded-t-2xl sm:rounded-2xl p-6 overflow-y-auto animate-modal-slide-up sm:animate-modal-scale-in flex flex-col"
               style={{
                 maxHeight: "min(calc(100vh - 2rem - env(safe-area-inset-bottom, 0px)), 500px)",
                 paddingBottom: "calc(2rem + env(safe-area-inset-bottom, 0px))",
@@ -471,7 +471,7 @@ export default function PackageDetailPage() {
               aria-label="Close"
             />
             <div
-              className="form-no-zoom relative bg-white w-full max-w-md rounded-t-2xl sm:rounded-2xl p-6 overflow-y-auto animate-modal-slide-up flex flex-col"
+              className="form-no-zoom relative bg-white w-full max-w-md rounded-t-2xl sm:rounded-2xl p-6 overflow-y-auto animate-modal-slide-up sm:animate-modal-scale-in flex flex-col"
               style={{
                 maxHeight: "min(calc(100vh - 2rem - env(safe-area-inset-bottom, 0px)), 500px)",
                 paddingBottom: "calc(2rem + env(safe-area-inset-bottom, 0px))",

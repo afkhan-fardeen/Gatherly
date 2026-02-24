@@ -98,7 +98,7 @@ export function CateringContent() {
         <div className="min-h-full bg-[#f4ede5]">
           {/* Topbar */}
           <header
-            className="sticky top-0 z-20 px-5 pt-[max(1rem,env(safe-area-inset-top))] pb-3.5"
+            className="sticky top-0 z-20 px-5 md:px-8 pt-[max(1rem,env(safe-area-inset-top))] pb-3.5"
             style={{ background: "linear-gradient(to bottom, #f4ede5 78%, transparent)" }}
           >
             <div className="flex items-start gap-3.5 mb-4">
@@ -134,7 +134,7 @@ export function CateringContent() {
             </div>
           </header>
 
-          <main className="px-4 pb-32 space-y-3">
+          <main className="px-4 md:px-8 pb-32 space-y-3">
             {/* Filter chips */}
             <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-0.5 -mx-4 px-4">
               {FILTER_CHIPS.map((chip) => (
@@ -167,7 +167,7 @@ export function CateringContent() {
 
             {/* Vendor cards */}
             {loading ? (
-              <div className="space-y-3">
+              <div className="space-y-3 md:grid md:grid-cols-2 lg:grid-cols-3 md:gap-4 md:space-y-0">
                 {[1, 2, 3, 4].map((i) => (
                   <div key={i} className="h-[280px] rounded-[20px] bg-white/60 border border-primary/10 animate-pulse" />
                 ))}
@@ -179,7 +179,7 @@ export function CateringContent() {
                 <p className="text-xs font-light text-[#a0888d] mt-1">Try a different search or filter</p>
               </div>
             ) : (
-              <div className="flex flex-col gap-3">
+              <div className="flex flex-col gap-3 md:grid md:grid-cols-2 lg:grid-cols-3 md:gap-4">
                 {vendors.map((vendor, i) => {
                   const pkg = vendor.packages[0];
                   const minPrice = pkg?.basePrice;

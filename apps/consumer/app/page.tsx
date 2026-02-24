@@ -16,7 +16,6 @@ import {
 import { validateSession, getToken } from "@/lib/session";
 
 const PRIMARY = "#6D0D35";
-const BLUSH = "#f4ede5";
 const TEXT = "#1e0f14";
 const TEXT_MID = "#5c3d47";
 const TEXT_MUTED = "#9e8085";
@@ -68,7 +67,15 @@ export default function HomePage() {
   }, []);
 
   return (
-    <div className="min-h-screen" style={{ background: "#fdfaf7", color: TEXT }}>
+    <div className="min-h-screen bg-white" style={{ color: TEXT }}>
+      {checking && (
+        <div className="fixed inset-0 z-[200] flex items-center justify-center bg-white">
+          <div className="flex flex-col items-center gap-3">
+            <div className="w-8 h-8 rounded-full border-2 border-primary border-t-transparent animate-spin" />
+            <span className="text-[14px] font-medium text-primary">Loading...</span>
+          </div>
+        </div>
+      )}
       {/* Noise overlay */}
       <div
         className="fixed inset-0 pointer-events-none z-[9999] opacity-[0.025]"
@@ -83,10 +90,8 @@ export default function HomePage() {
           navScrolled ? "shadow-[0_4px_30px_rgba(109,13,53,0.07)]" : ""
         }`}
         style={{
-          background: "rgba(253,250,247,0.88)",
-          backdropFilter: "blur(16px)",
-          WebkitBackdropFilter: "blur(16px)",
-          borderBottom: "1px solid rgba(109,13,53,0.06)",
+          background: "#ffffff",
+          borderBottom: "1px solid rgba(109,13,53,0.08)",
         }}
       >
         <Link href="/" className="flex items-center">
@@ -130,9 +135,8 @@ export default function HomePage() {
         <div
           className="fixed top-[68px] left-0 right-0 z-[99] flex flex-col gap-3 p-5 md:hidden"
           style={{
-            background: "rgba(253,250,247,0.97)",
-            backdropFilter: "blur(16px)",
-            borderBottom: "1px solid rgba(109,13,53,0.06)",
+            background: "#ffffff",
+            borderBottom: "1px solid rgba(109,13,53,0.08)",
           }}
         >
           <Link href="#how" className="w-full text-center py-3 rounded-full text-[13px] font-normal border border-primary/20" style={{ color: TEXT_MID }} onClick={() => setMobileMenuOpen(false)}>
@@ -171,10 +175,10 @@ export default function HomePage() {
               style={{ background: "rgba(109,13,53,0.07)", border: "1px solid rgba(109,13,53,0.12)" }}
             >
               <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
-              <span className="text-[10px] font-medium uppercase tracking-[2px] text-primary">Premium Event Planning</span>
+              <span className="text-[11px] font-medium uppercase tracking-[2px] text-primary">Premium Event Planning</span>
             </div>
 
-            <h1 className="font-serif text-[clamp(40px,5vw,72px)] font-medium leading-[1.05] tracking-[-1.5px] mb-5" style={{ color: TEXT }}>
+            <h1 className="font-serif text-[clamp(44px,6vw,80px)] font-medium leading-[1.05] tracking-[-1.5px] mb-6" style={{ color: TEXT }}>
               Elegance
               <br />
               in Every
@@ -184,7 +188,7 @@ export default function HomePage() {
               Made Perfect.
             </h1>
 
-            <p className="text-[clamp(14px,1.5vw,17px)] font-light leading-relaxed max-w-[420px] mb-10 mx-auto lg:mx-0" style={{ color: TEXT_MID }}>
+            <p className="text-[clamp(16px,1.8vw,19px)] font-light leading-relaxed max-w-[440px] mb-10 mx-auto lg:mx-0" style={{ color: TEXT_MID }}>
               Experience a premium approach to event planning and coordination. Discover curated vendors, create memorable events, and manage everything in one place.
             </p>
 
@@ -231,7 +235,7 @@ export default function HomePage() {
                   </div>
                 ))}
               </div>
-              <p className="text-[12.5px] font-light" style={{ color: TEXT_MUTED }}>
+              <p className="text-[14px] font-light" style={{ color: TEXT_MUTED }}>
                 <span className="font-medium" style={{ color: TEXT_MID }}>2,400+</span> events planned this month
               </p>
             </div>
@@ -279,12 +283,12 @@ export default function HomePage() {
         <div className="w-full h-px opacity-20" style={{ background: "linear-gradient(90deg, transparent 0%, #b8935a 30%, #6D0D35 60%, transparent 100%)" }} />
 
         {/* How it Works */}
-        <section id="how" className="py-16 md:py-24 lg:py-32 px-5 md:px-12 lg:px-20" style={{ background: BLUSH }}>
-          <p className="text-[10px] font-medium uppercase tracking-[3px] text-primary text-center mb-3" data-reveal>The Process</p>
-          <h2 className="text-[clamp(34px,5vw,58px)] font-semibold text-center tracking-[-1px] leading-tight mb-3" style={{ color: TEXT }} data-reveal>
+        <section id="how" className="py-16 md:py-24 lg:py-32 px-5 md:px-12 lg:px-20" style={{ background: "#faf8f5" }}>
+          <p className="text-[11px] font-medium uppercase tracking-[3px] text-primary text-center mb-3" data-reveal>The Process</p>
+          <h2 className="font-serif text-[clamp(36px,5.5vw,62px)] font-medium text-center tracking-[-1px] leading-tight mb-3" style={{ color: TEXT }} data-reveal>
             How <span className="italic font-light text-primary">It Works</span>
           </h2>
-          <p className="text-[clamp(14px,1.5vw,16px)] font-light text-center max-w-[520px] mx-auto mb-16 leading-relaxed" style={{ color: TEXT_MUTED }} data-reveal>
+          <p className="text-[clamp(16px,1.8vw,18px)] font-light text-center max-w-[540px] mx-auto mb-16 leading-relaxed" style={{ color: TEXT_MUTED }} data-reveal>
             A streamlined, elegant process for planning your perfect event — from vision to celebration.
           </p>
 
@@ -306,8 +310,8 @@ export default function HomePage() {
                 <div className="w-12 h-12 rounded-[14px] flex items-center justify-center mb-5" style={{ background: "rgba(109,13,53,0.07)", border: "1px solid rgba(109,13,53,0.12)", color: PRIMARY }}>
                   <StepIcon size={20} weight="regular" />
                 </div>
-                <h3 className="text-[26px] font-semibold mb-2.5 tracking-[-0.3px]" style={{ color: TEXT }}>{step.title}</h3>
-                <p className="text-sm font-light leading-relaxed" style={{ color: TEXT_MUTED }}>{step.body}</p>
+                <h3 className="font-serif text-[28px] font-medium mb-2.5 tracking-[-0.3px]" style={{ color: TEXT }}>{step.title}</h3>
+                <p className="text-[15px] font-light leading-relaxed" style={{ color: TEXT_MUTED }}>{step.body}</p>
               </div>
             );
             })}
@@ -327,8 +331,8 @@ export default function HomePage() {
                 <div className="w-11 h-11 rounded-xl flex items-center justify-center mx-auto mb-4" style={{ background: "rgba(109,13,53,0.07)", color: PRIMARY }}>
                   <FIcon size={18} weight="regular" />
                 </div>
-                <h4 className="text-xl font-semibold mb-1.5" style={{ color: TEXT }}>{f.title}</h4>
-                <p className="text-[13px] font-light leading-relaxed" style={{ color: TEXT_MUTED }}>{f.body}</p>
+                <h4 className="font-serif text-[22px] font-medium mb-1.5" style={{ color: TEXT }}>{f.title}</h4>
+                <p className="text-[14px] font-light leading-relaxed" style={{ color: TEXT_MUTED }}>{f.body}</p>
               </div>
             );
             })}
@@ -340,11 +344,11 @@ export default function HomePage() {
 
         {/* Testimonials */}
         <section className="py-16 md:py-24 lg:py-32 px-5 md:px-12 lg:px-20 bg-white">
-          <p className="text-[10px] font-medium uppercase tracking-[3px] text-primary text-center mb-3" data-reveal>Stories</p>
-          <h2 className="text-[clamp(34px,5vw,58px)] font-semibold text-center tracking-[-1px] leading-tight mb-3" style={{ color: TEXT }} data-reveal>
+          <p className="text-[11px] font-medium uppercase tracking-[3px] text-primary text-center mb-3" data-reveal>Stories</p>
+          <h2 className="font-serif text-[clamp(36px,5.5vw,62px)] font-medium text-center tracking-[-1px] leading-tight mb-3" style={{ color: TEXT }} data-reveal>
             Loved by <span className="italic font-light text-primary">Event Planners</span>
           </h2>
-          <p className="text-[clamp(14px,1.5vw,16px)] font-light text-center max-w-[520px] mx-auto mb-16 leading-relaxed" style={{ color: TEXT_MUTED }} data-reveal>
+          <p className="text-[clamp(16px,1.8vw,18px)] font-light text-center max-w-[540px] mx-auto mb-16 leading-relaxed" style={{ color: TEXT_MUTED }} data-reveal>
             From intimate gatherings to grand celebrations, Gatherlii brings every vision to life.
           </p>
 
@@ -357,7 +361,7 @@ export default function HomePage() {
               <div
                 key={t.name}
                 className="rounded-[20px] p-7 border border-primary/5 hover:shadow-lg hover:-translate-y-1 transition-all"
-                style={{ background: BLUSH }}
+                style={{ background: "#faf8f5" }}
                 data-reveal
               >
                 <div className="text-amber-600 text-sm tracking-widest mb-3">★★★★★</div>
@@ -367,8 +371,8 @@ export default function HomePage() {
                     {t.initial}
                   </div>
                   <div>
-                    <div className="text-[13px] font-medium" style={{ color: TEXT }}>{t.name}</div>
-                    <div className="text-[11px] font-light" style={{ color: TEXT_MUTED }}>{t.role}</div>
+                    <div className="text-[14px] font-medium" style={{ color: TEXT }}>{t.name}</div>
+                    <div className="text-[12px] font-light" style={{ color: TEXT_MUTED }}>{t.role}</div>
                   </div>
                 </div>
               </div>
@@ -380,16 +384,16 @@ export default function HomePage() {
         <div className="w-full h-px opacity-20" style={{ background: "linear-gradient(90deg, transparent 0%, #b8935a 30%, #6D0D35 60%, transparent 100%)" }} />
 
         {/* CTA */}
-        <section className="py-16 md:py-24 lg:py-32 px-5 md:px-12 lg:px-20 relative overflow-hidden" style={{ background: BLUSH }}>
+        <section className="py-16 md:py-24 lg:py-32 px-5 md:px-12 lg:px-20 relative overflow-hidden" style={{ background: "#faf8f5" }}>
           <div className="absolute inset-0 pointer-events-none opacity-100" style={{ background: "radial-gradient(ellipse at 20% 50%, rgba(109,13,53,0.06) 0%, transparent 50%), radial-gradient(ellipse at 80% 50%, rgba(184,147,90,0.06) 0%, transparent 50%)" }} />
           <div className="relative text-center">
             <div className="font-cursive text-[160px] font-bold leading-none text-center mb-[-20px] select-none" style={{ color: "rgba(109,13,53,0.05)" }}>"</div>
-            <h2 className="text-[clamp(38px,6vw,72px)] font-bold tracking-[-2px] leading-[1.05] mb-4" style={{ color: TEXT }} data-reveal>
+            <h2 className="font-serif text-[clamp(42px,6.5vw,76px)] font-medium tracking-[-2px] leading-[1.05] mb-4" style={{ color: TEXT }} data-reveal>
               Plan your
               <br />
               <span className="italic font-light text-primary">first event</span>
             </h2>
-            <p className="text-[clamp(14px,1.5vw,17px)] font-light max-w-[480px] mx-auto mb-10 leading-relaxed" style={{ color: TEXT_MUTED }} data-reveal>
+            <p className="text-[clamp(16px,1.8vw,18px)] font-light max-w-[500px] mx-auto mb-10 leading-relaxed" style={{ color: TEXT_MUTED }} data-reveal>
               Join thousands of event planners using Gatherlii to create unforgettable experiences across the Gulf.
             </p>
             {!checking && !token && (
@@ -410,19 +414,19 @@ export default function HomePage() {
                 </Link>
               </div>
             )}
-            <p className="text-xs font-light" style={{ color: TEXT_MUTED }} data-reveal>No credit card required · Set up in minutes</p>
+            <p className="text-[13px] font-light" style={{ color: TEXT_MUTED }} data-reveal>No credit card required · Set up in minutes</p>
           </div>
         </section>
 
         {/* Footer */}
-        <footer className="py-14 px-5 md:px-12 lg:px-20" style={{ background: TEXT, color: BLUSH }}>
+        <footer className="py-14 px-5 md:px-12 lg:px-20" style={{ background: TEXT, color: "#f4ede5" }}>
           <div className="max-w-6xl mx-auto">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 mb-12">
               <div>
                 <Link href="/" className="block mb-3">
                   <Image src="/logo/logo1.png" alt="Gatherlii" width={120} height={32} className="h-8 w-auto object-contain brightness-0 invert opacity-90" />
                 </Link>
-                <p className="text-[13px] font-light leading-relaxed max-w-[220px] opacity-70">
+                <p className="text-[14px] font-light leading-relaxed max-w-[240px] opacity-70">
                   Premium event planning and coordination for unforgettable experiences across the Gulf region.
                 </p>
               </div>
@@ -449,8 +453,8 @@ export default function HomePage() {
               </div>
             </div>
             <div className="border-t border-white/10 pt-6 flex flex-wrap justify-between items-center gap-4">
-              <p className="text-[12.5px] font-light opacity-50">© {new Date().getFullYear()} Gatherlii. All rights reserved.</p>
-              <p className="text-[12.5px] font-light opacity-50">Crafted with care in Bahrain 🇧🇭</p>
+              <p className="text-[13px] font-light opacity-50">© {new Date().getFullYear()} Gatherlii. All rights reserved.</p>
+              <p className="text-[13px] font-light opacity-50">Crafted with care in Bahrain</p>
             </div>
           </div>
         </footer>

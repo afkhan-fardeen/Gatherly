@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { ArrowClockwise } from "@phosphor-icons/react";
 
 const CHERRY = "#6D0D35";
@@ -12,6 +12,19 @@ interface PullToRefreshProps {
 }
 
 export function PullToRefresh({ children, onRefresh }: PullToRefreshProps) {
+  const [isDesktop, setIsDesktop] = useState(false);
+
+  useEffect(() => {
+    const mq = window.matchMedia("(min-width: 768px)");
+    const check = () => setIsDesktop(mq.matches);
+    check();
+    mq.addEventListener("change", check);
+    return () => mq.removeEventListener("change", check);
+  }, []);
+
+  if (isDesktop) {
+    return <>{children}</>;
+  }
   const [pullY, setPullY] = useState(0);
   const [refreshing, setRefreshing] = useState(false);
   const startY = useRef(0);

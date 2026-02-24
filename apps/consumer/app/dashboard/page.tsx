@@ -164,7 +164,7 @@ export default function DashboardPage() {
   return (
     <AppLayout>
       <div
-        className="px-5 pt-6 pb-40 space-y-7"
+        className="px-5 md:px-8 pt-6 pb-40 space-y-7"
         style={{ background: "linear-gradient(to bottom, #f4ede5 80%, #ede4da 100%)" }}
       >
         {/* Greeting */}
@@ -272,12 +272,12 @@ export default function DashboardPage() {
             </Link>
           </div>
           {vendors.length > 0 ? (
-            <div className="flex gap-2.5 overflow-x-auto py-4 -mx-5 px-5 scrollbar-hide">
+            <div className="flex gap-2.5 overflow-x-auto scrollbar-hide py-4 -mx-5 px-5 md:overflow-visible md:grid md:grid-cols-3 lg:grid-cols-6 md:gap-4 md:mx-0 md:px-0">
               {vendors.slice(0, 6).map((vendor, i) => (
                 <Link
                   key={vendor.id}
                   href={`/vendor/${vendor.id}`}
-                  className="shrink-0 w-[110px] rounded-2xl border border-primary/10 bg-[#fdfaf7] p-4 text-center transition-all hover:border-primary/20 hover:-translate-y-0.5"
+                  className="shrink-0 w-[110px] md:shrink md:w-auto rounded-2xl border border-primary/10 bg-[#fdfaf7] p-4 text-center transition-all hover:border-primary/20 hover:-translate-y-0.5"
                 >
                   <div
                     className="relative w-12 h-12 rounded-xl mx-auto mb-2 overflow-hidden"
@@ -340,12 +340,12 @@ export default function DashboardPage() {
                 Explore all
               </Link>
             </div>
-            <div className="flex gap-2.5 overflow-x-auto py-4 -mx-5 px-5 scrollbar-hide">
+            <div className="flex gap-2.5 overflow-x-auto scrollbar-hide py-4 -mx-5 px-5 md:overflow-visible md:grid md:grid-cols-2 lg:grid-cols-3 md:gap-4 md:mx-0 md:px-0">
               {spotlight.map((item, i) => (
                 <Link
                   key={item.id}
                   href={`/vendor/${item.vendorId}/package/${item.id}`}
-                  className="shrink-0 w-[200px] rounded-[18px] overflow-hidden relative transition-transform hover:scale-[1.02] active:scale-[0.99]"
+                  className="shrink-0 w-[200px] md:shrink md:w-auto rounded-[18px] overflow-hidden relative transition-transform hover:scale-[1.02] active:scale-[0.99]"
                 >
                   <div
                     className="w-full h-[240px] relative flex items-center justify-center"
@@ -402,7 +402,7 @@ export default function DashboardPage() {
               Quick Actions
             </span>
           </div>
-          <div className="grid grid-cols-2 gap-2.5">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-2.5 md:gap-4">
             <Link
               href="/events/create"
               className="flex flex-col gap-2.5 p-4 rounded-2xl border border-primary/10 bg-[#fdfaf7] transition-all hover:border-primary/20 hover:-translate-y-0.5"
