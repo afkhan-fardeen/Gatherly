@@ -12,7 +12,7 @@ export function SplashScreen() {
       aria-hidden="true"
     >
       {/* Content */}
-      <div className="flex flex-col items-center gap-0">
+      <div className="flex flex-col items-center gap-0 animate-fade-in-fast">
         <div className="relative w-[clamp(11rem,45vw,22rem)] h-[clamp(11rem,45vw,22rem)]">
           <Image
             src="/images/welcome-screen/g.png"

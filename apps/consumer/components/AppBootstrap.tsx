@@ -5,7 +5,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { SplashScreen } from "@/components/SplashScreen";
 import { validateSession, getToken } from "@/lib/session";
 
-const MIN_SPLASH_MS = 600;
+const MIN_SPLASH_MS = 400;
 
 /**
  * Shows splash on app open, validates session, redirects logged-in users from / to dashboard.

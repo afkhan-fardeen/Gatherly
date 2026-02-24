@@ -93,11 +93,15 @@
 }
 
 .animate-fade-in-up {
-  animation: fadeInUp 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation: fadeInUp 0.3s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 .animate-fade-in {
   animation: fadeIn 0.35s ease-out forwards;
+}
+
+.animate-fade-in-fast {
+  animation: fadeIn 0.2s ease-out forwards;
 }
 
 .animate-slide-in-up {
@@ -146,6 +150,14 @@
   min-height: 100%;
 }
 
+/* Tap feedback — compositor-friendly */
+.tap-scale {
+  transition: transform 0.15s ease-out;
+}
+.tap-scale:active {
+  transform: scale(0.98);
+}
+
 @media (prefers-reduced-motion: reduce) {
   .page-transition,
   .animate-modal-backdrop,
@@ -154,8 +166,12 @@
   .sm\:animate-modal-scale-in,
   .animate-fade-in-up,
   .animate-fade-in,
+  .animate-fade-in-fast,
   .animate-slide-in-up {
     animation: none !important;
+  }
+  .tap-scale:active {
+    transform: none;
   }
 }
 

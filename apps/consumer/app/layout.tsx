@@ -1,12 +1,17 @@
 import type { Metadata, Viewport } from "next";
+import dynamic from "next/dynamic";
 import { Poppins, Dancing_Script } from "next/font/google";
 import { Toaster } from "react-hot-toast";
 import { PageTransition } from "@/components/PageTransition";
 import { AppBootstrap } from "@/components/AppBootstrap";
-import { InstallPrompt } from "@/components/InstallPrompt";
 import { OfflineBanner } from "@/components/OfflineBanner";
 import { AppUpdatePrompt } from "@/components/AppUpdatePrompt";
 import "./globals.css";
+
+const InstallPrompt = dynamic(
+  () => import("@/components/InstallPrompt").then((m) => ({ default: m.InstallPrompt })),
+  { ssr: false }
+);
 
 const poppins = Poppins({
   subsets: ["latin"],

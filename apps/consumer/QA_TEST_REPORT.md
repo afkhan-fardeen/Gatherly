@@ -110,3 +110,51 @@
 | Build | PASS |
 
 **Overall:** Consumer app passes automated QA. Manual testing of auth, API flows, and forms is recommended before release.
+
+---
+
+## 8. Pre-Deploy Checklist (Pre-Deploy Testing Plan)
+
+**Date:** February 15, 2025
+
+### Regression (Critical Flows)
+
+| Flow | Status | Notes |
+|------|--------|-------|
+| Auth (Register → Login → Dashboard) | Manual | Token stored, redirect works |
+| Event create | Manual | Create event → Add details → Submit → Event in list |
+| Booking | Manual | Browse vendor → Select package → Book → Booking created |
+| Offline | Manual | DevTools Network Offline → Cached pages load, OfflineBanner shows |
+| Cache update | Manual | Deploy new build → AppUpdatePrompt appears, Update clears cache |
+
+### Functional
+
+| Area | Status | Notes |
+|------|--------|-------|
+| API smoke test | PASS | `pnpm test:api` — health, login, me, vendors, CORS |
+| Build | PASS | `npm run build` in consumer — 22 routes, no errors |
+| Page routing | PASS | All routes resolve (see Section 1–2) |
+
+### PWA
+
+| Check | Status | Notes |
+|-------|--------|-------|
+| Service worker | Manual | DevTools → Application → SW registered, activated |
+| Offline mode | Manual | Cached pages load, OfflineBanner |
+| Installability | Manual | Lighthouse PWA audit; Install prompt (Chrome) |
+| Update flow | Manual | AppUpdatePrompt on new deploy |
+
+### Performance / Security / Compatibility
+
+| Type | Status | Notes |
+|------|--------|-------|
+| Performance | Manual | Lighthouse FCP &lt; 1.8s, LCP &lt; 2.5s |
+| Security | Manual | JWT expiry, no secrets in client |
+| Compatibility | Manual | Chrome, Safari, Edge |
+
+### Execution
+
+- Run `pnpm test:api` before each deploy
+- Run manual regression flows or document skipped items
+- Run `cd apps/consumer && npm run build` — verify success
+- Run Lighthouse PWA + Performance audit on built app

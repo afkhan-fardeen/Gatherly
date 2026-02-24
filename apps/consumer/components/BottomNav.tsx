@@ -2,13 +2,13 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { House, Calendar, Plus, Compass, User } from "@phosphor-icons/react";
+import { House, Calendar, Plus, MagnifyingGlass, User } from "@phosphor-icons/react";
 
 const navItems = [
   { href: "/dashboard", Icon: House, label: "Home" },
   { href: "/events", Icon: Calendar, label: "Events" },
   { href: "/events/create", Icon: Plus, label: "Create", isCenter: true },
-  { href: "/services", Icon: Compass, label: "Discover" },
+  { href: "/services", Icon: MagnifyingGlass, label: "Discover" },
   { href: "/profile", Icon: User, label: "Profile" },
 ];
 
@@ -41,20 +41,20 @@ export function BottomNav() {
             <Link
               key={href}
               href={href}
-              className="flex flex-col items-center gap-1 flex-1 max-w-[72px] -mt-6"
+              className="flex flex-col items-center gap-1 flex-1 max-w-[72px] -mt-6 transition-transform duration-200 hover:scale-105 active:scale-95"
             >
               <div
-                className="w-14 h-14 rounded-full flex items-center justify-center shrink-0"
+                className="w-14 h-14 rounded-full flex items-center justify-center shrink-0 transition-transform duration-200"
                 style={{
                   background: "var(--primary)",
                   color: "var(--text-inverse)",
                   boxShadow: "var(--shadow-cherry)",
                 }}
               >
-                <Plus size={28} weight="bold" />
+                <Icon size={26} weight="bold" />
               </div>
               <span
-                className="text-[10px] font-medium"
+                className="text-[10px] font-medium transition-colors duration-200"
                 style={{ color: isActive ? "var(--primary)" : "var(--text-tertiary)" }}
               >
                 {label}
@@ -67,10 +67,10 @@ export function BottomNav() {
           <Link
             key={href}
             href={href}
-            className="flex flex-col items-center justify-center gap-1 min-w-[44px] min-h-[48px] flex-1"
+            className="flex flex-col items-center justify-center gap-1 min-w-[44px] min-h-[48px] flex-1 transition-all duration-200 active:scale-95"
           >
             <Icon size={24} weight={isActive ? "fill" : "regular"} style={{ color }} />
-            <span className="text-[10px] font-normal" style={{ color }}>
+            <span className="text-[10px] font-normal transition-colors duration-200" style={{ color }}>
               {label}
             </span>
           </Link>
