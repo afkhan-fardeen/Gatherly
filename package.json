@@ -7,6 +7,7 @@
     "dev:api": "npm run dev -w api",
     "dev:consumer": "npm run dev -w consumer",
     "dev:vendor": "npm run dev -w vendor",
+    "build": "npm run build -w @gatherly/shared && npm run build -w api && npm run build -w consumer && npm run build -w vendor",
     "db:up": "docker compose up -d",
     "db:down": "docker compose down",
     "db:studio": "npm run db:studio -w api",
