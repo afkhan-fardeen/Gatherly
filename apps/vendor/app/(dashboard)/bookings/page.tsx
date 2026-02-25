@@ -110,24 +110,56 @@ export default function BookingsPage() {
       </header>
 
       {/* Tabs */}
-      <div className="flex gap-2 overflow-x-auto pb-4 mb-6">
-        {TABS.map(({ key, label, icon: Icon, activeClass }) => (
+      <div
+        className="flex gap-1.5 rounded-full p-1.5 relative mb-6"
+        style={{
+          background: "rgba(255,255,255,0.8)",
+          border: "1px solid rgba(0,0,0,0.06)",
+          boxShadow: "0 1px 3px rgba(0,0,0,0.05)",
+        }}
+      >
+        <div
+          className="absolute top-1.5 bottom-1.5 rounded-full transition-all duration-300 ease-out"
+          style={{
+            left:
+              tab === "pending"
+                ? "6px"
+                : tab === "confirmed"
+                  ? "calc(20% + 2px)"
+                  : tab === "in_progress"
+                    ? "calc(40% + 2px)"
+                    : tab === "completed"
+                      ? "calc(60% + 2px)"
+                      : "calc(80% + 2px)",
+            width: "calc(20% - 4px)",
+            background:
+              tab === "pending"
+                ? "#d97706"
+                : tab === "confirmed"
+                  ? "#059669"
+                  : tab === "in_progress"
+                    ? "#2563eb"
+                    : tab === "completed"
+                      ? "#475569"
+                      : "#dc2626",
+            boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
+          }}
+        />
+        {TABS.map(({ key, label, icon: Icon }) => (
           <button
             key={key}
             type="button"
             onClick={() => setTab(key)}
-            className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium whitespace-nowrap transition-colors border ${
-              tab === key
-                ? `${activeClass} shadow-sm`
-                : "bg-white border-slate-200 text-slate-600 hover:bg-slate-50"
-            }`}
+            className="relative z-10 flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-full text-[12px] font-medium whitespace-nowrap transition-colors duration-300 min-w-0"
+            style={{ color: tab === key ? "white" : "#64748b" }}
           >
-            <Icon size={18} weight="regular" />
+            <Icon size={16} weight="regular" />
             {label}
           </button>
         ))}
       </div>
 
+      <div key={tab} className="animate-fade-in-up">
       {loading ? (
         <div className="space-y-4">
           {[1, 2, 3].map((i) => (
@@ -262,6 +294,7 @@ export default function BookingsPage() {
           ))}
         </div>
       )}
+      </div>
     </VendorLayout>
   );
 }

@@ -6,6 +6,7 @@ import { useParams, useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import {
   ArrowLeft,
+  CaretRight,
   ForkKnife,
   Calendar,
   MapPin,
@@ -43,7 +44,7 @@ interface BookingDetail {
   };
   package: {
     name: string;
-    packageItems: { name: string; description: string | null; category: string | null }[];
+    packageItems: { name: string; description: string | null; category: string | null; imageUrl: string | null }[];
   };
   reviews: { id: string }[];
 }
@@ -179,9 +180,9 @@ export default function BookingDetailPage() {
 
   if (loading) {
     return (
-      <AppLayout>
-        <div className="flex-1 flex items-center justify-center">
-          <p className="text-slate-500">Loading...</p>
+      <AppLayout contentBg="bg-[#f4ede5]">
+        <div className="flex-1 flex items-center justify-center" style={{ background: "linear-gradient(to bottom, #f4ede5 80%, #ede4da 100%)" }}>
+          <p className="text-[#a0888d]">Loading...</p>
         </div>
       </AppLayout>
     );
@@ -189,19 +190,26 @@ export default function BookingDetailPage() {
 
   if (error || !booking) {
     return (
-      <AppLayout>
-        <header className="sticky top-0 z-40 bg-white px-6 py-3 border-b border-slate-200 shrink-0">
-          <Link
-            href="/bookings"
-            className="flex items-center gap-3 text-slate-600 font-medium"
+      <AppLayout contentBg="bg-[#f4ede5]">
+        <div style={{ background: "linear-gradient(to bottom, #f4ede5 80%, #ede4da 100%)" }} className="min-h-full">
+          <header
+            className="sticky top-0 z-40 px-5 pt-[max(1rem,env(safe-area-inset-top))] pb-4"
+            style={{ background: "linear-gradient(to bottom, #f4ede5 75%, transparent)" }}
           >
-            <ArrowLeft size={22} weight="regular" />
-            Back to bookings
-          </Link>
-        </header>
-        <main className="p-6">
-          <p className="text-slate-500 text-center">{error || "Booking not found"}</p>
-        </main>
+            <Link
+              href="/bookings"
+              className="flex items-center gap-3 text-[#5c3d47] font-medium"
+            >
+              <span className="w-10 h-10 rounded-full bg-white border border-primary/10 flex items-center justify-center">
+                <ArrowLeft size={20} weight="regular" />
+              </span>
+              Back to bookings
+            </Link>
+          </header>
+          <main className="px-5 pb-40">
+            <p className="text-[#a0888d] text-center">{error || "Booking not found"}</p>
+          </main>
+        </div>
       </AppLayout>
     );
   }
@@ -219,31 +227,39 @@ export default function BookingDetailPage() {
   const timeStr = timeStart && timeEnd ? `${timeStart} – ${timeEnd}` : timeStart || timeEnd || null;
 
   return (
-    <AppLayout>
-      <header className="sticky top-0 z-40 bg-white px-6 py-3 border-b border-slate-200 shrink-0">
-        <div className="flex items-center gap-3">
-          <Link
-            href="/bookings"
-            className="w-11 h-11 min-w-[44px] min-h-[44px] rounded-full bg-slate-100 flex items-center justify-center shrink-0"
-          >
-            <ArrowLeft size={22} weight="regular" className="text-slate-600" />
-          </Link>
-          <div className="flex-1 min-w-0">
-            <h1 className={`${TYPO.H1_SM} truncate`}>
-              {booking.bookingReference}
-            </h1>
-            <p className={`${TYPO.CAPTION} truncate`}>
-              {booking.vendor.businessName} · {booking.package.name}
-            </p>
+    <AppLayout contentBg="bg-[#f4ede5]">
+      <div
+        className="min-h-full"
+        style={{ background: "linear-gradient(to bottom, #f4ede5 80%, #ede4da 100%)" }}
+      >
+        <header
+          className="sticky top-0 z-40 px-5 pt-[max(1rem,env(safe-area-inset-top))] pb-4"
+          style={{ background: "linear-gradient(to bottom, #f4ede5 75%, transparent)" }}
+        >
+          <div className="flex items-center gap-3">
+            <Link
+              href="/bookings"
+              className="w-10 h-10 shrink-0 rounded-full flex items-center justify-center bg-white border border-primary/10 text-[#1e0f14] transition-shadow hover:shadow-md"
+              style={{ boxShadow: "0 2px 8px rgba(109,13,53,0.06)" }}
+            >
+              <ArrowLeft size={20} weight="regular" />
+            </Link>
+            <div className="flex-1 min-w-0">
+              <h1 className="font-serif text-[24px] sm:text-[28px] font-medium leading-none tracking-[-0.5px] text-[#1e0f14] truncate">
+                Catering <span className="italic font-normal text-primary">Order</span>
+              </h1>
+              <p className="text-[12.5px] font-light text-[#9e8085] mt-1 truncate">
+                {booking.vendor.businessName} · {booking.event.name}
+              </p>
+            </div>
           </div>
-        </div>
-      </header>
+        </header>
 
-      <main className="p-6 pb-40 space-y-6">
+      <main className="px-5 pb-40 space-y-6">
         {/* Cancelled banner */}
         {booking.status === "cancelled" && (
-          <div className="p-4 rounded-md bg-cancelled/10 border border-cancelled/20">
-            <p className="text-sm font-semibold text-cancelled">This booking was cancelled</p>
+          <div className="p-4 rounded-[16px] bg-red-50 border border-red-200">
+            <p className="text-sm font-semibold text-red-700">This booking was cancelled</p>
           </div>
         )}
 
@@ -253,8 +269,8 @@ export default function BookingDetailPage() {
         )}
 
         {/* Vendor */}
-        <div className="flex items-center gap-4 p-4 border border-slate-100 rounded-md">
-          <div className="w-14 h-14 rounded-md bg-white border border-slate-100 flex items-center justify-center shrink-0 overflow-hidden">
+        <div className="flex items-center gap-4 p-4 rounded-[20px] border border-primary/10 bg-white" style={{ boxShadow: "0 2px 16px rgba(109, 13, 53, 0.06)" }}>
+          <div className="w-14 h-14 rounded-xl bg-[#f4ede5] border border-primary/5 flex items-center justify-center shrink-0 overflow-hidden">
             {booking.vendor.logoUrl ? (
               <img
                 src={booking.vendor.logoUrl}
@@ -272,10 +288,18 @@ export default function BookingDetailPage() {
         </div>
 
         {/* Event */}
-        <div className="space-y-3">
-          <h3 className={`${TYPO.H3} text-slate-500`}>
-            Event details
-          </h3>
+        <div className="p-4 rounded-[20px] border border-primary/10 bg-white space-y-3" style={{ boxShadow: "0 2px 16px rgba(109, 13, 53, 0.06)" }}>
+          <div className="flex items-center justify-between">
+            <h3 className="font-serif text-[14px] font-semibold uppercase tracking-[2px] text-[#5c3d47]">
+              For this event
+            </h3>
+            <Link
+              href={`/events/${booking.event.id}`}
+              className="text-[12px] font-semibold text-primary hover:underline flex items-center gap-1"
+            >
+              View event <CaretRight size={12} weight="bold" />
+            </Link>
+          </div>
           <div className="space-y-2">
             <div className="flex items-start gap-3">
               <Calendar size={18} weight="regular" className="text-slate-400 shrink-0 mt-0.5" />
@@ -304,21 +328,30 @@ export default function BookingDetailPage() {
 
         {/* Package items */}
         {booking.package.packageItems?.length > 0 && (
-          <div className="space-y-3">
-            <h3 className={`${TYPO.H3} text-slate-500`}>
+          <div className="p-4 rounded-[20px] border border-primary/10 bg-white space-y-3" style={{ boxShadow: "0 2px 16px rgba(109, 13, 53, 0.06)" }}>
+            <h3 className="font-serif text-[14px] font-semibold uppercase tracking-[2px] text-[#5c3d47]">
               Menu
             </h3>
             <ul className="space-y-2">
               {booking.package.packageItems.map((item, i) => (
                 <li
                   key={i}
-                  className="flex items-center gap-3 p-3 border border-slate-100 rounded-md"
+                  className="flex items-center gap-3 p-3 rounded-[14px] border border-primary/5 bg-[#fdfaf7]"
                 >
-                  <Package size={18} weight="regular" className="text-slate-400 shrink-0" />
-                  <div>
-                    <p className={TYPO.CARD_TITLE}>{item.name}</p>
+                  {item.imageUrl ? (
+                    <div className="w-12 h-12 rounded-xl overflow-hidden bg-slate-100 shrink-0 flex-shrink-0">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={item.imageUrl} alt="" className="w-full h-full object-cover" />
+                    </div>
+                  ) : (
+                    <div className="w-12 h-12 rounded-xl bg-primary/5 flex items-center justify-center shrink-0">
+                      <Package size={20} weight="regular" className="text-primary/50" />
+                    </div>
+                  )}
+                  <div className="flex-1 min-w-0">
+                    <p className="font-serif text-[15px] font-semibold text-[#1e0f14]">{item.name}</p>
                     {item.description && (
-                      <p className={TYPO.CAPTION}>{item.description}</p>
+                      <p className="text-[12px] font-normal text-[#a0888d] mt-0.5">{item.description}</p>
                     )}
                   </div>
                 </li>
@@ -329,20 +362,20 @@ export default function BookingDetailPage() {
 
         {/* Special requirements */}
         {(booking.specialRequirements || booking.event.specialRequirements) && (
-          <div className="space-y-2">
-            <h3 className={`${TYPO.H3} text-slate-500`}>
+          <div className="p-4 rounded-[20px] border border-primary/10 bg-white space-y-2" style={{ boxShadow: "0 2px 16px rgba(109, 13, 53, 0.06)" }}>
+            <h3 className="font-serif text-[14px] font-semibold uppercase tracking-[2px] text-[#5c3d47]">
               Special requirements
             </h3>
-            <p className={TYPO.BODY}>
+            <p className="text-[14px] font-normal text-[#5c3d47]">
               {booking.specialRequirements || booking.event.specialRequirements}
             </p>
           </div>
         )}
 
         {/* Total */}
-        <div className="p-4 bg-slate-50 border border-slate-100 rounded-md">
-          <p className={TYPO.BODY}>Total</p>
-          <p className="text-primary font-bold text-xl">
+        <div className="p-4 rounded-[20px] border border-primary/10 bg-white" style={{ boxShadow: "0 2px 16px rgba(109, 13, 53, 0.06)" }}>
+          <p className="text-[14px] font-normal text-[#5c3d47]">Total</p>
+          <p className="font-serif text-xl font-semibold text-primary">
             {Number(booking.totalAmount).toFixed(2)} BD
           </p>
         </div>
@@ -353,7 +386,8 @@ export default function BookingDetailPage() {
             <button
               type="button"
               onClick={openPayModal}
-              className="w-full py-3 rounded-md bg-primary text-white font-semibold flex items-center justify-center gap-2 hover:bg-primary/90"
+              className="w-full py-3.5 rounded-full bg-primary text-white font-semibold flex items-center justify-center gap-2 hover:bg-primary/90 transition-all"
+              style={{ boxShadow: "0 4px 16px rgba(109,13,53,0.28)" }}
             >
               <CreditCard size={18} weight="bold" />
               Pay {Number(booking.totalAmount).toFixed(2)} BD
@@ -363,7 +397,7 @@ export default function BookingDetailPage() {
             <button
               type="button"
               onClick={() => setReviewModal(true)}
-              className="w-full py-3 rounded-md bg-slate-100 text-slate-700 font-semibold flex items-center justify-center gap-2 hover:bg-slate-200"
+              className="w-full py-3.5 rounded-full bg-white text-[#5c3d47] font-semibold flex items-center justify-center gap-2 border border-primary/10 hover:bg-primary/5 transition-all"
             >
               <Star size={18} weight="bold" />
               Leave a review
@@ -375,7 +409,7 @@ export default function BookingDetailPage() {
       {/* Pay modal */}
       {payModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
-          <div className="form-no-zoom bg-white rounded-md p-6 max-w-sm w-full shadow-xl">
+          <div className="form-no-zoom bg-white rounded-[20px] p-6 max-w-sm w-full" style={{ boxShadow: "0 20px 60px rgba(109,13,53,0.15)" }}>
             <h3 className={`${TYPO.H2} mb-4`}>Pay {Number(booking.totalAmount).toFixed(2)} BD</h3>
             <p className={`${TYPO.SUBTEXT} mb-4`}>
               {booking.vendor.businessName} · {booking.package.name}
@@ -435,7 +469,7 @@ export default function BookingDetailPage() {
               <button
                 type="button"
                 onClick={() => setPayModal(false)}
-                className="flex-1 py-3 rounded-md border border-slate-200 font-semibold text-slate-600 hover:bg-slate-50"
+                className="flex-1 py-3 rounded-full border border-slate-200 font-semibold text-[#5c3d47] hover:bg-slate-50"
               >
                 Cancel
               </button>
@@ -447,7 +481,7 @@ export default function BookingDetailPage() {
                   (!useNewCard && !selectedPaymentId) ||
                   (useNewCard && newCardNumber.replace(/\D/g, "").length < 13)
                 }
-                className="flex-1 py-3 rounded-md bg-primary text-white font-semibold hover:bg-primary/90 disabled:opacity-50"
+                className="flex-1 py-3 rounded-full bg-primary text-white font-semibold hover:bg-primary/90 disabled:opacity-50"
               >
                 {payingId === booking.id ? "Paying…" : "Pay"}
               </button>
@@ -459,7 +493,7 @@ export default function BookingDetailPage() {
       {/* Review modal */}
       {reviewModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
-          <div className="form-no-zoom bg-white rounded-md p-6 max-w-sm w-full shadow-xl">
+          <div className="form-no-zoom bg-white rounded-[20px] p-6 max-w-sm w-full" style={{ boxShadow: "0 20px 60px rgba(109,13,53,0.15)" }}>
             <h3 className={`${TYPO.H2} mb-4`}>Leave a review</h3>
             <p className={`${TYPO.SUBTEXT} mb-4`}>
               {booking.vendor.businessName} · {booking.package.name}
@@ -493,7 +527,7 @@ export default function BookingDetailPage() {
                   setReviewText("");
                   setReviewRating(5);
                 }}
-                className="flex-1 py-3 rounded-md border border-slate-200 font-semibold text-slate-600 hover:bg-slate-50"
+                className="flex-1 py-3 rounded-full border border-slate-200 font-semibold text-[#5c3d47] hover:bg-slate-50"
               >
                 Cancel
               </button>
@@ -501,7 +535,7 @@ export default function BookingDetailPage() {
                 type="button"
                 onClick={handleSubmitReview}
                 disabled={submittingReview}
-                className="flex-1 py-3 rounded-md bg-primary text-white font-semibold hover:bg-primary/90 disabled:opacity-50"
+                className="flex-1 py-3 rounded-full bg-primary text-white font-semibold hover:bg-primary/90 disabled:opacity-50"
               >
                 {submittingReview ? "Submitting…" : "Submit"}
               </button>
@@ -509,6 +543,7 @@ export default function BookingDetailPage() {
           </div>
         </div>
       )}
+      </div>
     </AppLayout>
   );
 }

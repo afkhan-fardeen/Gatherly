@@ -10,11 +10,9 @@ import {
   Calendar,
   X,
   CheckCircle,
-  Minus,
-  Plus,
 } from "@phosphor-icons/react";
 import { AppLayout } from "@/components/AppLayout";
-import { CHERRY, ROUND, TYPO } from "@/lib/events-ui";
+import { CHERRY, TYPO } from "@/lib/events-ui";
 import {
   getBookingDraft,
   saveBookingDraft,
@@ -112,14 +110,6 @@ export default function PackageDetailPage() {
   const minG = pkg?.minGuests ?? 1;
   const maxG = pkg?.maxGuests ?? Infinity;
 
-  const adjustGuests = (delta: number) => {
-    const n = parseInt(guestCount, 10) || minG;
-    const next = Math.max(minG, Math.min(n + delta, maxG));
-    setGuestCount(String(next));
-    setGuestError("");
-    saveBookingDraft({ vendorId: id, packageId: pkgId, guestCount: next });
-  };
-
   const handleBookClick = () => {
     const token = getToken();
     if (!token) {
@@ -183,9 +173,9 @@ export default function PackageDetailPage() {
 
   if (loading) {
     return (
-      <AppLayout>
-        <div className="flex-1 flex items-center justify-center bg-[#FAFAFA]">
-          <p className="text-text-tertiary">Loading...</p>
+      <AppLayout contentBg="bg-[#f4ede5]">
+        <div className="flex-1 flex items-center justify-center" style={{ background: "linear-gradient(to bottom, #f4ede5 80%, #ede4da 100%)" }}>
+          <p className="text-[#a0888d]">Loading...</p>
         </div>
       </AppLayout>
     );
@@ -193,12 +183,12 @@ export default function PackageDetailPage() {
 
   if (!pkg || !vendor) {
     return (
-      <AppLayout>
-        <div className="flex-1 flex flex-col items-center justify-center p-6 bg-[#FAFAFA]">
-          <p className={`${TYPO.SUBTEXT} text-center`}>{error || "Package not found"}</p>
+      <AppLayout contentBg="bg-[#f4ede5]">
+        <div className="flex-1 flex flex-col items-center justify-center p-6" style={{ background: "linear-gradient(to bottom, #f4ede5 80%, #ede4da 100%)" }}>
+          <p className="text-[14px] font-normal text-[#a0888d] text-center">{error || "Package not found"}</p>
           <Link
             href={`/vendor/${id}`}
-            className={`mt-4 ${TYPO.LINK} text-primary hover:underline`}
+            className="mt-4 text-[14px] font-semibold text-primary hover:underline"
           >
             Back to vendor
           </Link>
@@ -222,10 +212,16 @@ export default function PackageDetailPage() {
   const totalAmount = subtotal + serviceCharges + setupFee;
 
   return (
-    <AppLayout showNav={false}>
-      <div className="bg-[#FAFAFA] min-h-full">
+    <AppLayout showNav={false} contentBg="bg-[#f4ede5]">
+      <div
+        className="min-h-full"
+        style={{ background: "linear-gradient(to bottom, #f4ede5 80%, #ede4da 100%)" }}
+      >
         {/* Header */}
-        <header className="sticky top-0 z-40 bg-white px-6 py-4 border-b border-slate-200 shrink-0 shadow-elevation-1">
+        <header
+          className="sticky top-0 z-40 px-5 pt-[max(1rem,env(safe-area-inset-top))] pb-4"
+          style={{ background: "linear-gradient(to bottom, #f4ede5 75%, transparent)" }}
+        >
           <div className="flex items-center gap-3">
             <Link
               href={
@@ -233,48 +229,49 @@ export default function PackageDetailPage() {
                   ? `/vendor/${id}?eventId=${eventIdFromUrl}&guestCount=${guestCountFromUrl}`
                   : `/vendor/${id}`
               }
-              className="w-11 h-11 min-w-[44px] min-h-[44px] rounded-full bg-slate-100 flex items-center justify-center shrink-0"
+              className="w-10 h-10 shrink-0 rounded-full flex items-center justify-center bg-white border border-primary/10 text-[#1e0f14] transition-shadow hover:shadow-md"
+              style={{ boxShadow: "0 2px 8px rgba(109,13,53,0.06)" }}
             >
-              <ArrowLeft size={22} weight="regular" className="text-text-secondary" />
+              <ArrowLeft size={20} weight="regular" />
             </Link>
             <div className="flex-1 min-w-0">
-              <h1 className={`${TYPO.H1} text-text-primary truncate`}>{pkg.name}</h1>
-              <p className={`${TYPO.SUBTEXT} truncate`}>{vendor.businessName}</p>
+              <h1 className="font-serif text-[22px] sm:text-[26px] font-medium text-[#1e0f14] truncate">{pkg.name}</h1>
+              <p className="text-[12.5px] font-light text-[#9e8085] truncate">{vendor.businessName}</p>
             </div>
           </div>
         </header>
 
-        <main className="pb-24">
-          <div className="p-6 space-y-6">
+        <main className="pb-24 px-5">
+          <div className="space-y-6">
             {pkg.imageUrl && (
-              <div className={`w-full h-52 overflow-hidden bg-slate-100 ${ROUND}`}>
+              <div className="w-full h-52 overflow-hidden rounded-[20px] bg-slate-100 border border-primary/10">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={pkg.imageUrl} alt="" className="w-full h-full object-cover" />
               </div>
             )}
 
-            <div>
-              <h2 className="font-serif text-typo-h2 font-medium text-text-primary">{pkg.name}</h2>
+            <div className="p-4 rounded-[20px] border border-primary/10 bg-white" style={{ boxShadow: "0 2px 16px rgba(109, 13, 53, 0.06)" }}>
+              <h2 className="font-serif text-[18px] font-semibold text-[#1e0f14]">{pkg.name}</h2>
               {pkg.description && (
-                <p className="text-body font-normal text-text-body mt-2 leading-relaxed">{pkg.description}</p>
+                <p className="text-[14px] font-normal text-[#5c3d47] mt-2 leading-relaxed">{pkg.description}</p>
               )}
             </div>
 
-            <div className={`p-5 bg-white border border-slate-200 ${ROUND} shadow-elevation-2`}>
-              <p className="text-body font-medium text-primary">
+            <div className="p-4 rounded-[20px] border border-primary/10 bg-white" style={{ boxShadow: "0 2px 16px rgba(109, 13, 53, 0.06)" }}>
+              <p className="font-serif text-[15px] font-semibold text-primary">
                 {pkg.priceType === "per_person"
                   ? `From ${Number(pkg.basePrice).toFixed(2)} BD per person`
                   : `${Number(pkg.basePrice).toFixed(2)} BD fixed`}
               </p>
               {(pkg.minGuests || pkg.maxGuests) && (
-                <p className="text-body-sm font-normal text-text-secondary mt-1">
+                <p className="text-[13px] font-normal text-[#a0888d] mt-1">
                   {pkg.minGuests && `Min ${pkg.minGuests} guests`}
                   {pkg.minGuests && pkg.maxGuests && " · "}
                   {pkg.maxGuests && `Max ${pkg.maxGuests} guests`}
                 </p>
               )}
               {pkg.setupFee != null && Number(pkg.setupFee) > 0 && (
-                <p className="text-body-sm font-normal text-text-secondary mt-1">
+                <p className="text-[13px] font-normal text-[#a0888d] mt-1">
                   Setup fee: {Number(pkg.setupFee).toFixed(2)} BD
                 </p>
               )}
@@ -282,28 +279,26 @@ export default function PackageDetailPage() {
 
             {pkg.packageItems.length > 0 && (
               <div>
-                <h3 className="text-caption font-medium text-text-tertiary uppercase tracking-wider mb-2">
+                <h3 className="font-serif text-[14px] font-semibold uppercase tracking-[2px] text-[#5c3d47] mb-2">
                   Menu items
                 </h3>
                 <div className="space-y-2">
                   {pkg.packageItems.map((item, i) => (
                     <div
                       key={i}
-                      className={`flex items-center gap-3 p-3 border border-slate-100 bg-white ${ROUND}`}
+                      className="flex items-center gap-3 p-3 rounded-[14px] border border-primary/5 bg-white"
                     >
                       {item.imageUrl ? (
-                        <div className={`w-10 h-10 overflow-hidden bg-slate-100 shrink-0 ${ROUND}`}>
+                        <div className="w-10 h-10 overflow-hidden bg-[#f4ede5] rounded-xl shrink-0">
                           {/* eslint-disable-next-line @next/next/no-img-element */}
                           <img src={item.imageUrl} alt="" className="w-full h-full object-cover" />
                         </div>
                       ) : (
-                        <div
-                          className={`w-10 h-10 bg-slate-100 flex items-center justify-center shrink-0 ${ROUND}`}
-                        >
-                          <ForkKnife size={18} weight="regular" className="text-text-tertiary" />
+                        <div className="w-10 h-10 bg-primary/5 rounded-xl flex items-center justify-center shrink-0">
+                          <ForkKnife size={18} weight="regular" className="text-primary/50" />
                         </div>
                       )}
-                      <span className="text-body font-normal text-text-body flex-1 min-w-0">{item.name}</span>
+                      <span className="text-[14px] font-normal text-[#1e0f14] flex-1 min-w-0">{item.name}</span>
                       <CheckCircle size={16} weight="fill" className="text-emerald-500 shrink-0" />
                     </div>
                   ))}
@@ -324,15 +319,15 @@ export default function PackageDetailPage() {
             }
             setShowBookModal(true);
           }}
-          className="fixed right-5 z-50 h-11 px-5 rounded-full font-medium text-sm text-white flex items-center gap-1.5 shadow-md active:scale-[0.98] transition-transform"
+          className="fixed right-5 z-50 h-10 px-4 rounded-full font-semibold text-[13px] text-white flex items-center justify-center gap-1.5 animate-subtle-pulse active:scale-[0.96] transition-transform"
           style={{
-            bottom: "calc(1.5rem + env(safe-area-inset-bottom, 0px))",
+            bottom: "calc(3.5rem + env(safe-area-inset-bottom, 0px))",
             backgroundColor: "#6D0D35",
-            boxShadow: "0 2px 12px rgba(63, 8, 16, 0.25)",
+            boxShadow: "0 4px 20px rgba(109, 13, 53, 0.35)",
           }}
         >
-          Request booking
-          <CaretRight size={18} weight="bold" />
+          Book package
+          <CaretRight size={16} weight="bold" />
         </button>
 
         {/* Book modal - guest count + price */}
@@ -344,18 +339,19 @@ export default function PackageDetailPage() {
             <button
               type="button"
               onClick={() => setShowBookModal(false)}
-              className="absolute inset-0 bg-black/50 animate-modal-backdrop"
+              className="absolute inset-0 bg-black/40 backdrop-blur-sm animate-modal-backdrop"
               aria-label="Close"
             />
             <div
-              className="form-no-zoom relative bg-white w-full max-w-md rounded-t-2xl sm:rounded-2xl p-6 overflow-y-auto animate-modal-slide-up sm:animate-modal-scale-in flex flex-col"
+              className="form-no-zoom relative bg-white w-full max-w-md rounded-t-2xl sm:rounded-2xl p-6 overflow-y-auto animate-modal-slide-up sm:animate-modal-scale-in flex flex-col shadow-xl"
               style={{
                 maxHeight: "min(calc(100vh - 2rem - env(safe-area-inset-bottom, 0px)), 500px)",
                 paddingBottom: "calc(2rem + env(safe-area-inset-bottom, 0px))",
+                boxShadow: "0 20px 60px rgba(109, 13, 53, 0.15)",
               }}
             >
               <div className="flex justify-between items-center mb-5">
-                <h3 className={TYPO.H2}>Book this package</h3>
+                <h3 className="font-serif text-[20px] font-semibold text-[#1e0f14]">Book this package</h3>
                 <button
                   type="button"
                   onClick={() => setShowBookModal(false)}
@@ -365,72 +361,51 @@ export default function PackageDetailPage() {
                 </button>
               </div>
 
-              {/* Guest count */}
+              {/* Guest count - custom input */}
               <div className="mb-5">
-                <label className="block text-sm font-medium text-text-primary mb-2">Number of guests</label>
-                <div className="flex items-center gap-3">
-                  <div className="flex items-center rounded-full border border-slate-200 overflow-hidden">
-                    <button
-                      type="button"
-                      onClick={() => adjustGuests(-1)}
-                      className="w-11 h-11 flex items-center justify-center text-text-secondary hover:bg-slate-50 disabled:opacity-30 disabled:pointer-events-none"
-                      disabled={count <= minG}
-                      aria-label="Decrease guests"
-                    >
-                      <Minus size={18} weight="bold" />
-                    </button>
-                    <input
-                      type="number"
-                      inputMode="numeric"
-                      min={minG}
-                      max={maxG === Infinity ? undefined : maxG}
-                      value={guestCount}
-                      onChange={(e) => {
-                        setGuestCount(e.target.value);
+                <label className="block font-serif text-[14px] font-semibold text-[#5c3d47] mb-2">Number of guests</label>
+                <input
+                  type="number"
+                  inputMode="numeric"
+                  min={minG}
+                  max={maxG === Infinity ? undefined : maxG}
+                  value={guestCount}
+                  onChange={(e) => {
+                    setGuestCount(e.target.value);
+                    setGuestError("");
+                  }}
+                  onBlur={() => {
+                    const n = parseInt(guestCount, 10);
+                    if (!isNaN(n)) {
+                      if (n < minG) {
+                        setGuestError(`Minimum ${minG} guests`);
+                        setGuestCount(String(minG));
+                        saveBookingDraft({ vendorId: id, packageId: pkgId, guestCount: minG });
+                      } else if (maxG !== Infinity && n > maxG) {
+                        setGuestError(`Maximum ${maxG} guests`);
+                        setGuestCount(String(maxG));
+                        saveBookingDraft({ vendorId: id, packageId: pkgId, guestCount: maxG });
+                      } else {
                         setGuestError("");
-                      }}
-                      onBlur={() => {
-                        const n = parseInt(guestCount, 10);
-                        if (!isNaN(n)) {
-                          if (n < minG) {
-                            setGuestError(`Minimum ${minG} guests`);
-                            setGuestCount(String(minG));
-                            saveBookingDraft({ vendorId: id, packageId: pkgId, guestCount: minG });
-                          } else if (maxG !== Infinity && n > maxG) {
-                            setGuestError(`Maximum ${maxG} guests`);
-                            setGuestCount(String(maxG));
-                            saveBookingDraft({ vendorId: id, packageId: pkgId, guestCount: maxG });
-                          } else {
-                            setGuestError("");
-                            saveBookingDraft({ vendorId: id, packageId: pkgId, guestCount: n });
-                          }
-                        } else {
-                          setGuestCount(String(minG));
-                          setGuestError("");
-                          saveBookingDraft({ vendorId: id, packageId: pkgId, guestCount: minG });
-                        }
-                      }}
-                      className="w-14 h-11 text-center text-base font-medium text-text-primary bg-transparent border-none focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => adjustGuests(1)}
-                      className="w-11 h-11 flex items-center justify-center text-text-secondary hover:bg-slate-50 disabled:opacity-30 disabled:pointer-events-none"
-                      disabled={count >= maxG}
-                      aria-label="Increase guests"
-                    >
-                      <Plus size={18} weight="bold" />
-                    </button>
-                  </div>
-                  {(pkg.minGuests || pkg.maxGuests) && (
-                    <span className="text-sm text-text-tertiary">
-                      Min {pkg.minGuests ?? 1}
-                      {pkg.maxGuests && ` · Max ${pkg.maxGuests}`}
-                    </span>
-                  )}
-                </div>
+                        saveBookingDraft({ vendorId: id, packageId: pkgId, guestCount: n });
+                      }
+                    } else {
+                      setGuestCount(String(minG));
+                      setGuestError("");
+                      saveBookingDraft({ vendorId: id, packageId: pkgId, guestCount: minG });
+                    }
+                  }}
+                  placeholder="e.g. 25"
+                  className="w-full h-12 px-4 rounded-xl bg-[#fdfaf7] border border-primary/10 text-[15px] font-medium text-[#1e0f14] placeholder:text-[#9e8085] outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                />
+                {(pkg.minGuests || pkg.maxGuests) && (
+                  <p className="mt-1.5 text-[12px] font-normal text-[#9e8085]">
+                    Min {pkg.minGuests ?? 1}
+                    {pkg.maxGuests && ` · Max ${pkg.maxGuests} guests`}
+                  </p>
+                )}
                 {guestError && (
-                  <p className="mt-1.5 text-sm text-red-600">{guestError}</p>
+                  <p className="mt-1.5 text-[13px] font-medium text-red-600">{guestError}</p>
                 )}
               </div>
 
@@ -447,7 +422,7 @@ export default function PackageDetailPage() {
                 type="button"
                 onClick={handleBookClick}
                 className="w-full h-12 rounded-full font-semibold text-base text-white flex items-center justify-center gap-2 active:scale-[0.98]"
-                style={{ backgroundColor: "#6D0D35" }}
+                style={{ backgroundColor: "#6D0D35", boxShadow: "0 4px 16px rgba(109,13,53,0.28)" }}
               >
                 Continue to select event
                 <CaretRight size={22} weight="bold" />
@@ -467,18 +442,19 @@ export default function PackageDetailPage() {
             <button
               type="button"
               onClick={() => setShowEventPicker(false)}
-              className="absolute inset-0 bg-black/50 animate-modal-backdrop"
+              className="absolute inset-0 bg-black/40 backdrop-blur-sm animate-modal-backdrop"
               aria-label="Close"
             />
             <div
-              className="form-no-zoom relative bg-white w-full max-w-md rounded-t-2xl sm:rounded-2xl p-6 overflow-y-auto animate-modal-slide-up sm:animate-modal-scale-in flex flex-col"
+              className="form-no-zoom relative bg-white w-full max-w-md rounded-t-2xl sm:rounded-2xl p-6 overflow-y-auto animate-modal-slide-up sm:animate-modal-scale-in flex flex-col shadow-xl"
               style={{
                 maxHeight: "min(calc(100vh - 2rem - env(safe-area-inset-bottom, 0px)), 500px)",
                 paddingBottom: "calc(2rem + env(safe-area-inset-bottom, 0px))",
+                boxShadow: "0 20px 60px rgba(109, 13, 53, 0.15)",
               }}
             >
               <div className="flex justify-between items-center mb-5">
-                <h3 className={TYPO.H2}>Select event</h3>
+                <h3 className="font-serif text-[20px] font-semibold text-[#1e0f14]">Select event</h3>
                 <button
                   type="button"
                   onClick={() => setShowEventPicker(false)}

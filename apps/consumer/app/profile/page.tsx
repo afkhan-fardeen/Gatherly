@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import {
   ArrowLeft,
   Camera,
+  CalendarCheck,
   ForkKnife,
   CreditCard,
   Receipt,
@@ -39,6 +40,7 @@ interface EventSummary {
 const QUICK_ACCESS = [
   { href: "/services/catering", icon: ForkKnife, label: "Browse Catering", sublabel: "Find catering for your events", iconClass: "bg-emerald-500/10 text-emerald-700" },
   { href: "/events", icon: Calendar, label: "My Events", sublabel: "Manage all your gatherings", iconClass: "bg-primary/10 text-primary", badge: true },
+  { href: "/bookings", icon: CalendarCheck, label: "My Bookings", sublabel: "Catering orders and payments", iconClass: "bg-amber-500/10 text-amber-700" },
 ] as const;
 
 const ACCOUNT_ITEMS = [
@@ -159,8 +161,8 @@ export default function ProfilePage() {
 
   if (loading || !user) {
     return (
-      <AppLayout>
-        <div className="flex-1 flex items-center justify-center bg-cream">
+      <AppLayout contentBg="bg-[#f4ede5]">
+        <div className="flex-1 flex items-center justify-center" style={{ background: "linear-gradient(to bottom, #f4ede5 80%, #ede4da 100%)" }}>
           <p className={TYPO.SUBTEXT}>{loading ? "Loading..." : "Please log in"}</p>
         </div>
       </AppLayout>
@@ -170,47 +172,45 @@ export default function ProfilePage() {
   const initials = user.name.split(" ").map((n) => n[0]).join("").toUpperCase().slice(0, 2);
 
   return (
-    <AppLayout contentBg="bg-cream">
-      <div className="flex-1 min-h-[100dvh]">
-        <header className="sticky top-0 z-40 flex items-center gap-3.5 px-5 pt-[max(1rem,env(safe-area-inset-top))] pb-4">
-          <Link
-            href="/dashboard"
-            className="w-[38px] h-[38px] rounded-full flex items-center justify-center shrink-0 border-[1.5px] bg-white transition-shadow hover:shadow-md"
-            style={{ borderColor: "#e4dbd1", boxShadow: "0 2px 8px rgba(0,0,0,0.06)" }}
-          >
-            <ArrowLeft size={16} weight="regular" className="text-text-primary" />
-          </Link>
-          <h1 className="font-serif text-[20px] font-medium text-text-primary tracking-tight">Profile</h1>
+    <AppLayout contentBg="bg-[#f4ede5]">
+      <div
+        className="flex-1 min-h-[100dvh]"
+        style={{ background: "linear-gradient(to bottom, #f4ede5 80%, #ede4da 100%)" }}
+      >
+        <header
+          className="sticky top-0 z-40 px-5 pt-[max(1rem,env(safe-area-inset-top))] pb-4"
+          style={{ background: "linear-gradient(to bottom, #f4ede5 75%, transparent)" }}
+        >
+          <div className="flex items-start justify-between">
+            <div className="flex items-center gap-3.5">
+              <Link
+                href="/dashboard"
+                className="w-10 h-10 shrink-0 rounded-full flex items-center justify-center bg-white border border-primary/10 text-[#1e0f14] transition-shadow hover:shadow-md"
+                style={{ boxShadow: "0 2px 8px rgba(109,13,53,0.06)" }}
+              >
+                <ArrowLeft size={20} weight="regular" />
+              </Link>
+              <div>
+                <h1 className="font-serif text-[28px] sm:text-[34px] font-medium leading-none tracking-[-0.8px] text-[#1e0f14]">
+                  My <span className="italic font-normal text-primary">Profile</span>
+                </h1>
+                <p className="text-[12.5px] font-light text-[#9e8085] mt-1 tracking-wide">
+                  Your account and settings
+                </p>
+              </div>
+            </div>
+          </div>
         </header>
 
         <main className="px-4 pb-32 space-y-6">
-          {/* Profile card - matches reference */}
+          {/* Profile card - no header image */}
           <section className="animate-fade-in-up">
             <div
               className="bg-white rounded-[20px] overflow-hidden"
               style={{ boxShadow: "0 4px 24px rgba(109, 13, 53, 0.08)" }}
             >
-              <div className="relative h-[100px] overflow-hidden">
-                <div
-                  className="absolute inset-0"
-                  style={{ background: "linear-gradient(135deg, #6D0D35 0%, #5A0B2C 100%)" }}
-                />
-                <div
-                  className="absolute inset-0 opacity-90"
-                  style={{
-                    backgroundImage: "radial-gradient(circle at 80% 50%, rgba(255,255,255,0.07) 0%, transparent 55%), radial-gradient(circle at 20% 80%, rgba(255,255,255,0.05) 0%, transparent 40%)",
-                  }}
-                />
-                <Link
-                  href="/profile/edit"
-                  className="absolute top-2.5 right-2.5 w-[30px] h-[30px] rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center text-white/90 hover:bg-white/30 transition-colors"
-                  aria-label="Edit banner"
-                >
-                  <Camera size={12} weight="regular" />
-                </Link>
-              </div>
-              <div className="px-5 pb-6">
-                <div className="relative -mt-10 mb-3.5">
+              <div className="px-5 pt-6 pb-6">
+                <div className="mb-4">
                   <Link href="/profile/edit" className="relative inline-block">
                     <div
                       className="w-20 h-20 rounded-full overflow-hidden border-[3.5px] border-white bg-slate-100 flex items-center justify-center"
@@ -227,11 +227,11 @@ export default function ProfilePage() {
                     </span>
                   </Link>
                 </div>
-                <h2 className="text-[22px] font-medium text-text-primary mb-0.5">{user.name}</h2>
+                <h2 className="font-serif text-[22px] font-medium text-[#1e0f14] mb-0.5">{user.name}</h2>
                 <p className="text-[13px] text-text-tertiary font-light mb-4">{user.email}</p>
 
                 {/* Stats row */}
-                <div className="flex bg-cream rounded-[14px] py-3 mb-4">
+                <div className="flex rounded-[14px] py-3 mb-4" style={{ background: "#f4ede5" }}>
                   <div className="flex-1 text-center">
                     <span className="text-[20px] font-medium text-primary block leading-none mb-1">{events.total}</span>
                     <span className="text-[10px] font-normal text-text-tertiary uppercase tracking-wider">Events</span>
@@ -262,7 +262,7 @@ export default function ProfilePage() {
 
           {/* Quick Access */}
           <section className="animate-fade-in-up" style={{ animationDelay: "0.05s" }}>
-            <h3 className="text-[10px] font-medium uppercase tracking-[1.8px] text-text-tertiary mb-2.5 pl-1">Quick Access</h3>
+            <h3 className="font-serif text-[14px] font-semibold uppercase tracking-[2px] text-[#5c3d47] mb-2.5 pl-1">Quick Access</h3>
             <MenuCard>
               {QUICK_ACCESS.map((item, i) => (
                 <div key={item.href} className={i < QUICK_ACCESS.length - 1 ? "border-b border-slate-100" : ""}>
@@ -274,7 +274,7 @@ export default function ProfilePage() {
 
           {/* Account */}
           <section className="animate-fade-in-up" style={{ animationDelay: "0.1s" }}>
-            <h3 className="text-[10px] font-medium uppercase tracking-[1.8px] text-text-tertiary mb-2.5 pl-1">Account</h3>
+            <h3 className="font-serif text-[14px] font-semibold uppercase tracking-[2px] text-[#5c3d47] mb-2.5 pl-1">Account</h3>
             <MenuCard>
               {ACCOUNT_ITEMS.map((item, i) => (
                 <div key={item.href} className={i < ACCOUNT_ITEMS.length - 1 ? "border-b border-slate-100" : ""}>
@@ -286,7 +286,7 @@ export default function ProfilePage() {
 
           {/* Settings */}
           <section className="animate-fade-in-up" style={{ animationDelay: "0.15s" }}>
-            <h3 className="text-[10px] font-medium uppercase tracking-[1.8px] text-text-tertiary mb-2.5 pl-1">Settings</h3>
+            <h3 className="font-serif text-[14px] font-semibold uppercase tracking-[2px] text-[#5c3d47] mb-2.5 pl-1">Settings</h3>
             <MenuCard>
               {SETTINGS_ITEMS.map((item, i) => (
                 <div key={item.href} className={i < SETTINGS_ITEMS.length - 1 ? "border-b border-slate-100" : ""}>
@@ -298,7 +298,7 @@ export default function ProfilePage() {
 
           {/* Support & Logout */}
           <section className="animate-fade-in-up" style={{ animationDelay: "0.2s" }}>
-            <h3 className="text-[10px] font-medium uppercase tracking-[1.8px] text-text-tertiary mb-2.5 pl-1">Support</h3>
+            <h3 className="font-serif text-[14px] font-semibold uppercase tracking-[2px] text-[#5c3d47] mb-2.5 pl-1">Support</h3>
             <MenuCard>
               {SUPPORT_ITEMS.map((item) => (
                 <div key={item.label} className="border-b border-slate-100">

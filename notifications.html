@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notifications - Gatherlii</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #faf8f5;
+            color: #1a1a1a;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            width: 100%;
+            padding: 20px;
+            flex: 1;
+        }
+        
+        .header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 32px;
+            padding-top: 16px;
+        }
+        
+        .back-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: white;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #8b5a8e;
+            font-size: 24px;
+        }
+        
+        .back-btn:active { background: #f5f5f5; }
+        
+        h1 {
+            font-size: 32px;
+            font-weight: 600;
+            letter-spacing: -0.5px;
+        }
+        
+        .notifications-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .notification {
+            background: white;
+            padding: 16px;
+            border-radius: 16px;
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+            transition: all 0.2s;
+            border-left: 4px solid transparent;
+        }
+        
+        .notification:active {
+            transform: scale(0.98);
+            background: #f9f9f9;
+        }
+        
+        .notification.unread {
+            border-left-color: #8b3a62;
+            background: #fef5f8;
+        }
+        
+        .icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+        
+        .icon.event { background: #ede0f5; color: #8b3a62; }
+        .icon.booking { background: #e8f5e9; color: #2d7c3a; }
+        .icon.message { background: #e3f2fd; color: #1565c0; }
+        .icon.payment { background: #fff3e0; color: #e65100; }
+        
+        .content {
+            flex: 1;
+            min-width: 0;
+        }
+        
+        .title {
+            font-size: 15px;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 4px;
+        }
+        
+        .description {
+            font-size: 13px;
+            color: #999;
+            line-height: 1.4;
+            margin-bottom: 8px;
+        }
+        
+        .timestamp {
+            font-size: 12px;
+            color: #bbb;
+        }
+        
+        .badge {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #8b3a62;
+            flex-shrink: 0;
+            margin-top: 6px;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #999;
+        }
+        
+        .empty-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+            opacity: 0.3;
+        }
+        
+        .empty-state h2 {
+            font-size: 18px;
+            color: #1a1a1a;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        
+        .bottom-nav {
+            display: flex;
+            justify-content: space-around;
+            padding: 16px 0 24px;
+            border-top: 1px solid #eee;
+            background: white;
+            max-width: 600px;
+            margin: 0 auto;
+            width: 100%;
+        }
+        
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            color: #999;
+            font-size: 12px;
+            text-decoration: none;
+            border: none;
+            background: none;
+        }
+        
+        .nav-item.active { color: #8b3a62; }
+        .nav-item-icon { font-size: 24px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <button class="back-btn">←</button>
+            <h1>Notifications</h1>
+        </div>
+        
+        <div class="notifications-list">
+            <div class="notification unread">
+                <div class="icon event"><i class="far fa-calendar"></i></div>
+                <div class="content">
+                    <div class="title">New Event Interest</div>
+                    <div class="description">Sarah liked your "Garden Wedding" event</div>
+                    <div class="timestamp">2 hours ago</div>
+                </div>
+                <div class="badge"></div>
+            </div>
+            
+            <div class="notification unread">
+                <div class="icon booking"><i class="fas fa-check"></i></div>
+                <div class="content">
+                    <div class="title">Booking Confirmed</div>
+                    <div class="description">Chat Town Catering confirmed for March 15</div>
+                    <div class="timestamp">4 hours ago</div>
+                </div>
+                <div class="badge"></div>
+            </div>
+            
+            <div class="notification">
+                <div class="icon message"><i class="far fa-comment"></i></div>
+                <div class="content">
+                    <div class="title">New Message</div>
+                    <div class="description">Bahraini Delights replied to your inquiry</div>
+                    <div class="timestamp">1 day ago</div>
+                </div>
+            </div>
+            
+            <div class="notification">
+                <div class="icon payment"><i class="fas fa-credit-card"></i></div>
+                <div class="content">
+                    <div class="title">Payment Received</div>
+                    <div class="description">Guest payment of 75 BD received</div>
+                    <div class="timestamp">2 days ago</div>
+                </div>
+            </div>
+            
+            <div class="notification">
+                <div class="icon event"><i class="far fa-calendar"></i></div>
+                <div class="content">
+                    <div class="title">Event Reminder</div>
+                    <div class="description">Your event "Birthday Bash" is in 3 days</div>
+                    <div class="timestamp">3 days ago</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="bottom-nav">
+        <button class="nav-item">
+            <span class="nav-item-icon"><i class="fas fa-home"></i></span>
+            <span>Home</span>
+        </button>
+        <button class="nav-item">
+            <span class="nav-item-icon"><i class="far fa-calendar"></i></span>
+            <span>Events</span>
+        </button>
+        <button class="nav-item" style="opacity: 0;">
+            <span class="nav-item-icon">+</span>
+        </button>
+        <button class="nav-item">
+            <span class="nav-item-icon"><i class="fas fa-search"></i></span>
+            <span>Discover</span>
+        </button>
+        <button class="nav-item active">
+            <span class="nav-item-icon"><i class="fas fa-bell"></i></span>
+            <span>Notify</span>
+        </button>
+    </div>
+</body>
+</html>

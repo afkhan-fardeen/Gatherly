@@ -16,6 +16,8 @@ import {
   Calendar,
   MapPin,
   Users,
+  CloudArrowDown,
+  CloudCheck,
 } from "@phosphor-icons/react";
 import { AppLayout } from "@/components/AppLayout";
 import { parseApiError, API_URL, getNetworkErrorMessage } from "@/lib/api";
@@ -56,6 +58,7 @@ export function CreateEventContent() {
     imageUrl: "",
   });
   const [uploadingImage, setUploadingImage] = useState(false);
+  const [savedAt, setSavedAt] = useState<number | null>(null);
 
   useEffect(() => {
     const token = (localStorage.getItem("token") || "").trim();
@@ -96,41 +99,31 @@ export function CreateEventContent() {
   }, []);
 
   function update(f: Partial<typeof form>) {
-    setForm((prev) => {
-      const next = { ...prev, ...f };
-      saveEventCreateDraft({
-        name: next.name,
-        eventType: next.eventType,
-        date: next.date,
-        timeStart: next.timeStart,
-        timeEnd: next.timeEnd,
-        guestCount: next.guestCount,
-        location: next.location,
-        venueType: next.venueType,
-        venueName: next.venueName,
-        specialRequirements: next.specialRequirements,
-        imageUrl: next.imageUrl,
-      });
-      return next;
-    });
+    setForm((prev) => ({ ...prev, ...f }));
   }
 
-  function handleSaveDraft() {
-    saveEventCreateDraft({
-      name: form.name,
-      eventType: form.eventType,
-      date: form.date,
-      timeStart: form.timeStart,
-      timeEnd: form.timeEnd,
-      guestCount: form.guestCount,
-      location: form.location,
-      venueType: form.venueType,
-      venueName: form.venueName,
-      specialRequirements: form.specialRequirements,
-      imageUrl: form.imageUrl,
-    });
-    toast.success("Draft saved");
-  }
+  // Autosave draft (debounced 500ms)
+  useEffect(() => {
+    const hasData = form.name.trim() || form.date || form.location.trim() || form.guestCount > 0 || form.specialRequirements.trim() || form.imageUrl.trim();
+    if (!hasData) return;
+    const t = setTimeout(() => {
+      saveEventCreateDraft({
+        name: form.name,
+        eventType: form.eventType,
+        date: form.date,
+        timeStart: form.timeStart,
+        timeEnd: form.timeEnd,
+        guestCount: form.guestCount,
+        location: form.location,
+        venueType: form.venueType,
+        venueName: form.venueName,
+        specialRequirements: form.specialRequirements,
+        imageUrl: form.imageUrl,
+      });
+      setSavedAt(Date.now());
+    }, 500);
+    return () => clearTimeout(t);
+  }, [form]);
 
   function toggleSection(id: string) {
     setExpanded((prev) => (prev === id ? null : id));
@@ -232,9 +225,24 @@ export function CreateEventContent() {
           <h1 className="font-serif text-[22px] font-medium text-[#1e0f14] tracking-[-0.3px]">
             New Event
           </h1>
-          <button type="button" onClick={handleSaveDraft} className="text-[13px] font-medium text-primary opacity-60 hover:opacity-100 transition-opacity">
-            Save draft
-          </button>
+          {(() => {
+            const hasData = form.name.trim() || form.date || form.location.trim() || form.guestCount > 0 || form.specialRequirements.trim() || form.imageUrl.trim();
+            const justSaved = savedAt && Date.now() - savedAt < 2500;
+            if (!hasData) return null;
+            return (
+              <span
+                className={`flex items-center gap-1.5 text-[13px] transition-colors ${justSaved ? "text-emerald-600" : "text-[#9e8085]"}`}
+                title="Saved automatically"
+              >
+                {justSaved ? (
+                  <CloudCheck size={18} weight="fill" className="text-emerald-600" />
+                ) : (
+                  <CloudArrowDown size={18} weight="regular" className="text-primary/70" />
+                )}
+                <span className="hidden sm:inline">{justSaved ? "Saved" : "Auto-save"}</span>
+              </span>
+            );
+          })()}
         </header>
 
         {/* Progress */}
@@ -524,27 +532,24 @@ export function CreateEventContent() {
                     <label className="text-[11px] font-medium uppercase tracking-[1.2px] text-[#a0888d] block mb-2">
                       Expected Guests
                     </label>
-                    <div className="flex items-center justify-between bg-[#f4ede5] rounded-xl py-2.5 px-3.5">
-                      <span className="text-[13px] font-normal text-[#5c3d47]">Number of guests</span>
-                      <div className="flex items-center gap-3.5">
-                        <button
-                          type="button"
-                          onClick={() => update({ guestCount: Math.max(0, form.guestCount - 5) })}
-                          className="w-[30px] h-[30px] rounded-full border border-primary/10 bg-[#fdfaf7] flex items-center justify-center text-primary text-lg font-light hover:bg-primary/7 hover:border-primary/20 transition-colors"
-                        >
-                          −
-                        </button>
-                        <span className="text-[22px] font-medium text-[#1e0f14] min-w-[28px] text-center">
-                          {form.guestCount}
-                        </span>
-                        <button
-                          type="button"
-                          onClick={() => update({ guestCount: form.guestCount + 5 })}
-                          className="w-[30px] h-[30px] rounded-full border border-primary/10 bg-[#fdfaf7] flex items-center justify-center text-primary text-lg font-light hover:bg-primary/7 hover:border-primary/20 transition-colors"
-                        >
-                          +
-                        </button>
-                      </div>
+                    <div className="flex items-center gap-3 bg-[#f4ede5] rounded-xl py-2.5 px-3.5">
+                      <span className="text-[13px] font-normal text-[#5c3d47] shrink-0">Number of guests</span>
+                      <input
+                        type="number"
+                        inputMode="numeric"
+                        min={1}
+                        max={9999}
+                        value={form.guestCount || ""}
+                        onChange={(e) => {
+                          const val = e.target.value === "" ? 0 : parseInt(e.target.value, 10);
+                          if (!isNaN(val)) update({ guestCount: Math.max(0, Math.min(9999, val)) });
+                        }}
+                        onBlur={() => {
+                          if (form.guestCount < 1) update({ guestCount: 1 });
+                        }}
+                        placeholder="e.g. 25"
+                        className="flex-1 min-w-0 h-10 px-4 rounded-lg bg-white border border-primary/10 text-[15px] font-medium text-[#1e0f14] text-center placeholder:text-[#9e8085] outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                      />
                     </div>
                   </div>
                   <div>

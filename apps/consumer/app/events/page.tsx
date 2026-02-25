@@ -16,6 +16,7 @@ import { AppLayout } from "@/components/AppLayout";
 import { PullToRefresh } from "@/components/PullToRefresh";
 import { API_URL } from "@/lib/api";
 import { formatTime } from "@/lib/date-utils";
+import { PARTNER_GRADIENTS } from "@/lib/gradients";
 
 interface Event {
   id: string;
@@ -31,13 +32,14 @@ interface Event {
   _count?: { guests: number };
 }
 
-type Tab = "upcoming" | "past";
+type Tab = "upcoming" | "past" | "draft";
 
 function getStatusDisplay(status: string | undefined, isPast: boolean): { label: string; className: string } {
   const s = status || "draft";
-  const completeStyle = "bg-[rgba(100,100,120,0.07)] text-[#6b6080] border-[rgba(100,100,120,0.12)]";
-  if (s === "cancelled") return { label: "Cancelled", className: "bg-slate-100 text-slate-500 border-slate-200" };
-  if (isPast) return { label: "Complete", className: completeStyle };
+  const completeStyle = "bg-emerald-100 text-emerald-700 border-emerald-200";
+  if (s === "cancelled") return { label: "Cancelled", className: "bg-red-100 text-red-700 border-red-200" };
+  if (s === "completed") return { label: "Complete", className: completeStyle };
+  if (isPast) return { label: "Past", className: "bg-slate-100 text-slate-600 border-slate-200" };
   if (s === "in_progress") return { label: "Catering", className: "bg-amber-500/10 text-amber-700 border-amber-500/20" };
   if (s === "draft") return { label: "Planning", className: "bg-emerald-500/10 text-emerald-700 border-emerald-500/20" };
   return { label: "Upcoming", className: "bg-primary/10 text-primary border-primary/20" };
@@ -73,12 +75,16 @@ export default function EventsPage() {
   today.setHours(0, 0, 0, 0);
   const upcoming = events.filter((e) => new Date(e.date) >= today);
   const past = events.filter((e) => new Date(e.date) < today);
-  const filtered = tab === "upcoming" ? upcoming : past;
+  const drafts = events.filter((e) => (e.status || "draft") === "draft");
+  const filtered =
+    tab === "upcoming" ? upcoming
+    : tab === "past" ? past
+    : drafts;
 
   return (
-    <AppLayout contentBg="bg-cream">
+    <AppLayout contentBg="bg-[#f4ede5]">
       <PullToRefresh onRefresh={fetchEvents}>
-        <div className="min-h-full bg-cream">
+        <div className="min-h-full" style={{ background: "linear-gradient(to bottom, #f4ede5 80%, #ede4da 100%)" }}>
           {/* Topbar - matches gatherlii-events */}
           <header
             className="sticky top-0 z-20 px-5 md:px-8 pt-[max(1rem,env(safe-area-inset-top))] pb-4"
@@ -92,7 +98,7 @@ export default function EventsPage() {
                   My <span className="italic font-normal text-primary">Events</span>
                 </h1>
                 <p className="text-[12.5px] font-light text-[#9e8085] mt-1 tracking-wide">
-                  {tab === "upcoming" ? "Showing upcoming events" : "Showing past events"}
+                  {tab === "upcoming" ? "Planning events" : tab === "past" ? "Past events" : "Draft events"}
                 </p>
               </div>
               <Link
@@ -107,41 +113,49 @@ export default function EventsPage() {
 
             {/* Tabs */}
             <div
-              className="flex gap-2 mt-6 mb-6 rounded-full p-1.5"
+              className="flex gap-1.5 mt-6 mb-6 rounded-full p-1.5 relative"
               style={{
                 background: "rgba(255,255,255,0.6)",
                 border: "1px solid rgba(109,13,53,0.09)",
                 backdropFilter: "blur(8px)",
               }}
             >
+              <div
+                className="absolute top-1.5 bottom-1.5 rounded-full bg-[#6D0D35] transition-all duration-300 ease-out"
+                style={{
+                  left: tab === "upcoming" ? "6px" : tab === "past" ? "calc(33.33% + 2px)" : "calc(66.66% + 2px)",
+                  width: "calc(33.33% - 4px)",
+                  boxShadow: "0 4px 14px rgba(109,13,53,0.3)",
+                }}
+              />
               <button
                 type="button"
                 onClick={() => setTab("upcoming")}
-                className={`flex-1 py-2.5 rounded-full text-[13.5px] font-normal transition-all ${
-                  tab === "upcoming"
-                    ? "text-white font-normal"
-                    : "text-[#9e8085]"
-                }`}
-                style={tab === "upcoming" ? { background: "#6D0D35", boxShadow: "0 4px 14px rgba(109,13,53,0.3)" } : {}}
+                className="relative z-10 flex-1 py-2.5 rounded-full text-[12px] font-normal transition-colors duration-300"
+                style={{ color: tab === "upcoming" ? "white" : "#9e8085" }}
               >
-                Upcoming
+                Planning
               </button>
               <button
                 type="button"
                 onClick={() => setTab("past")}
-                className={`flex-1 py-2.5 rounded-full text-[13.5px] font-normal transition-all ${
-                  tab === "past"
-                    ? "text-white font-normal"
-                    : "text-[#9e8085]"
-                }`}
-                style={tab === "past" ? { background: "#6D0D35", boxShadow: "0 4px 14px rgba(109,13,53,0.3)" } : {}}
+                className="relative z-10 flex-1 py-2.5 rounded-full text-[12px] font-normal transition-colors duration-300"
+                style={{ color: tab === "past" ? "white" : "#9e8085" }}
               >
                 Past
+              </button>
+              <button
+                type="button"
+                onClick={() => setTab("draft")}
+                className="relative z-10 flex-1 py-2.5 rounded-full text-[12px] font-normal transition-colors duration-300"
+                style={{ color: tab === "draft" ? "white" : "#9e8085" }}
+              >
+                Draft
               </button>
             </div>
           </header>
 
-          <main className="px-4 md:px-8 pb-32">
+          <main className="px-4 md:px-8 pb-32 animate-fade-in-up" key={tab}>
             {loading ? (
               <div className="space-y-3 md:grid md:grid-cols-2 md:gap-4 md:space-y-0">
                 {[1, 2, 3].map((i) => (
@@ -157,14 +171,16 @@ export default function EventsPage() {
                   <Calendar size={26} weight="regular" />
                 </div>
                 <h3 className="font-serif text-[20px] font-semibold text-[#1e0f14] mb-1.5">
-                  {tab === "upcoming" ? "No upcoming events" : "No past events"}
+                  {tab === "upcoming" ? "No planning events" : tab === "past" ? "No past events" : "No drafts"}
                 </h3>
                 <p className="text-[13px] font-light text-[#9e8085]">
                   {tab === "upcoming"
                     ? "Tap the + button to plan your next gathering."
-                    : "Past events will appear here."}
+                    : tab === "past"
+                      ? "Past events will appear here."
+                      : "Draft events will appear here."}
                 </p>
-                {tab === "upcoming" && (
+                {(tab === "upcoming" || tab === "draft") && (
                   <Link
                     href="/events/create"
                     className="inline-block mt-6 px-6 py-3 rounded-full text-sm font-normal text-white"
@@ -176,8 +192,8 @@ export default function EventsPage() {
               </div>
             ) : (
               <>
-                <p className="font-serif text-[11px] font-semibold uppercase tracking-[2px] text-[#5c3d47] mb-3 pl-0.5">
-                  {tab === "upcoming" ? "Upcoming Events" : "Past Events"}
+                <p className="font-serif text-[14px] font-semibold uppercase tracking-[2px] text-[#5c3d47] mb-3 pl-0.5">
+                  {tab === "upcoming" ? "Planning Events" : tab === "past" ? "Past Events" : "Draft Events"}
                 </p>
                 <div className="flex flex-col gap-3 md:grid md:grid-cols-2 md:gap-4">
                   {filtered.map((event, i) => {
@@ -198,52 +214,76 @@ export default function EventsPage() {
                         >
                           {/* Date block */}
                           <div
-                            className="w-[72px] shrink-0 flex flex-col items-center justify-center gap-0.5 py-4 px-2 border-r border-primary/10"
-                            style={{ background: i % 2 === 0 ? "#E5EDBF" : "#CFD7F2" }}
+                            className="w-[84px] shrink-0 flex flex-col items-center justify-center gap-0.5 py-2 px-2 border-r border-primary/10"
+                            style={{
+                              background: PARTNER_GRADIENTS[i % PARTNER_GRADIENTS.length],
+                            }}
                           >
-                            <span className="font-serif text-[10px] font-semibold uppercase tracking-[1.5px] text-primary">
+                            <span className="font-serif text-[10px] font-semibold uppercase tracking-wider text-white/80">
                               {d.toLocaleDateString("en-US", { month: "short" })}
                             </span>
-                            <span className="font-serif text-[26px] font-semibold leading-none text-[#1e0f14]">
+                            <span className="font-serif text-[22px] font-semibold leading-none text-white">
                               {d.getDate()}
                             </span>
-                            <span className="font-serif text-[10px] font-semibold text-[#a0888d]">
+                            <span className="font-serif text-[10px] font-semibold text-white/70">
                               {d.toLocaleDateString("en-US", { weekday: "short" })}
                             </span>
                           </div>
 
                           {/* Event body */}
-                          <div className="flex-1 min-w-0 py-3.5 px-4 flex flex-col gap-1.5">
+                          <div className="flex-1 min-w-0 py-2.5 px-3 flex flex-col gap-1">
+                            {/* Title row: title, guests (past: tag before arrow), arrow */}
                             <div className="flex items-start justify-between gap-2">
-                              <h3 className="font-serif text-[15px] font-semibold text-[#1e0f14] tracking-[-0.2px] truncate">
-                                {event.name}
-                              </h3>
-                              <CaretRight size={14} weight="bold" className="text-[#9e8085] shrink-0 mt-0.5 transition-all group-hover:translate-x-0.5 group-hover:text-primary" />
-                            </div>
-                            <div
-                              className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[9.5px] font-medium uppercase tracking-wider border w-fit ${statusDisplay.className}`}
-                            >
-                              <span className="w-1.5 h-1.5 rounded-full bg-current" />
-                              {statusDisplay.label}
-                            </div>
-                            <div className="flex flex-col gap-0.5">
-                              <div className="flex items-center gap-1.5 text-[12px] font-light text-[#9e8085]">
-                                {timeStr ? (
-                                  <>
-                                    <Clock size={11} weight="regular" className="shrink-0 opacity-60" />
-                                    {timeStr}
-                                  </>
-                                ) : null}
-                                <span className="flex items-center gap-1 ml-auto text-[11px] bg-cream rounded-full px-2 py-0.5 text-[#9e8085]">
+                              <div className="flex-1 min-w-0">
+                                <h3 className="font-serif text-[14px] font-semibold text-[#1e0f14] tracking-[-0.2px] truncate">
+                                  {event.name}
+                                </h3>
+                                <span className="flex items-center gap-1 text-[11px] font-light text-[#9e8085] mt-0.5">
                                   <Users size={10} weight="regular" className="shrink-0 opacity-60" />
                                   {event.guestCount ?? 0} guests
                                 </span>
                               </div>
+                              <div className="flex items-center gap-1.5 shrink-0">
+                                {tab === "upcoming" && !isPast && (
+                                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-medium uppercase tracking-wider border bg-emerald-500/10 text-emerald-700 border-emerald-500/20">
+                                    <span className="w-1.5 h-1.5 rounded-full bg-current" />
+                                    Planning
+                                  </span>
+                                )}
+                                {isPast && (
+                                  <span
+                                    className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-medium uppercase tracking-wider border ${statusDisplay.className}`}
+                                  >
+                                    <span className="w-1.5 h-1.5 rounded-full bg-current" />
+                                    {statusDisplay.label}
+                                  </span>
+                                )}
+                                <CaretRight size={14} weight="bold" className="text-[#9e8085] transition-all group-hover:translate-x-0.5 group-hover:text-primary" />
+                              </div>
+                            </div>
+                            {/* Status for upcoming (below title) - hide when Planning label is on right */}
+                            {!isPast && tab !== "upcoming" && (
+                              <div
+                                className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-medium uppercase tracking-wider border w-fit ${statusDisplay.className}`}
+                              >
+                                <span className="w-1.5 h-1.5 rounded-full bg-current" />
+                                {statusDisplay.label}
+                              </div>
+                            )}
+                            {/* Time and location in one line */}
+                            <div className="flex items-center gap-2 text-[11px] font-light text-[#9e8085] truncate">
+                              {timeStr && (
+                                <span className="flex items-center gap-1 shrink-0">
+                                  <Clock size={11} weight="regular" className="opacity-60" />
+                                  {timeStr}
+                                </span>
+                              )}
+                              {timeStr && event.location && <span className="opacity-50">·</span>}
                               {event.location && (
-                                <div className="flex items-center gap-1.5 text-[12px] font-light text-[#9e8085]">
+                                <span className="flex items-center gap-1 min-w-0 truncate">
                                   <MapPin size={11} weight="regular" className="shrink-0 opacity-60" />
                                   <span className="truncate">{event.location}</span>
-                                </div>
+                                </span>
                               )}
                             </div>
                           </div>
@@ -251,7 +291,7 @@ export default function EventsPage() {
                         {!isPast && (
                           <Link
                             href={`/services/catering?eventId=${event.id}`}
-                            className="flex items-center justify-center gap-2 py-3 border-t border-primary/5 bg-primary/5 text-primary hover:bg-primary/10 transition-colors text-sm font-normal"
+                            className="flex items-center justify-center gap-2 py-2.5 border-t border-primary/5 bg-primary/5 text-primary hover:bg-primary/10 transition-colors text-[13px] font-normal"
                           >
                             <ForkKnife size={18} weight="regular" />
                             Book catering

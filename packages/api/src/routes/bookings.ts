@@ -180,7 +180,7 @@ bookingsRouter.get("/:id", async (req, res) => {
       },
       package: {
         include: {
-          packageItems: { orderBy: { displayOrder: "asc" }, select: { name: true, description: true, category: true } },
+          packageItems: { orderBy: { displayOrder: "asc" }, select: { name: true, description: true, category: true, imageUrl: true } },
         },
       },
       reviews: { select: { id: true } },

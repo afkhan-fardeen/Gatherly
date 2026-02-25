@@ -131,9 +131,14 @@ export default function EditEventPage() {
   }
 
   return (
-    <AppLayout>
-      <div className="bg-[var(--bg-app)] min-h-full pb-[calc(6rem+env(safe-area-inset-bottom,0px))]">
-        <header className="px-6 pt-6 pb-4 shrink-0">
+    <AppLayout contentBg="bg-[#f4ede5]" fullHeight={false}>
+      <div
+        className="px-5 md:px-8 pt-6 pb-[calc(6rem+env(safe-area-inset-bottom,0px))] min-h-0"
+        style={{
+          background: "linear-gradient(to bottom, #f4ede5 80%, #ede4da 100%)",
+        }}
+      >
+        <header className="mb-6">
           <div className="flex items-center gap-3">
             <Link
               href={`/events/${eventId}`}
@@ -147,7 +152,7 @@ export default function EditEventPage() {
           </div>
         </header>
 
-        <main className="p-6">
+        <main>
           <form onSubmit={handleSubmit} className="form-no-zoom space-y-5">
             {error && (
               <div className="p-4 bg-red-50 border border-red-100 rounded-2xl">

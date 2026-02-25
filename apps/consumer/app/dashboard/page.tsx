@@ -141,7 +141,7 @@ export default function DashboardPage() {
         {/* Upcoming Events */}
         <section className="animate-fade-in-up" style={{ animationDelay: "0.05s" }}>
           <div className="flex justify-between items-center mb-3">
-            <span className="font-serif text-[11px] font-semibold uppercase tracking-[2px] text-[#5c3d47]">
+            <span className="font-serif text-[14px] font-semibold uppercase tracking-[2px] text-[#5c3d47]">
               Upcoming Events
             </span>
             <Link
@@ -153,7 +153,7 @@ export default function DashboardPage() {
           </div>
           {upcomingEvents.length > 0 ? (
             <div className="space-y-3">
-              {upcomingEvents.map((e) => {
+              {upcomingEvents.map((e, idx) => {
                 const { month, day, weekday } = formatEventDate(e.date);
                 const timeStr = formatTime(e.timeStart);
                 return (
@@ -163,20 +163,22 @@ export default function DashboardPage() {
                     className="flex overflow-hidden rounded-[18px] border border-primary/10 bg-[#fdfaf7] transition-all hover:shadow-[0_6px_24px_rgba(109,13,53,0.08)] active:scale-[0.99]"
                   >
                     <div
-                      className="w-[68px] shrink-0 flex flex-col items-center justify-center gap-0.5 py-3 px-2 border-r border-primary/10"
-                      style={{ backgroundColor: "#CFD7F2" }}
+                      className="w-[84px] shrink-0 flex flex-col items-center justify-center gap-0.5 py-2 px-2 border-r border-primary/10"
+                      style={{
+                        background: PARTNER_GRADIENTS[idx % PARTNER_GRADIENTS.length],
+                      }}
                     >
-                      <span className="font-serif text-[10px] font-semibold uppercase tracking-wider text-primary">
+                      <span className="font-serif text-[10px] font-semibold uppercase tracking-wider text-white/80">
                         {month}
                       </span>
-                      <span className="font-serif text-[24px] font-semibold text-[#1e0f14] leading-none">
+                      <span className="font-serif text-[22px] font-semibold text-white leading-none">
                         {day}
                       </span>
-                      <span className="font-serif text-[10px] font-semibold text-[#a0888d]">{weekday}</span>
+                      <span className="font-serif text-[10px] font-semibold text-white/70">{weekday}</span>
                     </div>
-                    <div className="flex-1 min-w-0 p-3.5 pl-4">
-                      <div className="flex items-start justify-between gap-2 mb-1">
-                        <h3 className="font-serif text-[15px] font-semibold text-[#1e0f14] tracking-tight truncate">
+                    <div className="flex-1 min-w-0 p-2.5 pl-3">
+                      <div className="flex items-start justify-between gap-2 mb-0.5">
+                        <h3 className="font-serif text-[14px] font-semibold text-[#1e0f14] tracking-tight truncate">
                           {e.name}
                         </h3>
                         <StatusBadge
@@ -186,21 +188,21 @@ export default function DashboardPage() {
                       </div>
                       <div className="flex flex-col gap-0.5">
                         {timeStr && (
-                          <div className="flex items-center gap-1.5 text-[12px] font-normal text-[#a0888d]">
+                          <div className="flex items-center gap-1.5 text-[11px] font-normal text-[#a0888d]">
                             <Clock size={11} weight="regular" className="opacity-50 shrink-0" />
                             {timeStr}
                           </div>
                         )}
                         {e.location && (
-                          <div className="flex items-center gap-1.5 text-[12px] font-normal text-[#a0888d]">
+                          <div className="flex items-center gap-1.5 text-[11px] font-normal text-[#a0888d]">
                             <MapPin size={11} weight="regular" className="opacity-50 shrink-0" />
                             <span className="truncate">{e.location}</span>
                           </div>
                         )}
                       </div>
                     </div>
-                    <div className="flex items-center pr-3">
-                      <CaretRight size={20} weight="bold" className="text-[#a0888d] shrink-0" />
+                    <div className="flex items-center pr-2.5">
+                      <CaretRight size={18} weight="bold" className="text-[#a0888d] shrink-0" />
                     </div>
                   </Link>
                 );
@@ -221,7 +223,7 @@ export default function DashboardPage() {
         {/* Featured Partners */}
         <section className="animate-fade-in-up" style={{ animationDelay: "0.1s" }}>
           <div className="flex justify-between items-center mb-3">
-            <span className="font-serif text-[11px] font-semibold uppercase tracking-[2px] text-[#5c3d47]">
+            <span className="font-serif text-[14px] font-semibold uppercase tracking-[2px] text-[#5c3d47]">
               Featured Partners
             </span>
             <Link

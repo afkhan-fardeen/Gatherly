@@ -6,7 +6,7 @@ import { useParams, useSearchParams, useRouter } from "next/navigation";
 import { ArrowLeft } from "@phosphor-icons/react";
 import toast from "react-hot-toast";
 import { AppLayout } from "@/components/AppLayout";
-import { CHERRY, TYPO } from "@/lib/events-ui";
+import { CHERRY } from "@/lib/events-ui";
 import { getBookingDraft, clearBookingDraft, saveBookingDraft } from "@/lib/booking-draft";
 
 import { API_URL, parseApiError, getNetworkErrorMessage } from "@/lib/api";
@@ -200,9 +200,9 @@ export default function BookVendorPage() {
 
   if (loading) {
     return (
-      <AppLayout>
-        <div className="flex-1 flex items-center justify-center">
-          <p className="text-slate-500">Loading...</p>
+      <AppLayout contentBg="bg-[#f4ede5]">
+        <div className="flex-1 flex items-center justify-center" style={{ background: "linear-gradient(to bottom, #f4ede5 80%, #ede4da 100%)" }}>
+          <p className="text-[#a0888d]">Loading...</p>
         </div>
       </AppLayout>
     );
@@ -210,18 +210,18 @@ export default function BookVendorPage() {
 
   if (!packageId || !pkg || !vendor) {
     return (
-      <AppLayout>
-        <div className="p-6">
+      <AppLayout contentBg="bg-[#f4ede5]">
+        <div className="p-6 min-h-[50vh] flex flex-col items-center justify-center" style={{ background: "linear-gradient(to bottom, #f4ede5 80%, #ede4da 100%)" }}>
           <Link
             href={vendor ? `/vendor/${vendorId}` : "/services/catering"}
-            className="inline-flex items-center gap-2 text-slate-500 hover:text-primary"
+            className="inline-flex items-center gap-2 text-primary font-semibold hover:underline mb-4"
           >
-            <ArrowLeft size={22} />
+            <ArrowLeft size={20} weight="regular" />
             {vendor ? "Back to vendor" : "Back to catering"}
           </Link>
-          <p className="mt-4 text-red-600">{error || "Package not found"}</p>
+          <p className="text-[14px] font-normal text-[#a0888d] text-center">{error || "Package not found"}</p>
           {error?.includes("Vendor not found") && (
-            <p className="mt-2 text-sm text-slate-500">
+            <p className="mt-2 text-[13px] font-light text-[#9e8085] text-center">
               This vendor may no longer be available. Try browsing other caterers.
             </p>
           )}
@@ -231,49 +231,70 @@ export default function BookVendorPage() {
   }
 
   return (
-    <AppLayout>
-      <header className="sticky top-0 z-40 bg-white px-6 py-3 border-b border-slate-200 shrink-0">
-        <div className="flex items-center gap-4">
-          <Link
-            href={`/vendor/${vendorId}`}
-            className="w-11 h-11 min-w-[44px] min-h-[44px] rounded-radius-sm bg-slate-100 flex items-center justify-center"
-          >
-            <ArrowLeft size={22} weight="regular" className="text-slate-600" />
-          </Link>
-          <div>
-            <h1 className="font-serif text-xl font-medium tracking-tight">Request Booking</h1>
-            <p className="text-slate-500 text-xs">{vendor.businessName} · {pkg.name}</p>
+    <AppLayout contentBg="bg-[#f4ede5]">
+      <div
+        className="min-h-full"
+        style={{ background: "linear-gradient(to bottom, #f4ede5 80%, #ede4da 100%)" }}
+      >
+        <header
+          className="sticky top-0 z-40 px-5 pt-[max(1rem,env(safe-area-inset-top))] pb-4"
+          style={{ background: "linear-gradient(to bottom, #f4ede5 75%, transparent)" }}
+        >
+          <div className="flex items-center gap-3">
+            <Link
+              href={`/vendor/${vendorId}/package/${pkg.id}`}
+              className="w-10 h-10 shrink-0 rounded-full flex items-center justify-center bg-white border border-primary/10 text-[#1e0f14] transition-shadow hover:shadow-md"
+              style={{ boxShadow: "0 2px 8px rgba(109,13,53,0.06)" }}
+            >
+              <ArrowLeft size={20} weight="regular" />
+            </Link>
+            <div className="flex-1 min-w-0">
+              <h1 className="font-serif text-[26px] sm:text-[32px] font-medium leading-none tracking-[-0.8px] text-[#1e0f14] truncate">
+                Request <span className="italic font-normal text-primary">Booking</span>
+              </h1>
+              <p className="text-[12.5px] font-light text-[#9e8085] mt-1 truncate">
+                {vendor.businessName} · {pkg.name}
+              </p>
+            </div>
           </div>
-        </div>
-      </header>
+        </header>
 
-      <main className="p-6 pb-40">
+      <main className="px-5 pb-40">
         <form onSubmit={handleSubmit} className="form-no-zoom space-y-6">
           {error && (
-            <div className="p-3 rounded-xl bg-red-50 text-red-600 text-sm border border-red-100">
+            <div className="p-4 rounded-[20px] bg-red-50 text-red-700 text-[14px] font-medium border border-red-200">
               {error}
             </div>
           )}
 
           {events.length === 0 ? (
-            <div className="p-6 rounded-2xl border border-slate-200 bg-slate-50 text-center">
-              <p className="text-slate-600 font-medium">Create an event first</p>
-              <p className="text-slate-500 text-sm mt-1">You need an event to book catering for.</p>
+            <div
+              className="flex flex-col items-center justify-center py-16 px-6 rounded-[20px] border border-dashed border-primary/15 bg-[#fdfaf7] text-center"
+              style={{ minHeight: 240 }}
+            >
+              <p className="font-serif text-[18px] font-medium text-[#1e0f14]">Create an event first</p>
+              <p className="text-[14px] font-light text-[#a0888d] mt-1">
+                You need an event to book catering for.
+              </p>
               <Link
                 href={`/events/create?redirect=${encodeURIComponent(`/vendor/${vendorId}/book?packageId=${pkg.id}`)}`}
-                className="inline-block mt-4 px-5 py-3 bg-primary text-white font-semibold rounded-full"
+                className="mt-6 inline-flex items-center gap-2 px-6 py-3 rounded-full text-sm font-semibold text-white transition-all"
+                style={{ backgroundColor: CHERRY, boxShadow: "0 4px 16px rgba(109,13,53,0.28)" }}
               >
                 Create Event
               </Link>
             </div>
           ) : (
             <>
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">Event</label>
+              <div
+                className="p-4 rounded-[20px] border border-primary/10 backdrop-blur-xl"
+                style={{ backgroundColor: "rgba(255, 255, 255, 0.75)", boxShadow: "0 2px 16px rgba(109, 13, 53, 0.06)" }}
+              >
+                <label className="block font-serif text-[14px] font-semibold text-[#5c3d47] mb-2">Event</label>
                 <select
                   value={eventId}
                   onChange={(e) => setEventId(e.target.value)}
-                  className="w-full h-12 px-4 rounded-full border border-slate-200 bg-white text-slate-900"
+                  className="w-full h-12 px-4 rounded-xl border border-primary/10 bg-[#fdfaf7] text-[#1e0f14] outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40"
                   required
                 >
                   {events.map((ev) => (
@@ -284,10 +305,14 @@ export default function BookVendorPage() {
                 </select>
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">Guest count</label>
+              <div
+                className="p-4 rounded-[20px] border border-primary/10 backdrop-blur-xl"
+                style={{ backgroundColor: "rgba(255, 255, 255, 0.75)", boxShadow: "0 2px 16px rgba(109, 13, 53, 0.06)" }}
+              >
+                <label className="block font-serif text-[14px] font-semibold text-[#5c3d47] mb-2">Guest count</label>
                 <input
                   type="number"
+                  inputMode="numeric"
                   min={pkg.minGuests ?? 1}
                   max={pkg.maxGuests ?? undefined}
                   value={guestCount}
@@ -301,14 +326,14 @@ export default function BookVendorPage() {
                       else if (maxG !== Infinity && n > maxG) setGuestCount(String(maxG));
                     } else setGuestCount(String(minG));
                   }}
-                  className="w-full h-12 px-4 rounded-full border border-slate-200 bg-white text-slate-900"
+                  placeholder="e.g. 25"
+                  className="w-full h-12 px-4 rounded-xl border border-primary/10 bg-[#fdfaf7] text-[15px] font-medium text-[#1e0f14] placeholder:text-[#9e8085] outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                   required
                 />
                 {(pkg.minGuests || pkg.maxGuests) && (
-                  <p className="text-xs text-slate-500 mt-1">
-                    {pkg.minGuests && `Min ${pkg.minGuests}`}
-                    {pkg.minGuests && pkg.maxGuests && " · "}
-                    {pkg.maxGuests && `Max ${pkg.maxGuests} guests`}
+                  <p className="mt-1.5 text-[12px] font-normal text-[#9e8085]">
+                    Min {pkg.minGuests ?? 1}
+                    {pkg.maxGuests && ` · Max ${pkg.maxGuests} guests`}
                   </p>
                 )}
               </div>
@@ -323,17 +348,23 @@ export default function BookVendorPage() {
                 const serviceCharges = (subtotal * serviceChargePercent) / 100;
                 const totalAmount = subtotal + serviceCharges + setupFee;
                 return (
-                  <div className="p-4 rounded-2xl border border-slate-200 bg-slate-50">
-                    <p className={`${TYPO.SUBTEXT} mb-1`}>Estimated total</p>
-                    <p className={`${TYPO.H2}`} style={{ color: CHERRY }}>
+                  <div
+                    className="p-4 rounded-[20px] border border-primary/10 backdrop-blur-xl"
+                    style={{ backgroundColor: "rgba(255, 255, 255, 0.75)", boxShadow: "0 2px 16px rgba(109, 13, 53, 0.06)" }}
+                  >
+                    <p className="text-[12px] font-normal text-[#a0888d] mb-3">Estimated total</p>
+                    <p className="font-serif text-[22px] font-semibold text-primary">
                       {totalAmount.toFixed(2)} BD
                     </p>
                   </div>
                 );
               })()}
 
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">
+              <div
+                className="p-4 rounded-[20px] border border-primary/10 backdrop-blur-xl"
+                style={{ backgroundColor: "rgba(255, 255, 255, 0.75)", boxShadow: "0 2px 16px rgba(109, 13, 53, 0.06)" }}
+              >
+                <label className="block font-serif text-[14px] font-semibold text-[#5c3d47] mb-2">
                   Special requirements (optional)
                 </label>
                 <textarea
@@ -349,7 +380,7 @@ export default function BookVendorPage() {
                     })
                   }
                   rows={3}
-                  className="w-full px-4 py-3 rounded-2xl border border-slate-200 bg-white text-slate-900 resize-none"
+                  className="w-full px-4 py-3 rounded-lg border border-primary/10 bg-[#fdfaf7] text-[14px] font-normal text-[#1e0f14] placeholder:text-[#9e8085] resize-none outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40"
                   placeholder="Dietary needs, allergies, setup preferences..."
                 />
               </div>
@@ -357,7 +388,8 @@ export default function BookVendorPage() {
               <button
                 type="submit"
                 disabled={submitting}
-                className="w-full py-3 rounded-full bg-primary text-white font-semibold hover:bg-primary/90 disabled:opacity-50"
+                className="w-full py-3.5 rounded-full font-semibold text-white transition-all disabled:opacity-50"
+                style={{ backgroundColor: CHERRY, boxShadow: "0 4px 16px rgba(109,13,53,0.28)" }}
               >
                 {submitting ? "Submitting..." : "Request Booking"}
               </button>
@@ -365,6 +397,7 @@ export default function BookVendorPage() {
           )}
         </form>
       </main>
+      </div>
     </AppLayout>
   );
 }

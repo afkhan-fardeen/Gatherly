@@ -121,8 +121,8 @@ export default function EditProfilePage() {
 
   if (loading || !user) {
     return (
-      <AppLayout>
-        <div className="flex-1 flex items-center justify-center bg-[var(--bg-app)]">
+      <AppLayout contentBg="bg-[#f4ede5]">
+        <div className="flex-1 flex items-center justify-center" style={{ background: "linear-gradient(to bottom, #f4ede5 80%, #ede4da 100%)" }}>
           <p className={TYPO.SUBTEXT}>{loading ? "Loading..." : "Please log in"}</p>
         </div>
       </AppLayout>
@@ -130,26 +130,44 @@ export default function EditProfilePage() {
   }
 
   return (
-    <AppLayout>
-      <header className="sticky top-0 z-40 bg-white px-6 py-3 border-b border-slate-200 shrink-0">
-        <div className="flex items-center gap-3">
-          <Link
-            href="/profile"
-            className="w-11 h-11 min-w-[44px] min-h-[44px] rounded-full border border-slate-200 bg-white flex items-center justify-center shrink-0 text-text-primary hover:bg-slate-50 transition-colors"
-          >
-            <ArrowLeft size={22} weight="regular" />
-          </Link>
-          <h1 className={TYPO.H1}>Edit profile</h1>
-        </div>
-      </header>
+    <AppLayout contentBg="bg-[#f4ede5]">
+      <div
+        className="min-h-full"
+        style={{ background: "linear-gradient(to bottom, #f4ede5 80%, #ede4da 100%)" }}
+      >
+        <header
+          className="sticky top-0 z-40 px-5 pt-[max(1rem,env(safe-area-inset-top))] pb-4"
+          style={{ background: "linear-gradient(to bottom, #f4ede5 75%, transparent)" }}
+        >
+          <div className="flex items-center gap-3">
+            <Link
+              href="/profile"
+              className="w-10 h-10 shrink-0 rounded-full flex items-center justify-center bg-white border border-primary/10 text-[#1e0f14] transition-shadow hover:shadow-md"
+              style={{ boxShadow: "0 2px 8px rgba(109,13,53,0.06)" }}
+            >
+              <ArrowLeft size={20} weight="regular" />
+            </Link>
+            <div>
+              <h1 className="font-serif text-[28px] sm:text-[34px] font-medium leading-none tracking-[-0.8px] text-[#1e0f14]">
+                Edit <span className="italic font-normal text-primary">Profile</span>
+              </h1>
+              <p className="text-[12.5px] font-light text-[#9e8085] mt-1 tracking-wide">
+                Name, email, phone
+              </p>
+            </div>
+          </div>
+        </header>
 
-      <main className="p-6 pb-40 bg-[var(--bg-app)]">
+      <main className="px-5 pb-40">
         <form onSubmit={handleSubmit} className="form-no-zoom space-y-6">
           {/* Profile image */}
-          <div className="flex flex-col items-center">
-            <label className={`${TYPO.FORM_LABEL} mb-2`}>Profile photo</label>
+          <div
+            className="flex flex-col items-center p-6 rounded-[20px] border border-primary/10 bg-white"
+            style={{ boxShadow: "0 2px 16px rgba(109, 13, 53, 0.06)" }}
+          >
+            <label className="font-serif text-[14px] font-semibold text-[#5c3d47] mb-2">Profile photo</label>
             <div className="relative">
-              <div className="w-24 h-24 rounded-md border-2 border-slate-200 overflow-hidden bg-slate-100 flex items-center justify-center shrink-0">
+              <div className="w-24 h-24 rounded-full border-[3px] border-white overflow-hidden bg-[#f4ede5] flex items-center justify-center shrink-0" style={{ boxShadow: "0 4px 16px rgba(109,13,53,0.12)" }}>
                 {form.profilePictureUrl ? (
                   <img
                     src={form.profilePictureUrl}
@@ -167,7 +185,7 @@ export default function EditProfilePage() {
                   </span>
                 )}
               </div>
-              <label className="absolute bottom-0 right-0 w-11 h-11 min-w-[44px] min-h-[44px] rounded-radius-sm bg-primary text-white flex items-center justify-center cursor-pointer hover:bg-primary/90">
+              <label className="absolute bottom-0 right-0 w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center cursor-pointer hover:bg-primary/90 border-2 border-white" style={{ boxShadow: "0 2px 8px rgba(109,13,53,0.3)" }}>
                 <Camera size={18} weight="bold" />
                 <input
                   type="file"
@@ -184,8 +202,8 @@ export default function EditProfilePage() {
           </div>
 
           {/* Name */}
-          <div>
-            <label className={`${TYPO.FORM_LABEL} mb-2`}>Name</label>
+          <div className="p-4 rounded-[20px] border border-primary/10 bg-white" style={{ boxShadow: "0 2px 16px rgba(109, 13, 53, 0.06)" }}>
+            <label className="font-serif text-[14px] font-semibold text-[#5c3d47] mb-2 block">Name</label>
             <input
               type="text"
               value={form.name}
@@ -197,8 +215,8 @@ export default function EditProfilePage() {
           </div>
 
           {/* Email (read-only) */}
-          <div>
-            <label className={`${TYPO.FORM_LABEL} mb-2`}>Email</label>
+          <div className="p-4 rounded-[20px] border border-primary/10 bg-white" style={{ boxShadow: "0 2px 16px rgba(109, 13, 53, 0.06)" }}>
+            <label className="font-serif text-[14px] font-semibold text-[#5c3d47] mb-2 block">Email</label>
             <input
               type="email"
               value={form.email}
@@ -209,8 +227,8 @@ export default function EditProfilePage() {
           </div>
 
           {/* Phone */}
-          <div>
-            <label className={`${TYPO.FORM_LABEL} mb-2`}>Phone</label>
+          <div className="p-4 rounded-[20px] border border-primary/10 bg-white" style={{ boxShadow: "0 2px 16px rgba(109, 13, 53, 0.06)" }}>
+            <label className="font-serif text-[14px] font-semibold text-[#5c3d47] mb-2 block">Phone</label>
             <input
               type="tel"
               value={form.phone}
@@ -223,12 +241,14 @@ export default function EditProfilePage() {
           <button
             type="submit"
             disabled={saving}
-            className="w-full py-3 bg-primary text-white font-semibold rounded-full hover:bg-primary/90 disabled:opacity-50 transition-colors"
+            className="w-full py-3.5 bg-primary text-white font-semibold rounded-full hover:bg-primary/90 disabled:opacity-50 transition-colors"
+            style={{ boxShadow: "0 4px 16px rgba(109,13,53,0.28)" }}
           >
             {saving ? "Saving..." : "Save changes"}
           </button>
         </form>
       </main>
+      </div>
     </AppLayout>
   );
 }

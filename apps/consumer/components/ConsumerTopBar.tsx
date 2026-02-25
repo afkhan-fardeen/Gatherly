@@ -29,9 +29,9 @@ export function ConsumerTopBar() {
   return (
     <div className="fixed top-0 left-0 right-0 z-50 flex justify-center md:hidden">
       <div
-          className="w-full max-w-[430px] flex justify-between items-center px-6 py-4 min-h-[56px]"
+          className="w-full max-w-[430px] flex justify-between items-center px-6 py-4 min-h-[56px] backdrop-blur-xl"
           style={{
-            background: "var(--bg-surface)",
+            background: "rgba(255, 255, 255, 0.75)",
             borderBottom: "1px solid var(--border-subtle)",
             boxShadow: "var(--shadow-xs)",
           }}

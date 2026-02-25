@@ -17,9 +17,9 @@ export function BottomNav() {
 
   return (
     <nav
-      className="fixed bottom-0 left-0 right-0 min-h-[56px] pt-2 pb-[max(0.75rem,env(safe-area-inset-bottom))] flex justify-around items-start z-50 md:hidden"
+      className="fixed bottom-0 left-0 right-0 min-h-[56px] pt-2 pb-[max(0.75rem,env(safe-area-inset-bottom))] flex justify-around items-start z-50 md:hidden backdrop-blur-xl"
       style={{
-        background: "var(--bg-surface)",
+        background: "rgba(255, 255, 255, 0.75)",
         borderTop: "1px solid var(--border-subtle)",
       }}
     >

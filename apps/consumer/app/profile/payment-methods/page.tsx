@@ -6,8 +6,6 @@ import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import { ArrowLeft, CreditCard, Plus, Trash } from "@phosphor-icons/react";
 import { AppLayout } from "@/components/AppLayout";
-import { TYPO } from "@/lib/events-ui";
-
 import { API_URL, parseApiError } from "@/lib/api";
 
 interface PaymentMethod {
@@ -94,77 +92,106 @@ export default function PaymentMethodsPage() {
   }
 
   return (
-    <AppLayout>
-      <header className="sticky top-0 z-40 bg-white px-6 py-3 border-b border-slate-200 shrink-0">
-        <div className="flex items-center gap-3">
-          <Link
-            href="/profile"
-            className="w-11 h-11 min-w-[44px] min-h-[44px] rounded-full border border-slate-200 bg-white flex items-center justify-center shrink-0 text-text-primary hover:bg-slate-50 transition-colors"
-            aria-label="Back"
-          >
-            <ArrowLeft size={22} weight="regular" />
-          </Link>
-          <h1 className={`${TYPO.H1} text-text-primary`}>Payment methods</h1>
+    <AppLayout contentBg="bg-[#f4ede5]">
+      <div
+        className="min-h-full"
+        style={{ background: "linear-gradient(to bottom, #f4ede5 80%, #ede4da 100%)" }}
+      >
+        <header
+          className="sticky top-0 z-40 px-5 pt-[max(1rem,env(safe-area-inset-top))] pb-4"
+          style={{ background: "linear-gradient(to bottom, #f4ede5 75%, transparent)" }}
+        >
+          <div className="flex items-center gap-3">
+            <Link
+              href="/profile"
+              className="w-10 h-10 shrink-0 rounded-full flex items-center justify-center bg-white border border-primary/10 text-[#1e0f14] transition-shadow hover:shadow-md"
+              style={{ boxShadow: "0 2px 8px rgba(109,13,53,0.06)" }}
+              aria-label="Back"
+            >
+              <ArrowLeft size={20} weight="regular" />
+            </Link>
+            <div>
+              <h1 className="font-serif text-[28px] sm:text-[34px] font-medium leading-none tracking-[-0.8px] text-[#1e0f14]">
+                Payment <span className="italic font-normal text-primary">Methods</span>
+              </h1>
+              <p className="text-[12.5px] font-light text-[#9e8085] mt-1 tracking-wide">
+                Cards for quick checkout
+              </p>
+            </div>
+          </div>
+        </header>
+
+      <main className="px-5 pb-40 space-y-6">
+        {/* Add card form */}
+        <div
+          className="p-4 rounded-[20px] border border-primary/10 bg-white"
+          style={{ boxShadow: "0 2px 16px rgba(109, 13, 53, 0.06)" }}
+        >
+          <p className="font-serif text-[14px] font-semibold text-[#5c3d47] mb-3">Add a card</p>
+          <p className="text-[12px] font-normal text-[#a0888d] mb-3">
+            Use dummy numbers like 4242 4242 4242 4242 for testing.
+          </p>
+          <form onSubmit={handleAddCard} className="form-no-zoom flex gap-2">
+            <input
+              type="text"
+              inputMode="numeric"
+              placeholder="Card number (e.g. 4242…)"
+              value={cardNumber}
+              onChange={(e) => setCardNumber(e.target.value.replace(/\D/g, "").slice(0, 19))}
+              className="flex-1 h-12 px-4 rounded-full border border-primary/10 text-[#1e0f14] placeholder:text-[#9e8085] bg-[#fdfaf7] focus:ring-2 focus:ring-primary/20 focus:border-primary/40 outline-none transition-all"
+            />
+            <button
+              type="submit"
+              disabled={adding || cardNumber.replace(/\D/g, "").length < 13}
+              className="h-12 px-5 rounded-full bg-primary text-white font-semibold hover:bg-primary/90 disabled:opacity-50 flex items-center gap-2 transition-colors shrink-0"
+              style={{ boxShadow: "0 4px 14px rgba(109,13,53,0.28)" }}
+            >
+              <Plus size={18} weight="bold" />
+              Add
+            </button>
+          </form>
         </div>
-      </header>
-
-      <main className="p-6 pb-40 space-y-6 bg-[var(--bg-app)]">
-        <p className={TYPO.SUBTEXT}>
-          Add cards for quick checkout. Use dummy numbers like 4242424242424242.
-        </p>
-
-        <form onSubmit={handleAddCard} className="form-no-zoom flex gap-2">
-          <input
-            type="text"
-            inputMode="numeric"
-            placeholder="Card number (e.g. 4242…)"
-            value={cardNumber}
-            onChange={(e) => setCardNumber(e.target.value.replace(/\D/g, "").slice(0, 19))}
-            className="flex-1 px-4 py-3 rounded-full border border-slate-200 text-text-primary placeholder:text-text-tertiary bg-white focus:ring-2 focus:ring-primary/20 focus:border-primary/40 outline-none transition-all"
-          />
-          <button
-            type="submit"
-            disabled={adding || cardNumber.replace(/\D/g, "").length < 13}
-            className="px-4 py-3 rounded-full bg-primary text-white font-semibold hover:bg-primary/90 disabled:opacity-50 flex items-center gap-2 transition-colors"
-          >
-            <Plus size={18} weight="bold" />
-            Add
-          </button>
-        </form>
 
         {loading ? (
-          <div className="space-y-2">
+          <div className="space-y-3">
             {[1, 2].map((i) => (
-              <div key={i} className="h-16 bg-slate-100 rounded-2xl animate-pulse" />
+              <div key={i} className="h-20 bg-white/60 rounded-[20px] animate-pulse border border-primary/5" />
             ))}
           </div>
         ) : methods.length === 0 ? (
-          <div className="text-center py-12 rounded-2xl border border-slate-200 bg-white shadow-elevation-1">
-            <CreditCard size={40} weight="regular" className="text-slate-300 mx-auto" />
-            <p className={`${TYPO.SUBTEXT} mt-4 font-medium`}>No saved cards</p>
-            <p className={`${TYPO.SUBTEXT} mt-1`}>Add a card above</p>
+          <div
+            className="flex flex-col items-center justify-center py-16 px-6 rounded-[20px] border border-dashed border-primary/15 bg-[#fdfaf7] text-center"
+            style={{ minHeight: 200 }}
+          >
+            <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mb-4">
+              <CreditCard size={32} weight="regular" className="text-primary" />
+            </div>
+            <p className="font-serif text-[18px] font-medium text-[#1e0f14]">No saved cards</p>
+            <p className="text-[14px] font-light text-[#a0888d] mt-1">Add a card above to get started</p>
           </div>
         ) : (
-          <div className="space-y-2">
+          <div className="space-y-3">
+            <p className="font-serif text-[14px] font-semibold uppercase tracking-[2px] text-[#5c3d47] mb-2">
+              Saved cards
+            </p>
             {methods.map((m) => (
               <div
                 key={m.id}
-                className="flex items-center justify-between p-4 rounded-2xl border border-slate-200 bg-white shadow-elevation-1"
+                className="flex items-center gap-3.5 p-4 rounded-[20px] border border-primary/10 bg-white transition-all hover:border-primary/20"
+                style={{ boxShadow: "0 2px 16px rgba(109, 13, 53, 0.06)" }}
               >
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center">
-                    <CreditCard size={22} weight="regular" className="text-slate-500" />
-                  </div>
-                  <div>
-                    <p className={`${TYPO.CARD_TITLE} capitalize`}>{m.brand}</p>
-                    <p className={TYPO.SUBTEXT}>•••• {m.last4}</p>
-                  </div>
+                <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
+                  <CreditCard size={24} weight="regular" className="text-primary" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="font-serif text-[15px] font-semibold text-[#1e0f14] capitalize">{m.brand}</p>
+                  <p className="text-[13px] font-normal text-[#a0888d]">•••• {m.last4}</p>
                 </div>
                 <button
                   type="button"
                   onClick={() => handleDelete(m.id)}
                   disabled={deletingId === m.id}
-                  className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-md transition-colors disabled:opacity-50"
+                  className="w-10 h-10 rounded-full flex items-center justify-center text-[#9e8085] hover:text-red-600 hover:bg-red-50 transition-colors disabled:opacity-50 shrink-0"
                   aria-label="Remove card"
                 >
                   <Trash size={18} weight="regular" />
@@ -174,6 +201,7 @@ export default function PaymentMethodsPage() {
           </div>
         )}
       </main>
+      </div>
     </AppLayout>
   );
 }

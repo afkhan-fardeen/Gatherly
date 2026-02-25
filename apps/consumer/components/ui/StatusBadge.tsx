@@ -1,7 +1,6 @@
 "use client";
 
-import { ROUND } from "@/lib/events-ui";
-import { MINTY_LIME, MINTY_LIME_DARK, WARM_PEACH, WARM_PEACH_DARK, CHERRY_LIGHT, CHERRY_DARK } from "@/lib/events-ui";
+import { MINTY_LIME, MINTY_LIME_DARK } from "@/lib/events-ui";
 
 export type EventStatus = "draft" | "in_progress" | "completed" | "cancelled";
 
@@ -10,9 +9,9 @@ const STATUS_CONFIG: Record<
   { label: string; bg: string; color: string }
 > = {
   draft: { label: "Planning", bg: MINTY_LIME, color: MINTY_LIME_DARK },
-  in_progress: { label: "In Progress", bg: WARM_PEACH, color: WARM_PEACH_DARK },
-  completed: { label: "Completed", bg: CHERRY_LIGHT, color: CHERRY_DARK },
-  cancelled: { label: "Cancelled", bg: "#f1f5f9", color: "#64748b" },
+  in_progress: { label: "In Progress", bg: "#fef3c7", color: "#b45309" },
+  completed: { label: "Completed", bg: "#d1fae5", color: "#047857" },
+  cancelled: { label: "Cancelled", bg: "#fee2e2", color: "#b91c1c" },
 };
 
 interface StatusBadgeProps {
@@ -26,7 +25,7 @@ export function StatusBadge({ status, className = "" }: StatusBadgeProps) {
 
   return (
     <span
-      className={`inline-block text-[9px] font-semibold uppercase tracking-wide px-2 py-0.5 ${ROUND} ${className}`}
+      className={`inline-block text-[9px] font-semibold uppercase tracking-wide px-2 py-0.5 rounded-full ${className}`}
       style={{ backgroundColor: config.bg, color: config.color }}
     >
       {config.label}

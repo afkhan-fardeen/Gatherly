@@ -129,6 +129,14 @@
   50% { transform: translateY(-10px); }
 }
 
+@keyframes subtle-pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.02); }
+}
+.animate-subtle-pulse {
+  animation: subtle-pulse 2.5s ease-in-out infinite;
+}
+
 /* Events page - card hover accent */
 .events-card-hover::before {
   content: '';
@@ -167,7 +175,8 @@
   .animate-fade-in-up,
   .animate-fade-in,
   .animate-fade-in-fast,
-  .animate-slide-in-up {
+  .animate-slide-in-up,
+  .animate-subtle-pulse {
     animation: none !important;
   }
   .tap-scale:active {
