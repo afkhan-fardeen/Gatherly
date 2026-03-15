@@ -26,6 +26,16 @@ export function getCurrentStepIndex(status: string, paymentStatus: string | null
   }
 }
 
+export function getStatusBadgeLabel(status: string, paymentStatus: string | null): string {
+  if (status === "cancelled") return "Declined";
+  if (status === "pending") return "Pending";
+  if (status === "confirmed") return (paymentStatus || "unpaid") === "paid" ? "Paid" : "Confirmed";
+  if (status === "in_preparation") return "Preparing";
+  if (status === "delivered") return "Delivered";
+  if (status === "completed") return "Completed";
+  return status.replace(/_/g, " ");
+}
+
 export function getBookingStatusLine(status: string, paymentStatus: string | null): string {
   if (status === "cancelled") return "Cancelled";
   if (status === "pending") return "Request sent";

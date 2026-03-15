@@ -104,10 +104,10 @@ export function CateringContent() {
                 <ArrowLeft size={15} weight="regular" />
               </Link>
               <div>
-                <h1 className="font-serif text-[30px] font-medium leading-none tracking-[-0.5px] text-[#1e0f14]">
+                <h1 className="font-serif text-[34px] font-medium leading-none tracking-[-0.8px] text-[#1e0f14]">
                   <span className="italic font-normal text-primary">Cat</span>ering
                 </h1>
-                <p className="text-[12.5px] font-light text-[#a0888d] mt-1">Find the best caterers</p>
+                <p className="text-[12.5px] font-light text-[#9e8085] mt-1 tracking-wide">Find the best caterers</p>
               </div>
             </div>
 

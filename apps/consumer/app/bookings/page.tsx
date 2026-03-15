@@ -7,6 +7,7 @@ import toast from "react-hot-toast";
 import {
   ArrowLeft,
   CalendarCheck,
+  CaretDown,
   ForkKnife,
   CreditCard,
   CaretRight,
@@ -19,11 +20,12 @@ import { getBookingStatusLine } from "@/lib/bookingStatus";
 import { API_URL, fetchAuth, parseApiError } from "@/lib/api";
 import { getToken } from "@/lib/session";
 import { CHERRY } from "@/lib/events-ui";
-import { formatEventDate } from "@/lib/date-utils";
+import { formatEventDate, formatDateLong } from "@/lib/date-utils";
 import { PARTNER_GRADIENTS } from "@/lib/gradients";
 
 interface Booking {
   id: string;
+  eventId: string;
   bookingReference: string;
   status: string;
   paymentStatus: string | null;
@@ -57,6 +59,7 @@ export default function BookingsPage() {
   const [selectedPaymentId, setSelectedPaymentId] = useState<string | null>(null);
   const [newCardNumber, setNewCardNumber] = useState("");
   const [useNewCard, setUseNewCard] = useState(false);
+  const [expandedEvent, setExpandedEvent] = useState<string | null>(null);
 
   const fetchBookings = useCallback(async () => {
     if (!getToken()) return;
@@ -172,11 +175,30 @@ export default function BookingsPage() {
         ? bookings.filter((b) => b.status === "completed")
         : bookings.filter((b) => b.status === "cancelled");
 
+  const eventGroups = filtered.reduce<{ eventId: string; eventName: string; eventDate: string; bookings: Booking[] }[]>(
+    (acc, b) => {
+      const eventId = (b as Booking & { eventId?: string }).eventId ?? `${b.event.name}-${b.event.date}`;
+      const existing = acc.find((g) => g.eventId === eventId);
+      if (existing) {
+        existing.bookings.push(b);
+      } else {
+        acc.push({ eventId, eventName: b.event.name, eventDate: b.event.date, bookings: [b] });
+      }
+      return acc;
+    },
+    []
+  );
+
+  const getEventAllAccepted = (group: { bookings: Booking[] }) => {
+    const nonCancelled = group.bookings.filter((b) => b.status !== "cancelled");
+    return nonCancelled.length === 0 || nonCancelled.every((b) => b.status !== "pending");
+  };
+
   return (
     <AppLayout contentBg="bg-[#f4ede5]">
       <PullToRefresh onRefresh={fetchBookings}>
         <div
-          className="px-5 md:px-8 pt-6 pb-24"
+          className="min-h-full px-5 md:px-8 pt-6 pb-24"
           style={{
             background: "linear-gradient(to bottom, #f4ede5 80%, #ede4da 100%)",
           }}
@@ -277,108 +299,111 @@ export default function BookingsPage() {
               )}
             </div>
           ) : (
-            <div className="flex flex-col gap-3 md:grid md:grid-cols-2 md:gap-4">
-              {filtered.map((booking, idx) => {
-                const { month, day, weekday } = formatEventDate(booking.event.date);
-                const statusLabel = getBookingStatusLine(
-                  booking.status,
-                  booking.paymentStatus
-                ).split(" · ")[0];
-                const needsPay =
-                  booking.status === "confirmed" &&
-                  (booking.paymentStatus || "unpaid") === "unpaid";
-                const canReview =
-                  (booking.status === "completed" || booking.status === "delivered") &&
-                  (!booking.reviews || booking.reviews.length === 0);
-
+            <div className="flex flex-col gap-4">
+              {eventGroups.map((group, groupIdx) => {
+                const isExpanded = expandedEvent === group.eventId || (expandedEvent === null && groupIdx === 0);
+                const isRealEventId = group.eventId?.match(/^[0-9a-f-]{36}$/i);
+                const eventAllAccepted = getEventAllAccepted(group);
                 return (
                   <div
-                    key={booking.id}
-                    className="relative overflow-hidden rounded-[20px] border border-primary/10 bg-white transition-all hover:-translate-y-0.5 hover:shadow-xl hover:border-primary/20"
+                    key={group.eventId}
+                    className={`bg-[#fdfaf7] border border-primary/10 rounded-[18px] overflow-hidden transition-shadow ${
+                      isExpanded ? "shadow-[0_4px_20px_rgba(109,13,53,0.08)]" : ""
+                    }`}
                   >
-                    <Link href={`/bookings/${booking.id}`} className="flex group">
-                      {/* Date badge */}
-                    <div
-                      className="w-[84px] shrink-0 flex flex-col items-center justify-center gap-0.5 py-2 px-2 border-r border-primary/10"
-                      style={{
-                        background:
-                          PARTNER_GRADIENTS[idx % PARTNER_GRADIENTS.length],
-                      }}
+                    <button
+                      type="button"
+                      onClick={() => setExpandedEvent(isExpanded ? null : group.eventId)}
+                      className="w-full flex items-center justify-between py-4 px-4 hover:bg-primary/[0.02] transition-colors text-left"
                     >
-                      <span className="font-serif text-[10px] font-semibold uppercase tracking-wider text-white/80">
-                        {month}
-                      </span>
-                      <span className="font-serif text-[22px] font-semibold text-white leading-none">
-                        {day}
-                      </span>
-                      <span className="font-serif text-[10px] font-semibold text-white/70">
-                        {weekday}
-                      </span>
-                    </div>
-
-                    {/* Content */}
-                    <div className="flex-1 min-w-0 p-2.5 pl-3 relative">
-                      <span
-                        className={`absolute top-2 right-2 px-2 py-0.5 rounded-full text-[9px] font-semibold uppercase tracking-wide ${getBookingStatusStyle(
-                          booking.status
-                        )}`}
-                      >
-                        {statusLabel}
-                      </span>
-                      <h3 className="font-serif text-[14px] font-semibold text-[#1e0f14] tracking-tight truncate pr-20">
-                        {booking.event.name}
-                      </h3>
-                      <p className="text-[11px] font-normal text-[#a0888d] line-clamp-1 mt-0.5">
-                        {booking.package.name} · {booking.vendor.businessName}
-                      </p>
-                      <p className="text-[10px] font-light text-[#9e8085] mt-1">
-                        {Number(booking.totalAmount).toFixed(2)} BD
-                      </p>
-                    </div>
-
-                    <div className="flex items-center pr-2.5 shrink-0">
-                      <CaretRight
-                        size={14}
+                      <div className="flex-1 min-w-0">
+                        <div className="text-[14.5px] font-medium text-[#1e0f14]">{group.eventName}</div>
+                        <div className="text-[11.5px] font-light text-[#a0888d] mt-0.5">
+                          {formatDateLong(group.eventDate)} · {group.bookings.length} booking{group.bookings.length === 1 ? "" : "s"}
+                        </div>
+                      </div>
+                      {isRealEventId && (
+                        <Link
+                          href={`/events/${group.eventId}`}
+                          onClick={(e) => e.stopPropagation()}
+                          className="text-[12px] font-semibold text-primary shrink-0 ml-2"
+                        >
+                          View in event
+                        </Link>
+                      )}
+                      <CaretDown
+                        size={16}
                         weight="bold"
-                        className="text-[#9e8085] transition-all group-hover:translate-x-0.5 group-hover:text-primary"
+                        className={`text-[#a0888d] shrink-0 ml-2 transition-transform ${isExpanded ? "rotate-180" : ""}`}
                       />
-                    </div>
-                    </Link>
-
-                    {/* Actions - like Book catering on Events */}
-                    {(needsPay || canReview) && (
-                      <div
-                        className="flex items-center justify-center gap-2 py-2.5 border-t border-primary/5 bg-primary/5"
-                        onClick={(e) => e.preventDefault()}
-                      >
-                        {needsPay && (
-                          <button
-                            type="button"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              openPayModal(booking);
-                            }}
-                            disabled={payingId === booking.id}
-                            className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-[12px] font-semibold text-white transition-all disabled:opacity-50"
-                            style={{ backgroundColor: CHERRY }}
-                          >
-                            <CreditCard size={14} weight="bold" />
-                            Pay
-                          </button>
-                        )}
-                        {canReview && (
-                          <button
-                            type="button"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setReviewModal(booking);
-                            }}
-                            className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-[12px] font-semibold bg-white text-[#5c3d47] border border-primary/10 hover:bg-white/90"
-                          >
-                            <Star size={14} weight="regular" />
-                            Leave review
-                          </button>
-                        )}
+                    </button>
+                    {isExpanded && (
+                      <div className="px-4 pb-4 border-t border-primary/10 pt-4 space-y-3 animate-fade-in">
+                        {group.bookings.map((booking, idx) => {
+                          const { month, day, weekday } = formatEventDate(booking.event.date);
+                          const statusLabel = getBookingStatusLine(booking.status, booking.paymentStatus).split(" · ")[0];
+                          const needsPay =
+                            eventAllAccepted &&
+                            booking.status === "confirmed" &&
+                            (booking.paymentStatus || "unpaid") === "unpaid";
+                          const canReview =
+                            (booking.status === "completed" || booking.status === "delivered") &&
+                            (!booking.reviews || booking.reviews.length === 0);
+                          return (
+                            <div
+                              key={booking.id}
+                              className="relative overflow-hidden rounded-[20px] border border-primary/10 bg-white transition-all hover:shadow-md hover:border-primary/20"
+                            >
+                              <Link href={`/bookings/${booking.id}`} className="flex group">
+                                <div
+                                  className="w-[84px] shrink-0 flex flex-col items-center justify-center gap-0.5 py-2 px-2 border-r border-primary/10"
+                                  style={{ background: PARTNER_GRADIENTS[idx % PARTNER_GRADIENTS.length] }}
+                                >
+                                  <span className="font-serif text-[10px] font-semibold uppercase tracking-wider text-white/80">{month}</span>
+                                  <span className="font-serif text-[22px] font-semibold text-white leading-none">{day}</span>
+                                  <span className="font-serif text-[10px] font-semibold text-white/70">{weekday}</span>
+                                </div>
+                                <div className="flex-1 min-w-0 p-2.5 pl-3 relative">
+                                  <span className={`absolute top-2 right-2 px-2 py-0.5 rounded-full text-[9px] font-semibold uppercase tracking-wide ${getBookingStatusStyle(booking.status)}`}>
+                                    {statusLabel}
+                                  </span>
+                                  <h3 className="font-serif text-[14px] font-semibold text-[#1e0f14] tracking-tight truncate pr-20">{booking.event.name}</h3>
+                                  <p className="text-[11px] font-normal text-[#a0888d] line-clamp-1 mt-0.5">{booking.package.name} · {booking.vendor.businessName}</p>
+                                  <p className="text-[10px] font-light text-[#9e8085] mt-1">{Number(booking.totalAmount).toFixed(2)} BD</p>
+                                </div>
+                                <div className="flex items-center pr-2.5 shrink-0">
+                                  <CaretRight size={14} weight="bold" className="text-[#9e8085] transition-all group-hover:translate-x-0.5 group-hover:text-primary" />
+                                </div>
+                              </Link>
+                              {(needsPay || canReview) && (
+                                <div className="flex items-center justify-center gap-2 py-2.5 border-t border-primary/5 bg-primary/5" onClick={(e) => e.preventDefault()}>
+                                  {needsPay && (
+                                    <button
+                                      type="button"
+                                      onClick={(e) => { e.stopPropagation(); openPayModal(booking); }}
+                                      disabled={payingId === booking.id}
+                                      className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-[12px] font-semibold text-white transition-all disabled:opacity-50"
+                                      style={{ backgroundColor: CHERRY }}
+                                    >
+                                      <CreditCard size={14} weight="bold" />
+                                      Pay
+                                    </button>
+                                  )}
+                                  {canReview && (
+                                    <button
+                                      type="button"
+                                      onClick={(e) => { e.stopPropagation(); setReviewModal(booking); }}
+                                      className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-[12px] font-semibold bg-white text-[#5c3d47] border border-primary/10 hover:bg-white/90"
+                                    >
+                                      <Star size={14} weight="regular" />
+                                      Leave review
+                                    </button>
+                                  )}
+                                </div>
+                              )}
+                            </div>
+                          );
+                        })}
                       </div>
                     )}
                   </div>

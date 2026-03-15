@@ -235,8 +235,10 @@ export default function PackageDetailPage() {
               <ArrowLeft size={20} weight="regular" />
             </Link>
             <div className="flex-1 min-w-0">
-              <h1 className="font-serif text-[22px] sm:text-[26px] font-medium text-[#1e0f14] truncate">{pkg.name}</h1>
-              <p className="text-[12.5px] font-light text-[#9e8085] truncate">{vendor.businessName}</p>
+              <h1 className="font-serif text-[28px] sm:text-[34px] font-medium leading-none tracking-[-0.8px] text-[#1e0f14] break-words">
+                <span className="italic font-normal text-primary">{pkg.name}</span>
+              </h1>
+              <p className="text-[12.5px] font-light text-[#9e8085] mt-1 tracking-wide break-words">{vendor.businessName}</p>
             </div>
           </div>
         </header>
@@ -308,7 +310,7 @@ export default function PackageDetailPage() {
           </div>
         </main>
 
-        {/* Floating Request booking button */}
+        {/* Floating Add to cart / Book package button */}
         <button
           type="button"
           onClick={() => {
@@ -326,7 +328,7 @@ export default function PackageDetailPage() {
             boxShadow: "0 4px 20px rgba(109, 13, 53, 0.35)",
           }}
         >
-          Book package
+          {eventIdFromUrl ? "Add to cart" : "Book package"}
           <CaretRight size={16} weight="bold" />
         </button>
 
@@ -351,7 +353,9 @@ export default function PackageDetailPage() {
               }}
             >
               <div className="flex justify-between items-center mb-5">
-                <h3 className="font-serif text-[20px] font-semibold text-[#1e0f14]">Book this package</h3>
+                <h3 className="font-serif text-[20px] font-semibold text-[#1e0f14]">
+                  {eventIdFromUrl ? "Add to cart" : "Book this package"}
+                </h3>
                 <button
                   type="button"
                   onClick={() => setShowBookModal(false)}

@@ -126,9 +126,9 @@ bookingsRouter.post("/", async (req, res) => {
 
 bookingsRouter.get("/", async (req, res) => {
   const userId = req.user!.userId;
-  const { status, paymentStatus } = req.query;
+  const { status, paymentStatus, eventId } = req.query;
 
-  const where: { userId: string; status?: string | { in: string[] }; paymentStatus?: string } = { userId };
+  const where: { userId: string; status?: string | { in: string[] }; paymentStatus?: string; eventId?: string } = { userId };
   if (typeof status === "string" && status) {
     const statuses = status.split(",").map((s) => s.trim()).filter(Boolean);
     if (statuses.length === 1) {
@@ -139,6 +139,11 @@ bookingsRouter.get("/", async (req, res) => {
   }
   if (typeof paymentStatus === "string" && paymentStatus) {
     where.paymentStatus = paymentStatus;
+  }
+  if (typeof eventId === "string" && eventId) {
+    const event = await prisma.event.findFirst({ where: { id: eventId, userId } });
+    if (!event) return res.status(404).json({ error: "Event not found" });
+    where.eventId = eventId;
   }
 
   const bookings = await prisma.booking.findMany({
@@ -153,6 +158,93 @@ bookingsRouter.get("/", async (req, res) => {
   });
 
   res.json(bookings);
+});
+
+// POST /api/bookings/pay-event - pay all confirmed unpaid bookings for an event (combined checkout)
+bookingsRouter.post("/pay-event", async (req, res) => {
+  const userId = req.user!.userId;
+  const { eventId } = req.body as { eventId?: string };
+  const paymentMethodId = req.body?.paymentMethodId as string | undefined;
+
+  if (!eventId || typeof eventId !== "string") {
+    return res.status(400).json({ error: "eventId is required" });
+  }
+
+  const event = await prisma.event.findFirst({
+    where: { id: eventId, userId },
+  });
+  if (!event) {
+    return res.status(404).json({ error: "Event not found" });
+  }
+
+  const allEventBookings = await prisma.booking.findMany({
+    where: { eventId, userId, status: { not: "cancelled" } },
+    select: { status: true },
+  });
+  const hasPending = allEventBookings.some((b) => b.status === "pending");
+  if (hasPending) {
+    return res.status(400).json({ error: "All vendors must accept before payment. Some bookings are still pending." });
+  }
+
+  const toPay = await prisma.booking.findMany({
+    where: {
+      eventId,
+      userId,
+      status: { in: ["confirmed", "in_preparation", "delivered"] },
+      paymentStatus: "unpaid",
+    },
+    include: {
+      vendor: { select: { businessName: true, userId: true } },
+      event: { select: { name: true, date: true } },
+      package: { select: { name: true } },
+    },
+  });
+
+  if (toPay.length === 0) {
+    return res.status(400).json({ error: "No confirmed unpaid bookings to pay for this event" });
+  }
+
+  let paymentMethodLabel = "card";
+  if (paymentMethodId) {
+    const pm = await prisma.paymentMethod.findFirst({
+      where: { id: paymentMethodId, userId },
+    });
+    if (pm) paymentMethodLabel = `${pm.brand} •••• ${pm.last4}`;
+  }
+
+  await prisma.$transaction(
+    toPay.map((b) =>
+      prisma.booking.update({
+        where: { id: b.id },
+        data: { paymentStatus: "paid", paymentMethod: paymentMethodLabel },
+      })
+    )
+  );
+
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { name: true },
+  });
+  const consumerName = user?.name || "A customer";
+  for (const b of toPay) {
+    await prisma.notification.create({
+      data: {
+        userId: b.vendor.userId,
+        type: "payment_received",
+        title: "Customer has paid",
+        message: `${consumerName} paid for ${b.event.name}. You can start preparation.`,
+        link: `/bookings/${b.id}`,
+        metadata: { bookingId: b.id, targetApp: "vendor" },
+      },
+    });
+  }
+
+  const totalPaid = toPay.reduce((sum, b) => sum + Number(b.totalAmount), 0);
+  res.json({
+    paid: toPay.length,
+    totalAmount: totalPaid,
+    bookings: toPay.map((b) => ({ id: b.id, totalAmount: b.totalAmount })),
+  });
 });
 
 // GET /api/bookings/:id - consumer booking detail
@@ -214,6 +306,15 @@ bookingsRouter.patch("/:id/pay", async (req, res) => {
     return res.status(400).json({ error: "Booking is already paid" });
   }
 
+  const otherEventBookings = await prisma.booking.findMany({
+    where: { eventId: booking.eventId, userId, status: { not: "cancelled" }, id: { not: id } },
+    select: { status: true },
+  });
+  const hasPending = otherEventBookings.some((b) => b.status === "pending");
+  if (hasPending) {
+    return res.status(400).json({ error: "All vendors must accept before payment. Some bookings are still pending." });
+  }
+
   let paymentMethodLabel = "card";
   if (paymentMethodId) {
     const pm = await prisma.paymentMethod.findFirst({
@@ -237,8 +338,8 @@ bookingsRouter.patch("/:id/pay", async (req, res) => {
     data: {
       userId: updated.vendor.userId,
       type: "payment_received",
-      title: "Payment received",
-      message: `${updated.user.name} paid for ${updated.event.name}`,
+      title: "Customer has paid",
+      message: `${updated.user.name} paid for ${updated.event.name}. You can start preparation.`,
       link: `/bookings/${updated.id}`,
       metadata: { bookingId: updated.id, targetApp: "vendor" },
     },

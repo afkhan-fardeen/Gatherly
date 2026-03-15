@@ -48,10 +48,20 @@ export async function fetchAuth(input: RequestInfo | URL, init?: RequestInit): P
   const token = getToken();
   const headers = new Headers(init?.headers);
   if (token) headers.set("Authorization", `Bearer ${token}`);
-  const res = await fetch(input, { ...init, headers });
-  if (res.status === 401 && typeof window !== "undefined") {
-    clearSession();
-    window.location.href = "/login";
+  const url = typeof input === "string" ? input : input instanceof URL ? input.href : input.url;
+  const method = init?.method ?? "GET";
+  try {
+    const res = await fetch(input, { ...init, headers });
+    const { logApiCall } = await import("./logger");
+    logApiCall(method, url, res.status);
+    if (res.status === 401 && typeof window !== "undefined") {
+      clearSession();
+      window.location.href = "/login";
+    }
+    return res;
+  } catch (err) {
+    const { logApiCall } = await import("./logger");
+    logApiCall(method, url, undefined, err);
+    throw err;
   }
-  return res;
 }

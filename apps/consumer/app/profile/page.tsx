@@ -40,12 +40,12 @@ interface EventSummary {
 const QUICK_ACCESS = [
   { href: "/services/catering", icon: ForkKnife, label: "Browse Catering", sublabel: "Find catering for your events", iconClass: "bg-emerald-500/10 text-emerald-700" },
   { href: "/events", icon: Calendar, label: "My Events", sublabel: "Manage all your gatherings", iconClass: "bg-primary/10 text-primary", badge: true },
-  { href: "/bookings", icon: CalendarCheck, label: "My Bookings", sublabel: "Catering orders and payments", iconClass: "bg-amber-500/10 text-amber-700" },
 ] as const;
 
 const ACCOUNT_ITEMS = [
   { href: "/profile/payment-methods", icon: CreditCard, label: "Payment Methods", sublabel: "Cards and billing", iconClass: "bg-blue-500/10 text-blue-700" },
   { href: "/profile/payment-history", icon: Receipt, label: "Payment History", sublabel: "Past transactions", iconClass: "bg-amber-500/10 text-amber-700" },
+  { href: "/bookings", icon: CalendarCheck, label: "Order history", sublabel: "Past and active orders", iconClass: "bg-amber-500/10 text-amber-700" },
   { href: "/profile/edit", icon: User, label: "Personal Info", sublabel: "Name, email, phone", iconClass: "bg-primary/10 text-primary" },
 ] as const;
 

@@ -19,6 +19,7 @@ import { vendorRouter } from "./routes/vendor.js";
 import { vendorsRouter } from "./routes/vendors.js";
 import { spotlightRouter } from "./routes/spotlight.js";
 import { spotlightVendorRouter } from "./routes/spotlight-vendor.js";
+import { logRequest } from "./lib/logger.js";
 
 const app = express();
 const PORT = process.env.PORT || process.env.API_PORT || 3001;
@@ -44,6 +45,15 @@ const corsOptions =
 
 app.use(cors(corsOptions));
 app.use(express.json());
+
+// Request logging (method, path, status, duration)
+app.use((req, res, next) => {
+  const start = Date.now();
+  res.on("finish", () => {
+    logRequest(req.method, req.originalUrl || req.url, res.statusCode, Date.now() - start);
+  });
+  next();
+});
 
 app.use("/api/health", healthRouter);
 app.use("/api/upload", uploadRouter);

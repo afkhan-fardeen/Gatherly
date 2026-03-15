@@ -66,6 +66,7 @@ export default function BookingDetailPage() {
   const [selectedPaymentId, setSelectedPaymentId] = useState<string | null>(null);
   const [newCardNumber, setNewCardNumber] = useState("");
   const [useNewCard, setUseNewCard] = useState(false);
+  const [eventBookings, setEventBookings] = useState<{ status: string }[]>([]);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -79,7 +80,17 @@ export default function BookingDetailPage() {
       .then((r) => r.json())
       .then((data) => {
         if (data.error) setError(data.error);
-        else setBooking(data);
+        else {
+          setBooking(data);
+          if (data?.event?.id) {
+            fetch(`${API_URL}/api/bookings?eventId=${data.event.id}`, {
+              headers: { Authorization: `Bearer ${token}` },
+            })
+              .then((r) => (r.ok ? r.json() : []))
+              .then((bks) => setEventBookings(Array.isArray(bks) ? bks : []))
+              .catch(() => setEventBookings([]));
+          }
+        }
       })
       .catch(() => setError("Failed to load booking"))
       .finally(() => setLoading(false));
@@ -214,7 +225,10 @@ export default function BookingDetailPage() {
     );
   }
 
+  const nonCancelled = eventBookings.filter((b) => b.status !== "cancelled");
+  const allEventAccepted = nonCancelled.length === 0 || nonCancelled.every((b) => b.status !== "pending");
   const canPay =
+    allEventAccepted &&
     booking.status === "confirmed" &&
     (booking.paymentStatus || "unpaid") !== "paid";
   const canReview =
@@ -297,7 +311,7 @@ export default function BookingDetailPage() {
               href={`/events/${booking.event.id}`}
               className="text-[12px] font-semibold text-primary hover:underline flex items-center gap-1"
             >
-              View event <CaretRight size={12} weight="bold" />
+              See all services for {booking.event.name} <CaretRight size={12} weight="bold" />
             </Link>
           </div>
           <div className="space-y-2">
@@ -382,6 +396,14 @@ export default function BookingDetailPage() {
 
         {/* Actions */}
         <div className="space-y-3">
+          {booking.status === "confirmed" && (booking.paymentStatus || "unpaid") !== "paid" && !allEventAccepted && (
+            <Link
+              href={`/events/${booking.event.id}/cart`}
+              className="block w-full py-3.5 rounded-full bg-amber-50 border border-amber-200 text-amber-800 font-semibold text-center hover:bg-amber-100 transition-all"
+            >
+              Pay in cart (all vendors must accept first)
+            </Link>
+          )}
           {canPay && (
             <button
               type="button"

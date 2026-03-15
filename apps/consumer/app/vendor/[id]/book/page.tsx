@@ -10,6 +10,7 @@ import { CHERRY } from "@/lib/events-ui";
 import { getBookingDraft, clearBookingDraft, saveBookingDraft } from "@/lib/booking-draft";
 
 import { API_URL, parseApiError, getNetworkErrorMessage } from "@/lib/api";
+import { logInfo, logError } from "@/lib/logger";
 
 interface Event {
   id: string;
@@ -171,6 +172,7 @@ export default function BookVendorPage() {
     }
 
     try {
+      logInfo("BookVendor", "submitting booking", { eventId, vendorId, packageId: pkg.id, guestCount: count });
       const res = await fetch(`${API_URL}/api/bookings`, {
         method: "POST",
         headers: {
@@ -186,12 +188,17 @@ export default function BookVendorPage() {
         }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(parseApiError(data) || "Booking failed");
+      if (!res.ok) {
+        logError("BookVendor", "booking failed", res.status, data);
+        throw new Error(parseApiError(data) || "Booking failed");
+      }
+      logInfo("BookVendor", "booking success");
       clearBookingDraft();
-      toast.success("Booking request sent!");
-      router.push("/bookings");
+      toast.success(eventIdFromUrl ? "Added to cart!" : "Booking request sent!");
+      router.push(eventIdFromUrl ? `/events/${eventId}/cart` : "/bookings");
       router.refresh();
     } catch (err) {
+      logError("BookVendor", "booking error", err);
       setError(getNetworkErrorMessage(err, "Booking failed"));
     } finally {
       setSubmitting(false);
@@ -249,10 +256,10 @@ export default function BookVendorPage() {
               <ArrowLeft size={20} weight="regular" />
             </Link>
             <div className="flex-1 min-w-0">
-              <h1 className="font-serif text-[26px] sm:text-[32px] font-medium leading-none tracking-[-0.8px] text-[#1e0f14] truncate">
+              <h1 className="font-serif text-[28px] sm:text-[34px] font-medium leading-none tracking-[-0.8px] text-[#1e0f14] break-words">
                 Request <span className="italic font-normal text-primary">Booking</span>
               </h1>
-              <p className="text-[12.5px] font-light text-[#9e8085] mt-1 truncate">
+              <p className="text-[12.5px] font-light text-[#9e8085] mt-1 tracking-wide break-words">
                 {vendor.businessName} · {pkg.name}
               </p>
             </div>
@@ -260,7 +267,7 @@ export default function BookVendorPage() {
         </header>
 
       <main className="px-5 pb-40">
-        <form onSubmit={handleSubmit} className="form-no-zoom space-y-6">
+        <form onSubmit={handleSubmit} className="form-no-zoom space-y-5">
           {error && (
             <div className="p-4 rounded-[20px] bg-red-50 text-red-700 text-[14px] font-medium border border-red-200">
               {error}
@@ -286,15 +293,13 @@ export default function BookVendorPage() {
             </div>
           ) : (
             <>
-              <div
-                className="p-4 rounded-[20px] border border-primary/10 backdrop-blur-xl"
-                style={{ backgroundColor: "rgba(255, 255, 255, 0.75)", boxShadow: "0 2px 16px rgba(109, 13, 53, 0.06)" }}
-              >
-                <label className="block font-serif text-[14px] font-semibold text-[#5c3d47] mb-2">Event</label>
-                <select
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-[13px] font-medium text-[#5c3d47] mb-1.5">Event</label>
+                  <select
                   value={eventId}
                   onChange={(e) => setEventId(e.target.value)}
-                  className="w-full h-12 px-4 rounded-xl border border-primary/10 bg-[#fdfaf7] text-[#1e0f14] outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40"
+                  className="w-full h-11 px-4 rounded-xl border border-slate-200 bg-white text-[#1e0f14] outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40"
                   required
                 >
                   {events.map((ev) => (
@@ -303,14 +308,11 @@ export default function BookVendorPage() {
                     </option>
                   ))}
                 </select>
-              </div>
+                </div>
 
-              <div
-                className="p-4 rounded-[20px] border border-primary/10 backdrop-blur-xl"
-                style={{ backgroundColor: "rgba(255, 255, 255, 0.75)", boxShadow: "0 2px 16px rgba(109, 13, 53, 0.06)" }}
-              >
-                <label className="block font-serif text-[14px] font-semibold text-[#5c3d47] mb-2">Guest count</label>
-                <input
+                <div>
+                  <label className="block text-[13px] font-medium text-[#5c3d47] mb-1.5">Guest count</label>
+                  <input
                   type="number"
                   inputMode="numeric"
                   min={pkg.minGuests ?? 1}
@@ -327,16 +329,16 @@ export default function BookVendorPage() {
                     } else setGuestCount(String(minG));
                   }}
                   placeholder="e.g. 25"
-                  className="w-full h-12 px-4 rounded-xl border border-primary/10 bg-[#fdfaf7] text-[15px] font-medium text-[#1e0f14] placeholder:text-[#9e8085] outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                  className="w-full h-11 px-4 rounded-xl border border-slate-200 bg-white text-[15px] font-medium text-[#1e0f14] placeholder:text-[#9e8085] outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                   required
                 />
                 {(pkg.minGuests || pkg.maxGuests) && (
-                  <p className="mt-1.5 text-[12px] font-normal text-[#9e8085]">
+                  <p className="mt-1 text-[12px] text-[#9e8085]">
                     Min {pkg.minGuests ?? 1}
                     {pkg.maxGuests && ` · Max ${pkg.maxGuests} guests`}
                   </p>
                 )}
-              </div>
+                </div>
 
               {(() => {
                 const count = parseInt(guestCount, 10);
@@ -348,25 +350,19 @@ export default function BookVendorPage() {
                 const serviceCharges = (subtotal * serviceChargePercent) / 100;
                 const totalAmount = subtotal + serviceCharges + setupFee;
                 return (
-                  <div
-                    className="p-4 rounded-[20px] border border-primary/10 backdrop-blur-xl"
-                    style={{ backgroundColor: "rgba(255, 255, 255, 0.75)", boxShadow: "0 2px 16px rgba(109, 13, 53, 0.06)" }}
-                  >
-                    <p className="text-[12px] font-normal text-[#a0888d] mb-3">Estimated total</p>
-                    <p className="font-serif text-[22px] font-semibold text-primary">
+                  <div className="py-2">
+                    <p className="text-[12px] text-[#a0888d]">Estimated total</p>
+                    <p className="font-serif text-[20px] font-semibold text-primary">
                       {totalAmount.toFixed(2)} BD
                     </p>
                   </div>
                 );
               })()}
 
-              <div
-                className="p-4 rounded-[20px] border border-primary/10 backdrop-blur-xl"
-                style={{ backgroundColor: "rgba(255, 255, 255, 0.75)", boxShadow: "0 2px 16px rgba(109, 13, 53, 0.06)" }}
-              >
-                <label className="block font-serif text-[14px] font-semibold text-[#5c3d47] mb-2">
-                  Special requirements (optional)
-                </label>
+                <div>
+                  <label className="block text-[13px] font-medium text-[#5c3d47] mb-1.5">
+                    Special requirements (optional)
+                  </label>
                 <textarea
                   value={specialRequirements}
                   onChange={(e) => setSpecialRequirements(e.target.value)}
@@ -380,9 +376,10 @@ export default function BookVendorPage() {
                     })
                   }
                   rows={3}
-                  className="w-full px-4 py-3 rounded-lg border border-primary/10 bg-[#fdfaf7] text-[14px] font-normal text-[#1e0f14] placeholder:text-[#9e8085] resize-none outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40"
+                  className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white text-[14px] font-normal text-[#1e0f14] placeholder:text-[#9e8085] resize-none outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40"
                   placeholder="Dietary needs, allergies, setup preferences..."
                 />
+                </div>
               </div>
 
               <button
@@ -391,7 +388,7 @@ export default function BookVendorPage() {
                 className="w-full py-3.5 rounded-full font-semibold text-white transition-all disabled:opacity-50"
                 style={{ backgroundColor: CHERRY, boxShadow: "0 4px 16px rgba(109,13,53,0.28)" }}
               >
-                {submitting ? "Submitting..." : "Request Booking"}
+                {submitting ? "Adding..." : eventIdFromUrl ? "Add to cart" : "Request Booking"}
               </button>
             </>
           )}

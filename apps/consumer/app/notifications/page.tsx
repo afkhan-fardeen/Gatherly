@@ -177,7 +177,7 @@ export default function NotificationsPage() {
   return (
     <AppLayout contentBg="bg-[#f4ede5]">
       <div
-        className="px-5 md:px-8 pt-6 pb-40"
+        className="min-h-full px-5 md:px-8 pt-6 pb-40"
         style={{
           background: "linear-gradient(to bottom, #f4ede5 80%, #ede4da 100%)",
         }}

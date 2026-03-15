@@ -133,9 +133,10 @@ export default function EditEventPage() {
   return (
     <AppLayout contentBg="bg-[#f4ede5]" fullHeight={false}>
       <div
-        className="px-5 md:px-8 pt-6 pb-[calc(6rem+env(safe-area-inset-bottom,0px))] min-h-0"
+        className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden px-5 md:px-8 pt-6 pb-[calc(6rem+env(safe-area-inset-bottom,0px))]"
         style={{
           background: "linear-gradient(to bottom, #f4ede5 80%, #ede4da 100%)",
+          WebkitOverflowScrolling: "touch",
         }}
       >
         <header className="mb-6">

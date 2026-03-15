@@ -1,29 +1,34 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { EventImage } from "@/components/EventImage";
 import {
   ArrowLeft,
   Calendar,
-  MapPin,
-  Users,
   Pencil,
   Trash,
   ForkKnife,
+  CaretDown,
   CaretRight,
   Warning,
   X,
-  Clock,
+  Sparkle,
+  ShoppingCart,
+  MusicNote,
+  Flower,
 } from "@phosphor-icons/react";
 import { AppLayout } from "@/components/AppLayout";
-import { StatusBadge } from "@/components/ui/StatusBadge";
-import { API_URL, fetchAuth } from "@/lib/api";
+import { API_URL, fetchAuth, parseApiError } from "@/lib/api";
+import { logInfo, logError } from "@/lib/logger";
 import { getToken } from "@/lib/session";
-import { formatDateLong, formatTime, formatEventDate } from "@/lib/date-utils";
+import { formatDateLong, formatTime } from "@/lib/date-utils";
+import toast from "react-hot-toast";
 import { CHERRY } from "@/lib/events-ui";
 import { PARTNER_GRADIENTS } from "@/lib/gradients";
+import { getBookingStatusStyle } from "@/components/ui/Tag";
+import { getStatusBadgeLabel } from "@/lib/bookingStatus";
 
 interface Event {
   id: string;
@@ -50,10 +55,28 @@ export default function EventDetailPage() {
   const router = useRouter();
   const eventId = params.eventId as string;
   const [event, setEvent] = useState<Event | null>(null);
+  const [bookings, setBookings] = useState<EventBooking[]>([]);
   const [loading, setLoading] = useState(true);
   const [deleting, setDeleting] = useState(false);
   const [markingComplete, setMarkingComplete] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [expanded, setExpanded] = useState<string | null>("details");
+
+  interface EventBooking {
+    id: string;
+    status: string;
+    paymentStatus: string;
+    totalAmount: number;
+    vendor: { businessName: string; logoUrl: string | null };
+    package: { name: string; imageUrl: string | null };
+  }
+
+  const fetchBookings = useCallback(async () => {
+    if (!eventId) return;
+    const res = await fetchAuth(`${API_URL}/api/bookings?eventId=${eventId}`);
+    const data = res.ok ? await res.json() : [];
+    setBookings(Array.isArray(data) ? data : []);
+  }, [eventId]);
 
   useEffect(() => {
     if (!getToken()) {
@@ -62,10 +85,13 @@ export default function EventDetailPage() {
     }
     fetchAuth(`${API_URL}/api/events/${eventId}`)
       .then((res) => (res.ok ? res.json() : null))
-      .then(setEvent)
+      .then((e) => {
+        setEvent(e);
+        if (e) fetchBookings();
+      })
       .catch(() => setEvent(null))
       .finally(() => setLoading(false));
-  }, [eventId]);
+  }, [eventId, fetchBookings]);
 
   async function handleMarkComplete() {
     if (!event) return;
@@ -84,14 +110,23 @@ export default function EventDetailPage() {
 
   async function handleDelete() {
     setDeleting(true);
+    logInfo("EventDetail", "delete initiated", { eventId });
     try {
       const res = await fetchAuth(`${API_URL}/api/events/${eventId}`, {
         method: "DELETE",
       });
       if (res.ok) {
+        logInfo("EventDetail", "delete success", { eventId });
         setShowDeleteModal(false);
         router.push("/events");
+      } else {
+        const data = await res.json().catch(() => ({}));
+        logError("EventDetail", "delete failed", res.status, data);
+        toast.error(parseApiError(data) || "Failed to delete event");
       }
+    } catch (err) {
+      logError("EventDetail", "delete error", err);
+      toast.error(err instanceof Error ? err.message : "Failed to delete event");
     } finally {
       setDeleting(false);
     }
@@ -132,19 +167,28 @@ export default function EventDetailPage() {
       ? `${formatTime(event.timeStart)} – ${formatTime(event.timeEnd)}`
       : formatTime(event.timeStart)
     : null;
-  const { month, day, weekday } = formatEventDate(event.date);
+  const totalCart = bookings.reduce((s, b) => s + Number(b.totalAmount), 0);
+  const nonCancelled = bookings.filter((b) => b.status !== "cancelled");
+  const allVendorsAccepted = nonCancelled.length === 0 || nonCancelled.every((b) => b.status !== "pending");
+  const pendingCount = bookings.filter((b) => b.status === "pending").length;
+  const confirmedUnpaid = bookings.filter(
+    (b) =>
+      ["confirmed", "in_preparation", "delivered"].includes(b.status) &&
+      (b.paymentStatus || "unpaid") !== "paid"
+  );
+  const canPay = allVendorsAccepted && confirmedUnpaid.length > 0;
 
   return (
     <AppLayout contentBg="bg-[#f4ede5]">
       <div
-        className="px-5 md:px-8 pt-6 pb-40"
+        className="min-h-full px-5 md:px-8 pt-6 pb-40"
         style={{
           background: "linear-gradient(to bottom, #f4ede5 80%, #ede4da 100%)",
         }}
       >
-        {/* Header - My Events style */}
+        {/* Header: back, title, cart */}
         <header
-          className="sticky top-0 z-20 mb-6"
+          className="sticky top-0 z-20 mb-6 -mx-5 px-5 md:-mx-8 md:px-8"
           style={{ background: "linear-gradient(to bottom, #f4ede5 75%, transparent)" }}
         >
           <div className="flex items-center gap-3">
@@ -156,20 +200,39 @@ export default function EventDetailPage() {
               <ArrowLeft size={20} weight="regular" />
             </Link>
             <div className="flex-1 min-w-0">
-              <h1 className="font-serif text-[26px] sm:text-[32px] font-medium leading-none tracking-[-0.8px] text-[#1e0f14] truncate">
+              <h1 className="font-serif text-[28px] sm:text-[34px] font-medium leading-none tracking-[-0.8px] text-[#1e0f14] break-words">
                 {event.name}
               </h1>
-              <p className="text-[12.5px] font-light text-[#9e8085] mt-1">
-                {dateStr}
-                {timeStr && ` · ${timeStr}`}
+              <p className="text-[12.5px] font-light text-[#9e8085] mt-1 tracking-wide break-words">
+                {dateStr} · {event.guestCount} guests
               </p>
             </div>
+            {!isPast && (
+              <div className="shrink-0">
+              <Link
+                href={bookings.length > 0 ? `/events/${eventId}/cart` : `/events/${eventId}/services`}
+                className="relative w-10 h-10 shrink-0 rounded-full flex items-center justify-center bg-white border border-primary/10 text-[#1e0f14] transition-shadow hover:shadow-md"
+                style={{ boxShadow: "0 2px 8px rgba(109,13,53,0.06)" }}
+                aria-label="View cart"
+              >
+                <ShoppingCart size={22} weight="regular" />
+                {bookings.length > 0 && (
+                  <span
+                    className="absolute -top-1 -right-1 min-w-[18px] h-[18px] rounded-full flex items-center justify-center text-[10px] font-bold text-white"
+                    style={{ backgroundColor: CHERRY }}
+                  >
+                    {bookings.length}
+                  </span>
+                )}
+              </Link>
+              </div>
+            )}
           </div>
         </header>
 
         {/* Event image (optional) */}
         {event.imageUrl && (
-          <div className="h-48 relative overflow-hidden rounded-[20px] border border-primary/10 bg-slate-100 mb-6">
+          <div className="h-40 relative overflow-hidden rounded-2xl border border-primary/10 bg-slate-100 mb-5">
             <EventImage
               src={event.imageUrl}
               alt={event.name}
@@ -179,122 +242,182 @@ export default function EventDetailPage() {
           </div>
         )}
 
-        {/* Event hero card */}
+        {/* Accordion 1: Event details */}
         <div
-          className="rounded-[20px] overflow-hidden border border-primary/10 bg-white mb-6"
-          style={{ boxShadow: "0 2px 16px rgba(109, 13, 53, 0.06)" }}
+          className={`bg-[#fdfaf7] border border-primary/10 rounded-[18px] overflow-hidden mb-4 transition-shadow ${
+            expanded === "details" ? "shadow-[0_4px_20px_rgba(109,13,53,0.08)]" : ""
+          }`}
         >
-          <div className="flex">
-            <div
-              className="w-[84px] shrink-0 flex flex-col items-center justify-center gap-0.5 py-2 px-2 border-r border-primary/10"
-              style={{ background: PARTNER_GRADIENTS[0] }}
-            >
-              <span className="font-serif text-[10px] font-semibold uppercase tracking-wider text-white/80">
-                {month}
-              </span>
-              <span className="font-serif text-[22px] font-semibold text-white leading-none">
-                {day}
-              </span>
-              <span className="font-serif text-[10px] font-semibold text-white/70">
-                {weekday}
-              </span>
-            </div>
-            <div className="flex-1 min-w-0 p-4 pl-3">
-              <div className="flex items-center gap-2 flex-wrap mb-2">
-                <StatusBadge
-                  status={(event.status || "draft") as "draft" | "in_progress" | "completed" | "cancelled"}
-                />
-                <span className="text-[9px] font-semibold uppercase tracking-wide px-2 py-0.5 rounded-full bg-primary/10 text-primary">
-                  {event.eventType.replace(/_/g, " ")}
-                </span>
+          <button
+            type="button"
+            onClick={() => setExpanded(expanded === "details" ? null : "details")}
+            className="w-full flex items-center justify-between py-4 px-4 hover:bg-primary/[0.02] transition-colors"
+          >
+            <div className="flex items-center gap-3">
+              <div
+                className={`w-9 h-9 rounded-[10px] flex items-center justify-center shrink-0 transition-colors ${
+                  expanded === "details" ? "bg-primary text-white" : "bg-primary/7 text-primary"
+                }`}
+              >
+                <Calendar size={16} weight="regular" />
               </div>
-              <p className="font-serif text-[14px] font-semibold text-[#1e0f14]">
-                {event.guestCount} guests
-              </p>
+              <div className="text-left">
+                <div className="text-[14.5px] font-medium text-[#1e0f14]">Event details</div>
+                <div className="text-[11.5px] font-light text-[#a0888d] mt-0.5">{dateStr} · {event.location}</div>
+              </div>
             </div>
-          </div>
+            <CaretDown
+              size={16}
+              weight="bold"
+              className={`text-[#a0888d] transition-transform ${expanded === "details" ? "rotate-180" : ""}`}
+            />
+          </button>
+          {expanded === "details" && (
+            <div className="px-4 pb-4 space-y-2 text-[13px] border-t border-primary/10 pt-4 animate-fade-in">
+              <div><span className="font-medium text-[#5c3d47]">Date: </span><span className="text-[#1e0f14]">{dateStr}</span></div>
+              <div><span className="font-medium text-[#5c3d47]">Time: </span><span className="text-[#1e0f14]">{timeStr || "—"}</span></div>
+              <div><span className="font-medium text-[#5c3d47]">Location: </span><span className="text-[#1e0f14]">{event.location}{event.venueName && ` · ${event.venueName}`}</span></div>
+              <div><span className="font-medium text-[#5c3d47]">Total Guests: </span><span className="text-[#1e0f14]">{event.guestCount}</span></div>
+              <div><span className="font-medium text-[#5c3d47]">Notes: </span><span className="text-[#1e0f14]">{event.specialRequirements ? (event.dietaryRequirements?.length ? `${event.specialRequirements} Dietary: ${event.dietaryRequirements.join(", ")}` : event.specialRequirements) : event.dietaryRequirements?.length ? `Dietary: ${event.dietaryRequirements.join(", ")}` : "—"}</span></div>
+            </div>
+          )}
         </div>
 
-        {/* Details sections */}
-        <div className="space-y-4 mb-6">
-          <div
-            className="flex items-start gap-3 p-4 rounded-[20px] border border-primary/10 bg-white"
-            style={{ boxShadow: "0 2px 16px rgba(109, 13, 53, 0.06)" }}
-          >
-            <div className="w-10 h-10 shrink-0 rounded-xl flex items-center justify-center bg-primary/10 text-primary">
-              <MapPin size={20} weight="regular" />
+        {/* Accordion 2: Services */}
+        {!isPast && (
+          <div className="space-y-4 mb-5">
+            {/* Catering accordion */}
+            <div
+              className={`bg-[#fdfaf7] border border-primary/10 rounded-[18px] overflow-hidden transition-shadow ${
+                expanded === "catering" ? "shadow-[0_4px_20px_rgba(109,13,53,0.08)]" : ""
+              }`}
+            >
+              <button
+                type="button"
+                onClick={() => setExpanded(expanded === "catering" ? null : "catering")}
+                className="w-full flex items-center justify-between py-4 px-4 hover:bg-primary/[0.02] transition-colors"
+              >
+                <div className="flex items-center gap-3">
+                  <div
+                    className={`w-9 h-9 rounded-[10px] flex items-center justify-center shrink-0 transition-colors ${
+                      expanded === "catering" ? "bg-primary text-white" : "bg-primary/7 text-primary"
+                    }`}
+                  >
+                    <ForkKnife size={16} weight="regular" />
+                  </div>
+                  <div className="text-left">
+                    <div className="text-[14.5px] font-medium text-[#1e0f14]">Catering</div>
+                    <div className="text-[11.5px] font-light text-[#a0888d] mt-0.5">
+                      {bookings.length === 0 ? "No services added" : `${bookings.length} vendor${bookings.length === 1 ? "" : "s"} · ${totalCart.toFixed(2)} BD`}
+                    </div>
+                  </div>
+                </div>
+                <CaretDown
+                  size={16}
+                  weight="bold"
+                  className={`text-[#a0888d] transition-transform ${expanded === "catering" ? "rotate-180" : ""}`}
+                />
+              </button>
+              {expanded === "catering" && (
+                <div className="px-4 pb-4 border-t border-primary/10 pt-4 animate-fade-in">
+                  {bookings.length === 0 ? (
+                    <p className="text-[13px] text-[#a0888d]">Add catering for your event.</p>
+                  ) : (
+                    <div className="space-y-2">
+                      {bookings.map((b) => (
+                        <Link
+                          key={b.id}
+                          href={`/bookings/${b.id}`}
+                          className="flex items-center justify-between gap-3 p-3 rounded-xl border border-primary/5 bg-white hover:border-primary/15 transition-colors"
+                        >
+                          <div className="flex-1 min-w-0">
+                            <p className="text-[13px] font-medium text-[#1e0f14]">{b.vendor.businessName} · {b.package.name}</p>
+                            <span className={`inline-block mt-1.5 px-2 py-0.5 rounded-full text-[9px] font-semibold uppercase tracking-wide ${getBookingStatusStyle(b.status)}`}>
+                              {getStatusBadgeLabel(b.status, b.paymentStatus)}
+                            </span>
+                          </div>
+                          <div className="text-right shrink-0">
+                            <p className="text-[14px] font-semibold text-primary">{Number(b.totalAmount).toFixed(2)} BD</p>
+                            <CaretRight size={14} weight="bold" className="text-[#9e8085] mt-0.5" />
+                          </div>
+                        </Link>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
-            <div>
-              <p className="text-[11px] font-medium uppercase tracking-wider text-[#9e8085] mb-0.5">
-                Location
-              </p>
-              <p className="font-serif text-[15px] font-medium text-[#1e0f14]">
-                {event.location}
-              </p>
-              {event.venueName && (
-                <p className="text-[13px] font-normal text-[#a0888d] mt-0.5">
-                  {event.venueName}
-                </p>
+
+            {/* Decor - coming soon */}
+            <div className="bg-[#fdfaf7] border border-primary/10 rounded-[18px] overflow-hidden opacity-75">
+              <div className="flex items-center justify-between py-4 px-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-9 h-9 rounded-[10px] flex items-center justify-center shrink-0 bg-primary/7 text-primary">
+                    <Flower size={16} weight="regular" />
+                  </div>
+                  <div className="text-left">
+                    <div className="text-[14.5px] font-medium text-[#1e0f14]">Decor</div>
+                    <div className="text-[11.5px] font-light text-[#a0888d] mt-0.5">Coming soon</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Entertainment - coming soon */}
+            <div className="bg-[#fdfaf7] border border-primary/10 rounded-[18px] overflow-hidden opacity-75">
+              <div className="flex items-center justify-between py-4 px-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-9 h-9 rounded-[10px] flex items-center justify-center shrink-0 bg-primary/7 text-primary">
+                    <MusicNote size={16} weight="regular" />
+                  </div>
+                  <div className="text-left">
+                    <div className="text-[14.5px] font-medium text-[#1e0f14]">Entertainment</div>
+                    <div className="text-[11.5px] font-light text-[#a0888d] mt-0.5">Coming soon</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Primary CTA */}
+            <div className="pt-2">
+              {bookings.length === 0 ? (
+                <Link
+                  href={`/events/${eventId}/services`}
+                  className="flex items-center justify-center gap-2 py-3.5 rounded-xl font-semibold text-white transition-all hover:opacity-95"
+                  style={{ backgroundColor: CHERRY, boxShadow: "0 4px 14px rgba(109,13,53,0.3)" }}
+                >
+                  <Sparkle size={20} weight="regular" />
+                  Add services
+                </Link>
+              ) : !allVendorsAccepted && pendingCount > 0 ? (
+                <div className="py-3.5 rounded-xl bg-amber-50 border border-amber-200 text-center">
+                  <p className="text-[13px] font-medium text-amber-800">Waiting for {pendingCount} vendor{pendingCount === 1 ? "" : "s"} to accept</p>
+                  <p className="text-[12px] text-amber-700 mt-0.5">You can pay once all have accepted</p>
+                </div>
+              ) : canPay ? (
+                <Link
+                  href={`/events/${eventId}/cart`}
+                  className="flex items-center justify-center gap-2 py-3.5 rounded-xl font-semibold text-white transition-all hover:opacity-95"
+                  style={{ backgroundColor: CHERRY, boxShadow: "0 4px 14px rgba(109,13,53,0.3)" }}
+                >
+                  <ShoppingCart size={20} weight="bold" />
+                  View cart & pay
+                </Link>
+              ) : (
+                <Link
+                  href={`/events/${eventId}/cart`}
+                  className="flex items-center justify-center gap-2 py-3.5 rounded-xl font-semibold text-[#5c3d47] bg-white border border-primary/10 hover:bg-[#fdfaf7] transition-colors"
+                >
+                  <ShoppingCart size={20} weight="regular" />
+                  View cart
+                </Link>
               )}
             </div>
           </div>
+        )}
 
-          {(event.budgetMin != null || event.budgetMax != null) && (
-            <div
-              className="p-4 rounded-[20px] border border-primary/10 bg-white"
-              style={{ boxShadow: "0 2px 16px rgba(109, 13, 53, 0.06)" }}
-            >
-              <p className="text-[11px] font-medium uppercase tracking-wider text-[#9e8085] mb-1">
-                Budget
-              </p>
-              <p className="font-serif text-[15px] font-medium text-[#1e0f14]">
-                {event.budgetMin != null && event.budgetMax != null
-                  ? `${Number(event.budgetMin).toFixed(0)} – ${Number(event.budgetMax).toFixed(0)} BD`
-                  : event.budgetMin != null
-                    ? `From ${Number(event.budgetMin).toFixed(0)} BD`
-                    : `Up to ${Number(event.budgetMax).toFixed(0)} BD`}
-              </p>
-            </div>
-          )}
-
-          {event.dietaryRequirements?.length > 0 && (
-            <div
-              className="p-4 rounded-[20px] border border-primary/10 bg-white"
-              style={{ boxShadow: "0 2px 16px rgba(109, 13, 53, 0.06)" }}
-            >
-              <p className="text-[11px] font-medium uppercase tracking-wider text-[#9e8085] mb-2">
-                Dietary requirements
-              </p>
-              <div className="flex flex-wrap gap-2">
-                {event.dietaryRequirements.map((d) => (
-                  <span
-                    key={d}
-                    className="text-[11px] font-semibold uppercase tracking-wide px-2.5 py-1 rounded-full bg-primary/10 text-primary"
-                  >
-                    {d}
-                  </span>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {event.specialRequirements && (
-            <div
-              className="p-4 rounded-[20px] border border-primary/10 bg-white"
-              style={{ boxShadow: "0 2px 16px rgba(109, 13, 53, 0.06)" }}
-            >
-              <p className="text-[11px] font-medium uppercase tracking-wider text-[#9e8085] mb-1">
-                Special requirements
-              </p>
-              <p className="font-serif text-[14px] font-normal text-[#1e0f14]">
-                {event.specialRequirements}
-              </p>
-            </div>
-          )}
-        </div>
-
-        {/* Actions */}
-        <div className="space-y-3">
+        {/* Edit & Delete */}
+        <section className="space-y-2">
           {isPast &&
             event.status !== "completed" &&
             event.status !== "cancelled" && (
@@ -302,76 +425,30 @@ export default function EventDetailPage() {
                 type="button"
                 onClick={handleMarkComplete}
                 disabled={markingComplete}
-                className="w-full py-3.5 rounded-full font-semibold text-[#1e0f14] bg-white border border-primary/10 hover:bg-[#fdfaf7] transition-colors disabled:opacity-50"
+                className="w-full py-3 rounded-xl font-semibold text-[#1e0f14] bg-white border border-primary/10 hover:bg-[#fdfaf7] transition-colors disabled:opacity-50"
               >
                 {markingComplete ? "Updating…" : "Mark complete"}
               </button>
             )}
 
-          {!isPast && (
+          <div className="flex gap-2">
             <Link
-              href={`/services/catering?eventId=${eventId}&guestCount=${event.guestCount}`}
-              className="flex items-center justify-between p-4 rounded-[20px] border border-primary/20 bg-primary/5 hover:bg-primary/10 transition-colors"
+              href={`/events/${eventId}/edit`}
+              className="flex-1 inline-flex items-center justify-center gap-2 py-2.5 rounded-full text-[13px] font-medium text-[#5c3d47] bg-white/90 border border-slate-200 hover:bg-white hover:border-primary/20 transition-colors"
             >
-              <div className="flex items-center gap-3">
-                <div
-                  className="w-12 h-12 flex items-center justify-center rounded-xl text-white"
-                  style={{ backgroundColor: CHERRY }}
-                >
-                  <ForkKnife size={24} weight="regular" />
-                </div>
-                <div>
-                  <p className="font-serif text-[15px] font-semibold text-[#1e0f14]">
-                    Book catering
-                  </p>
-                  <p className="text-[13px] font-normal text-[#a0888d]">
-                    Find caterers for this event
-                  </p>
-                </div>
-              </div>
-              <CaretRight size={22} weight="regular" className="text-primary" />
+              <Pencil size={16} weight="regular" />
+              Edit
             </Link>
-          )}
-
-          <Link
-            href="/bookings"
-            className="flex items-center justify-between p-4 rounded-[20px] border border-primary/10 bg-white hover:bg-[#fdfaf7] transition-colors"
-            style={{ boxShadow: "0 2px 16px rgba(109, 13, 53, 0.06)" }}
-          >
-            <div className="flex items-center gap-3">
-              <div className="w-12 h-12 flex items-center justify-center rounded-xl bg-primary/10 text-primary">
-                <ForkKnife size={24} weight="regular" />
-              </div>
-              <div>
-                <p className="font-serif text-[15px] font-semibold text-[#1e0f14]">
-                  My catering orders
-                </p>
-                <p className="text-[13px] font-normal text-[#a0888d]">
-                  View and track your catering bookings
-                </p>
-              </div>
-            </div>
-            <CaretRight size={22} weight="regular" className="text-[#9e8085]" />
-          </Link>
-        </div>
-
-        <div className="flex gap-3 mt-4">
-          <Link
-            href={`/events/${eventId}/edit`}
-            className="flex-1 flex items-center justify-center gap-2 py-3.5 rounded-full font-semibold text-[#1e0f14] bg-white border border-primary/10 hover:bg-[#fdfaf7] transition-colors"
-          >
-            <Pencil size={18} weight="regular" />
-            Edit
-          </Link>
-          <button
-            type="button"
-            onClick={() => setShowDeleteModal(true)}
-            className="flex-1 flex items-center justify-center gap-2 py-3.5 rounded-full font-semibold text-red-600 bg-white border border-red-200 hover:bg-red-50 transition-colors"
-          >
-            <Trash size={18} weight="regular" />
-            Delete
-          </button>
-        </div>
+            <button
+              type="button"
+              onClick={() => setShowDeleteModal(true)}
+              className="flex-1 inline-flex items-center justify-center gap-2 py-2.5 rounded-full text-[13px] font-medium text-red-600 bg-white/90 border border-red-200 hover:bg-red-50 hover:border-red-300 transition-colors"
+            >
+              <Trash size={16} weight="regular" />
+              Delete
+            </button>
+          </div>
+        </section>
       </div>
 
       {/* Delete confirmation modal */}
@@ -384,38 +461,35 @@ export default function EventDetailPage() {
             aria-label="Close"
           />
           <div
-            className="relative bg-white w-full max-w-md rounded-[20px] p-6 shadow-xl"
+            className="relative bg-white w-full max-w-sm rounded-2xl p-5 shadow-xl flex flex-col gap-4"
             style={{ boxShadow: "0 20px 60px rgba(109,13,53,0.15)" }}
           >
-            <div className="flex justify-between items-start mb-5">
-              <div className="flex items-center gap-3">
-                <div className="w-12 h-12 flex items-center justify-center rounded-full shrink-0 bg-red-100">
-                  <Warning size={24} weight="fill" className="text-red-600" />
-                </div>
-                <div>
-                  <h3 className="font-serif text-[18px] font-semibold text-[#1e0f14]">
-                    Delete event?
-                  </h3>
-                  <p className="text-[13px] font-normal text-[#a0888d] mt-0.5">
-                    This cannot be undone. All event details and linked data will
-                    be permanently removed.
-                  </p>
-                </div>
+            <div className="flex items-start gap-2.5">
+              <div className="w-9 h-9 shrink-0 flex items-center justify-center rounded-full bg-red-100">
+                <Warning size={18} weight="fill" className="text-red-600" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <h3 className="text-[14px] font-semibold text-[#1e0f14]">
+                  Delete event?
+                </h3>
+                <p className="text-[12px] font-normal text-[#a0888d] mt-0.5">
+                  Cannot be undone.
+                </p>
               </div>
               <button
                 type="button"
                 onClick={() => !deleting && setShowDeleteModal(false)}
-                className="w-10 h-10 flex items-center justify-center rounded-full text-slate-400 hover:bg-slate-100 shrink-0"
+                className="w-8 h-8 shrink-0 flex items-center justify-center rounded-full text-slate-400 hover:bg-slate-100"
               >
-                <X size={20} weight="bold" />
+                <X size={16} weight="bold" />
               </button>
             </div>
-            <div className="flex gap-3 mt-4">
+            <div className="flex gap-2">
               <button
                 type="button"
                 onClick={() => !deleting && setShowDeleteModal(false)}
                 disabled={deleting}
-                className="flex-1 py-3 font-semibold text-[#5c3d47] border border-slate-200 rounded-full hover:bg-slate-50 transition-colors disabled:opacity-50"
+                className="flex-1 py-2.5 text-[13px] font-semibold text-[#5c3d47] border border-slate-200 rounded-xl hover:bg-slate-50 transition-colors disabled:opacity-50"
               >
                 Cancel
               </button>
@@ -423,14 +497,14 @@ export default function EventDetailPage() {
                 type="button"
                 onClick={handleDelete}
                 disabled={deleting}
-                className="flex-1 py-3 font-semibold text-white rounded-full flex items-center justify-center gap-2 disabled:opacity-50"
+                className="flex-1 py-2.5 text-[13px] font-semibold text-white rounded-xl flex items-center justify-center gap-1.5 disabled:opacity-50"
                 style={{
                   backgroundColor: "#dc2626",
                   boxShadow: "0 4px 14px rgba(220, 38, 38, 0.35)",
                 }}
               >
-                {deleting ? "Deleting…" : "Delete event"}
-                <Trash size={18} weight="regular" />
+                {deleting ? "Deleting…" : "Delete"}
+                <Trash size={16} weight="regular" />
               </button>
             </div>
           </div>

@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { prisma } from "../lib/prisma.js";
+import { logError, logInfo } from "../lib/logger.js";
 import { authMiddleware } from "../middleware/auth.js";
 import {
   createEventSchema,
@@ -188,10 +189,30 @@ eventsRouter.put("/:id", async (req, res) => {
 });
 
 eventsRouter.delete("/:id", async (req, res) => {
-  const existing = await prisma.event.findFirst({
-    where: { id: req.params.id, userId: req.user!.userId },
-  });
-  if (!existing) return res.status(404).json({ error: "Event not found" });
-  await prisma.event.delete({ where: { id: req.params.id } });
-  res.status(204).send();
+  try {
+    const existing = await prisma.event.findFirst({
+      where: { id: req.params.id, userId: req.user!.userId },
+    });
+    if (!existing) return res.status(404).json({ error: "Event not found" });
+
+    // Delete in order: reviews → bookings → event (FK constraints)
+    await prisma.$transaction(async (tx) => {
+      const bookings = await tx.booking.findMany({
+        where: { eventId: req.params.id },
+        select: { id: true },
+      });
+      const bookingIds = bookings.map((b) => b.id);
+      logInfo("DELETE event", { eventId: req.params.id, bookingsCount: bookingIds.length });
+      if (bookingIds.length > 0) {
+        await tx.review.deleteMany({ where: { bookingId: { in: bookingIds } } });
+        await tx.booking.deleteMany({ where: { eventId: req.params.id } });
+      }
+      await tx.event.delete({ where: { id: req.params.id } });
+    });
+
+    res.status(204).send();
+  } catch (err) {
+    logError("DELETE event failed", err);
+    res.status(500).json({ error: "Failed to delete event" });
+  }
 });

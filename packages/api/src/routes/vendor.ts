@@ -487,13 +487,17 @@ vendorRouter.patch("/bookings/:id/status", vendorAuth, async (req: Request, res:
   };
   const notif = notifTypes[newStatus];
   if (notif) {
+    const link =
+      newStatus === "cancelled"
+        ? `/events/${booking.eventId}`
+        : "/bookings";
     await prisma.notification.create({
       data: {
         userId: booking.userId,
         type: notif.type,
         title: notif.title,
         message: notif.message,
-        link: "/bookings",
+        link,
         metadata: { targetApp: "consumer" },
       },
     });

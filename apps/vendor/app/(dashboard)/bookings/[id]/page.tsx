@@ -193,18 +193,25 @@ export default function BookingDetailPage() {
       );
     }
     if (isConfirmed) {
+      const isPaid = (booking?.paymentStatus || "unpaid") === "paid";
       return (
         <div className="flex flex-wrap gap-2">
-          <button
-            type="button"
-            onClick={() => updateStatus("in_preparation")}
-            disabled={updating}
-            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-amber-100 text-amber-800 font-semibold hover:bg-amber-200 disabled:opacity-50"
-            title="You're starting to prepare the order"
-          >
-            <CookingPot size={18} weight="bold" />
-            Preparing order
-          </button>
+          {isPaid ? (
+            <button
+              type="button"
+              onClick={() => updateStatus("in_preparation")}
+              disabled={updating}
+              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-amber-100 text-amber-800 font-semibold hover:bg-amber-200 disabled:opacity-50"
+              title="You're starting to prepare the order"
+            >
+              <CookingPot size={18} weight="bold" />
+              Preparing order
+            </button>
+          ) : (
+            <div className="px-4 py-2 rounded-xl bg-slate-100 text-slate-600 text-sm font-medium">
+              Awaiting customer payment. You can start preparation once they&apos;ve paid.
+            </div>
+          )}
           <button
             type="button"
             onClick={() => updateStatus("cancelled")}

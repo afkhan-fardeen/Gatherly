@@ -255,9 +255,9 @@ apps/consumer/
 │   └── logo/                # logo1.png
 ├── types/
 │   └── pwa.d.ts
-├── DOCS.md
-├── QA_TEST_REPORT.md
 └── next.config.js
+
+# Note: DOCS.md and QA_TEST_REPORT.md are in docs/consumer/ at the repo root.
 ```
 
 ---
