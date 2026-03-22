@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import toast from "react-hot-toast";
 import { Sparkle, CaretRight, ArrowLeft, CreditCard, Clock } from "@phosphor-icons/react";
 import { VendorLayout } from "@/components/VendorLayout";
 import { API_URL, parseApiError, parseJsonResponse, vendorFetch } from "@/lib/api";
@@ -77,7 +78,7 @@ export default function SpotlightPage() {
       if (!res.ok) throw new Error(parseApiError(data) || data.error || "Purchase failed");
       setSuccess(true);
     } catch (err) {
-      alert(err instanceof Error ? err.message : "Purchase failed");
+      toast.error(err instanceof Error ? err.message : "Purchase failed");
     } finally {
       setPurchasing(false);
     }

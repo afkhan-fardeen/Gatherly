@@ -138,7 +138,7 @@ export default function VendorDashboardPage() {
             }
           />
           <MetricCard
-            label="Revenue (This Month)"
+            label="Paid event revenue (this month)"
             value={loading ? "—" : `${revenueThisMonth.toLocaleString()} BD`}
             icon={
               <div className="w-12 h-12 bg-emerald-500/10 rounded-xl flex items-center justify-center">
@@ -147,7 +147,7 @@ export default function VendorDashboardPage() {
             }
             badge={
               <span className="text-emerald-500 text-xs font-bold bg-emerald-500/10 px-2 py-1 rounded-full">
-                Revenue
+                Paid · event dates
               </span>
             }
           />
@@ -208,19 +208,23 @@ export default function VendorDashboardPage() {
                 Add packages to your profile so customers can discover and book your catering
                 services for their next event.
               </p>
-              <div className="mt-10 flex flex-col sm:flex-row gap-4">
+              <div className="mt-10 flex flex-col sm:flex-row gap-4 items-center">
                 <Link
                   href="/packages/new"
                   className="bg-primary text-white px-8 py-3.5 rounded-xl font-semibold hover:bg-primary/90 transition-all shadow-lg shadow-primary/30"
                 >
                   Create your first package
                 </Link>
-                <button
-                  type="button"
-                  className="px-8 py-3.5 rounded-xl font-semibold border border-slate-200 hover:bg-slate-50 transition-all"
-                >
-                  Import Booking
-                </button>
+                <div className="flex flex-col items-center sm:items-start gap-1">
+                  <button
+                    type="button"
+                    disabled
+                    className="px-8 py-3.5 rounded-xl font-semibold border border-slate-200 text-slate-400 cursor-not-allowed bg-slate-50"
+                  >
+                    Import booking
+                  </button>
+                  <span className="text-xs text-slate-400">Coming soon</span>
+                </div>
               </div>
             </div>
           ) : (

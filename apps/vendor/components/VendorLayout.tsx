@@ -17,6 +17,7 @@ import {
 import { Logo } from "./Logo";
 import { SearchBar } from "./SearchBar";
 import { API_URL, vendorFetch } from "@/lib/api";
+import { useVendorProfile } from "@/contexts/VendorProfileContext";
 
 interface VendorLayoutProps {
   children: React.ReactNode;
@@ -43,6 +44,7 @@ const NAV_ITEMS = [
 export function VendorLayout({ children }: VendorLayoutProps) {
   const pathname = usePathname();
   const router = useRouter();
+  const vendorFromLayout = useVendorProfile();
   const [unreadCount, setUnreadCount] = useState(0);
   const [businessName, setBusinessName] = useState<string | null>(null);
   const [profilePictureUrl, setProfilePictureUrl] = useState<string | null>(null);
@@ -52,6 +54,12 @@ export function VendorLayout({ children }: VendorLayoutProps) {
   const notifRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    if (vendorFromLayout) {
+      setBusinessName(vendorFromLayout.businessName ?? null);
+      setProfilePictureUrl(vendorFromLayout.user?.profilePictureUrl ?? null);
+      setUserName(vendorFromLayout.user?.name ?? null);
+      return;
+    }
     const token = localStorage.getItem("token");
     if (!token) return;
     vendorFetch(`${API_URL}/api/vendor/me`)
@@ -64,7 +72,7 @@ export function VendorLayout({ children }: VendorLayoutProps) {
         }
       })
       .catch(() => {});
-  }, []);
+  }, [vendorFromLayout]);
 
   useEffect(() => {
     if (!notificationOpen) return;
@@ -115,28 +123,31 @@ export function VendorLayout({ children }: VendorLayoutProps) {
           <Logo href="/dashboard" />
         </div>
         <nav className="flex-1 px-4 space-y-1">
-          {NAV_ITEMS.map(({ href, label, icon: Icon }) => (
-            <Link
-              key={href}
-              href={href}
-              className={`flex items-center gap-3 px-3 py-2 rounded-lg font-medium transition-colors ${
-                pathname === href || pathname.startsWith(href + "/")
-                  ? "bg-primary/10 text-primary"
-                  : "text-slate-600 hover:bg-slate-100"
-              }`}
-            >
-              <Icon size={20} weight="regular" />
-              {label}
-            </Link>
-          ))}
+          {NAV_ITEMS.map(({ href, label, icon: Icon }) => {
+            const active = pathname === href || pathname.startsWith(href + "/");
+            return (
+              <Link
+                key={href}
+                href={href}
+                aria-current={active ? "page" : undefined}
+                className={`flex items-center gap-3 px-3 py-2 rounded-lg font-medium transition-colors ${
+                  active ? "bg-primary/10 text-primary" : "text-slate-600 hover:bg-slate-100"
+                }`}
+              >
+                <Icon size={20} weight="regular" aria-hidden />
+                {label}
+              </Link>
+            );
+          })}
           <div className="pt-4 pb-2 px-3 text-xs font-semibold text-slate-400 uppercase tracking-wider">
             Settings
           </div>
           <Link
             href="/profile"
+            aria-current={pathname === "/profile" || pathname.startsWith("/profile/") ? "page" : undefined}
             className="flex items-center gap-3 px-3 py-2 rounded-lg font-medium text-slate-600 hover:bg-slate-100 transition-colors"
           >
-            <User size={20} weight="regular" />
+            <User size={20} weight="regular" aria-hidden />
             Profile
           </Link>
         </nav>
@@ -144,9 +155,10 @@ export function VendorLayout({ children }: VendorLayoutProps) {
           <button
             type="button"
             onClick={handleLogout}
+            aria-label="Sign out"
             className="w-full flex items-center gap-3 px-3 py-2 text-rose-500 hover:bg-rose-50 transition-colors rounded-lg font-medium"
           >
-            <SignOut size={20} weight="regular" />
+            <SignOut size={20} weight="regular" aria-hidden />
             Sign Out
           </button>
         </div>
@@ -156,7 +168,7 @@ export function VendorLayout({ children }: VendorLayoutProps) {
       <main className="hidden md:flex flex-1 flex-col min-w-0 overflow-hidden">
         <header className="h-16 flex items-center justify-between px-6 bg-white border-b border-slate-200 z-10 shrink-0">
           <div className="flex-1 flex items-center gap-4">
-            <div className="hidden sm:block w-full max-w-md">
+            <div className="w-full max-w-md">
               <SearchBar />
             </div>
           </div>
@@ -164,9 +176,11 @@ export function VendorLayout({ children }: VendorLayoutProps) {
             <button
               type="button"
               onClick={() => setNotificationOpen(!notificationOpen)}
+              aria-label="Notifications"
+              aria-expanded={notificationOpen}
               className="relative p-2 rounded-lg hover:bg-slate-100 transition-colors"
             >
-              <Bell size={22} weight="regular" className="text-slate-600" />
+              <Bell size={22} weight="regular" className="text-slate-600" aria-hidden />
               {unreadCount > 0 && (
                 <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] rounded-full bg-rose-500 text-white text-[10px] font-bold flex items-center justify-center px-1">
                   {unreadCount > 99 ? "99+" : unreadCount}
@@ -182,24 +196,34 @@ export function VendorLayout({ children }: VendorLayoutProps) {
                   <p className="px-4 py-6 text-sm text-slate-500 text-center">No notifications</p>
                 ) : (
                   <div className="py-1">
-                    {notifications.slice(0, 5).map((n) => (
-                      <div
-                        key={n.id}
-                        className={`px-4 py-2 hover:bg-slate-50 ${!n.isRead ? "bg-primary/5" : ""}`}
-                      >
-                        <p className="font-medium text-sm text-slate-900 truncate">{n.title}</p>
-                        <p className="text-xs text-slate-500 truncate">{n.message}</p>
-                        {n.link && (
-                          <Link
-                            href={n.link}
-                            onClick={() => setNotificationOpen(false)}
-                            className="inline-flex items-center gap-1 mt-1 text-xs font-medium text-primary hover:underline"
-                          >
-                            View <CaretRight size={12} weight="bold" />
-                          </Link>
-                        )}
-                      </div>
-                    ))}
+                    {notifications.slice(0, 5).map((n) => {
+                      const rowClass = `px-4 py-2 hover:bg-slate-50 ${!n.isRead ? "bg-primary/5" : ""}`;
+                      const body = (
+                        <>
+                          <p className="font-medium text-sm text-slate-900 truncate">{n.title}</p>
+                          <p className="text-xs text-slate-500 truncate">{n.message}</p>
+                          {n.link && (
+                            <span className="inline-flex items-center gap-1 mt-1 text-xs font-medium text-primary">
+                              View <CaretRight size={12} weight="bold" aria-hidden />
+                            </span>
+                          )}
+                        </>
+                      );
+                      return n.link ? (
+                        <Link
+                          key={n.id}
+                          href={n.link}
+                          onClick={() => setNotificationOpen(false)}
+                          className={`block ${rowClass}`}
+                        >
+                          {body}
+                        </Link>
+                      ) : (
+                        <div key={n.id} className={rowClass}>
+                          {body}
+                        </div>
+                      );
+                    })}
                   </div>
                 )}
                 <Link
@@ -214,6 +238,7 @@ export function VendorLayout({ children }: VendorLayoutProps) {
           </div>
           <Link
             href="/profile"
+            aria-label={businessName ? `Profile: ${businessName}` : "Profile"}
             className="flex items-center gap-3 pl-2 group cursor-pointer"
           >
             <div className="text-right hidden sm:block">

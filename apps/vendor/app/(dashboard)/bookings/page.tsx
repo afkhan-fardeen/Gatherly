@@ -33,12 +33,18 @@ interface Booking {
   package: { name: string; imageUrl: string | null };
 }
 
-const TABS: { key: Tab; label: string; icon: typeof Clock; activeClass: string }[] = [
-  { key: "pending", label: "Pending", icon: Clock, activeClass: "bg-amber-500 text-white border-amber-500" },
-  { key: "confirmed", label: "Confirmed", icon: Check, activeClass: "bg-emerald-600 text-white border-emerald-600" },
-  { key: "in_progress", label: "In progress", icon: CookingPot, activeClass: "bg-blue-600 text-white border-blue-600" },
-  { key: "completed", label: "Completed", icon: CheckCircle, activeClass: "bg-slate-600 text-white border-slate-600" },
-  { key: "cancelled", label: "Cancelled", icon: X, activeClass: "bg-red-600 text-white border-red-600" },
+const TABS: {
+  key: Tab;
+  label: string;
+  shortLabel: string;
+  icon: typeof Clock;
+  activeClass: string;
+}[] = [
+  { key: "pending", label: "Pending", shortLabel: "Pending", icon: Clock, activeClass: "bg-amber-500 text-white border-amber-500" },
+  { key: "confirmed", label: "Confirmed", shortLabel: "Conf.", icon: Check, activeClass: "bg-emerald-600 text-white border-emerald-600" },
+  { key: "in_progress", label: "In progress", shortLabel: "Active", icon: CookingPot, activeClass: "bg-blue-600 text-white border-blue-600" },
+  { key: "completed", label: "Completed", shortLabel: "Done", icon: CheckCircle, activeClass: "bg-slate-600 text-white border-slate-600" },
+  { key: "cancelled", label: "Cancelled", shortLabel: "Canc.", icon: X, activeClass: "bg-red-600 text-white border-red-600" },
 ];
 
 export default function BookingsPage() {
@@ -108,15 +114,16 @@ export default function BookingsPage() {
         <p className="text-slate-500 mt-1">Manage booking requests</p>
       </header>
 
-      {/* Tabs */}
-      <div
-        className="flex gap-1.5 rounded-full p-1.5 relative mb-6"
-        style={{
-          background: "rgba(255,255,255,0.8)",
-          border: "1px solid rgba(0,0,0,0.06)",
-          boxShadow: "0 1px 3px rgba(0,0,0,0.05)",
-        }}
-      >
+      {/* Tabs — scroll on narrow desktop; shorter labels below xl */}
+      <div className="overflow-x-auto scrollbar-hide -mx-1 px-1 mb-6">
+        <div
+          className="flex gap-1.5 rounded-full p-1.5 relative min-w-[36rem]"
+          style={{
+            background: "rgba(255,255,255,0.8)",
+            border: "1px solid rgba(0,0,0,0.06)",
+            boxShadow: "0 1px 3px rgba(0,0,0,0.05)",
+          }}
+        >
         <div
           className="absolute top-1.5 bottom-1.5 rounded-full transition-all duration-300 ease-out"
           style={{
@@ -144,18 +151,21 @@ export default function BookingsPage() {
             boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
           }}
         />
-        {TABS.map(({ key, label, icon: Icon }) => (
+        {TABS.map(({ key, label, shortLabel, icon: Icon }) => (
           <button
             key={key}
             type="button"
             onClick={() => setTab(key)}
-            className="relative z-10 flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-full text-[12px] font-medium whitespace-nowrap transition-colors duration-300 min-w-0"
+            title={label}
+            className="relative z-10 flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-full text-[12px] font-medium whitespace-nowrap transition-colors duration-300 min-w-0 shrink-0"
             style={{ color: tab === key ? "white" : "#64748b" }}
           >
-            <Icon size={16} weight="regular" />
-            {label}
+            <Icon size={16} weight="regular" aria-hidden />
+            <span className="hidden xl:inline">{label}</span>
+            <span className="xl:hidden">{shortLabel}</span>
           </button>
         ))}
+        </div>
       </div>
 
       <div key={tab} className="animate-fade-in-up">
@@ -268,9 +278,10 @@ export default function BookingsPage() {
                         updateStatus(b.id, "confirmed");
                       }}
                       disabled={updating === b.id}
+                      aria-label={`Accept booking ${b.bookingReference}`}
                       className="flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-100 text-emerald-700 font-semibold hover:bg-emerald-200 disabled:opacity-50"
                     >
-                      <Check size={18} weight="bold" />
+                      <Check size={18} weight="bold" aria-hidden />
                       Accept
                     </button>
                     <button
@@ -281,9 +292,10 @@ export default function BookingsPage() {
                         updateStatus(b.id, "cancelled");
                       }}
                       disabled={updating === b.id}
+                      aria-label={`Decline booking ${b.bookingReference}`}
                       className="flex items-center gap-2 px-4 py-2 rounded-lg bg-red-50 text-red-600 font-semibold hover:bg-red-100 disabled:opacity-50"
                     >
-                      <X size={18} weight="bold" />
+                      <X size={18} weight="bold" aria-hidden />
                       Decline
                     </button>
                   </div>

@@ -6,7 +6,8 @@ import { Package, Plus, PencilSimple, Trash, Sparkle } from "@phosphor-icons/rea
 import { VendorLayout } from "@/components/VendorLayout";
 import { ConfirmModal } from "@/components/ConfirmModal";
 
-import { API_URL, vendorFetch } from "@/lib/api";
+import toast from "react-hot-toast";
+import { API_URL, parseApiError, vendorFetch } from "@/lib/api";
 
 interface Pkg {
   id: string;
@@ -61,8 +62,12 @@ export default function PackagesListPage() {
       const res = await vendorFetch(`${API_URL}/api/vendor/packages/${id}`, {
         method: "DELETE",
       });
+      const data = await res.json().catch(() => ({}));
       if (res.ok) {
         setPackages((prev) => prev.filter((p) => p.id !== id));
+        toast.success("Package deactivated");
+      } else {
+        toast.error(parseApiError(data) || "Could not deactivate package");
       }
     } finally {
       setDeleting(null);
@@ -182,10 +187,11 @@ export default function PackagesListPage() {
                         type="button"
                         onClick={() => requestDeactivate(pkg.id)}
                         disabled={deleting === pkg.id}
+                        aria-label={`Deactivate package ${pkg.name}`}
                         className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center text-red-500 hover:bg-red-50 disabled:opacity-50"
                         title="Deactivate"
                       >
-                        <Trash size={18} weight="regular" />
+                        <Trash size={18} weight="regular" aria-hidden />
                       </button>
                     </div>
                   </div>

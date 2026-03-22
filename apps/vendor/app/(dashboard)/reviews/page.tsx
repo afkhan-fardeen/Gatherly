@@ -1,11 +1,12 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import toast from "react-hot-toast";
 import { Package, Star } from "@phosphor-icons/react";
 import { VendorLayout } from "@/components/VendorLayout";
 import { PageHeader } from "@/components/PageHeader";
 
-import { API_URL, vendorFetch } from "@/lib/api";
+import { API_URL, parseApiError, vendorFetch } from "@/lib/api";
 
 interface Review {
   id: string;
@@ -28,14 +29,25 @@ interface ReviewsData {
 export default function ReviewsPage() {
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [data, setData] = useState<ReviewsData | null>(null);
   const [reviews, setReviews] = useState<Review[]>([]);
 
   const loadPage = useCallback(async (page: number, append: boolean) => {
     const token = localStorage.getItem("token");
-    if (!token) return;
+    if (!token) return false;
     const res = await vendorFetch(`${API_URL}/api/vendor/reviews?page=${page}&limit=20`);
-    if (!res.ok) return;
+    if (!res.ok) {
+      const errBody = await res.json().catch(() => ({}));
+      const msg = parseApiError(errBody) || "Could not load reviews";
+      if (append) {
+        toast.error(msg);
+      } else {
+        setLoadError(msg);
+      }
+      return false;
+    }
+    setLoadError(null);
     const json = (await res.json()) as ReviewsData;
     setData(json);
     if (append) {
@@ -43,12 +55,14 @@ export default function ReviewsPage() {
     } else {
       setReviews(json.reviews);
     }
+    return true;
   }, []);
 
   useEffect(() => {
     let cancelled = false;
     (async () => {
       setLoading(true);
+      setLoadError(null);
       await loadPage(1, false);
       if (!cancelled) setLoading(false);
     })();
@@ -74,6 +88,34 @@ export default function ReviewsPage() {
           <div className="animate-pulse space-y-4">
             <div className="h-8 bg-slate-100 rounded-lg w-48" />
             <div className="h-32 bg-slate-100 rounded-xl" />
+          </div>
+        </div>
+      </VendorLayout>
+    );
+  }
+
+  if (loadError && !data) {
+    return (
+      <VendorLayout>
+        <div>
+          <PageHeader
+            title="Reviews"
+            subtitle="See what customers say about your service."
+          />
+          <div className="p-6 rounded-xl border border-red-100 bg-red-50 text-red-800 text-sm">
+            <p className="font-medium">{loadError}</p>
+            <button
+              type="button"
+              onClick={async () => {
+                setLoading(true);
+                setLoadError(null);
+                await loadPage(1, false);
+                setLoading(false);
+              }}
+              className="mt-4 px-4 py-2 rounded-lg bg-white border border-red-200 font-semibold text-red-900 hover:bg-red-100/50"
+            >
+              Try again
+            </button>
           </div>
         </div>
       </VendorLayout>

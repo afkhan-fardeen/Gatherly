@@ -173,18 +173,20 @@ export default function BookingDetailPage() {
             type="button"
             onClick={() => updateStatus("confirmed")}
             disabled={updating}
+            aria-label="Accept booking"
             className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-emerald-600 text-white font-semibold hover:bg-emerald-700 disabled:opacity-50"
           >
-            <Check size={18} weight="bold" />
+            <Check size={18} weight="bold" aria-hidden />
             Accept
           </button>
           <button
             type="button"
             onClick={() => updateStatus("cancelled")}
             disabled={updating}
+            aria-label="Decline booking"
             className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-red-50 text-red-600 font-semibold hover:bg-red-100 disabled:opacity-50"
           >
-            <X size={18} weight="bold" />
+            <X size={18} weight="bold" aria-hidden />
             Decline
           </button>
         </div>

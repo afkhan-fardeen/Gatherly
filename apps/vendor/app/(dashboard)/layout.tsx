@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { API_URL, vendorFetch } from "@/lib/api";
+import { VendorProfileProvider, type VendorProfileMe } from "@/contexts/VendorProfileContext";
 
 interface User {
   id: string;
@@ -18,6 +19,7 @@ export default function DashboardLayout({
 }) {
   const router = useRouter();
   const [user, setUser] = useState<User | null>(null);
+  const [vendorProfile, setVendorProfile] = useState<VendorProfileMe | null>(null);
   const [checking, setChecking] = useState(true);
 
   useEffect(() => {
@@ -34,7 +36,7 @@ export default function DashboardLayout({
     }
     let cancelled = false;
     vendorFetch(`${API_URL}/api/vendor/me`)
-      .then((res) => {
+      .then(async (res) => {
         if (cancelled) return;
         if (res.status === 401) return;
         if (!res.ok) {
@@ -43,11 +45,15 @@ export default function DashboardLayout({
           router.replace("/login");
           return;
         }
+        const v = (await res.json()) as VendorProfileMe;
+        if (cancelled) return;
+        setVendorProfile(v);
         setUser(parsed);
         setChecking(false);
       })
       .catch(() => {
         if (!cancelled) {
+          setVendorProfile(null);
           setUser(parsed);
           setChecking(false);
         }
@@ -65,5 +71,7 @@ export default function DashboardLayout({
     );
   }
 
-  return <>{children}</>;
+  return (
+    <VendorProfileProvider value={vendorProfile}>{children}</VendorProfileProvider>
+  );
 }
