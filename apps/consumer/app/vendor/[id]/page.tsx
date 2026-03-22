@@ -161,10 +161,22 @@ export default function VendorProfilePage() {
               <ArrowLeft size={15} weight="regular" />
             </Link>
             <div className="flex gap-2">
-              <button type="button" className="w-9 h-9 rounded-full flex items-center justify-center bg-white text-[#1e0f14] shadow-sm" aria-label="Save">
+              <button
+                type="button"
+                disabled
+                title="Coming soon"
+                className="w-9 h-9 rounded-full flex items-center justify-center bg-white/80 text-[#1e0f14] shadow-sm opacity-50 cursor-not-allowed"
+                aria-label="Save (coming soon)"
+              >
                 <Heart size={15} weight="regular" />
               </button>
-              <button type="button" className="w-9 h-9 rounded-full flex items-center justify-center bg-white text-[#1e0f14] shadow-sm" aria-label="Share">
+              <button
+                type="button"
+                disabled
+                title="Coming soon"
+                className="w-9 h-9 rounded-full flex items-center justify-center bg-white/80 text-[#1e0f14] shadow-sm opacity-50 cursor-not-allowed"
+                aria-label="Share (coming soon)"
+              >
                 <ShareNetwork size={14} weight="regular" />
               </button>
             </div>

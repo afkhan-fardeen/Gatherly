@@ -72,4 +72,6 @@ if [ $FAILED -eq 1 ]; then
   exit 1
 fi
 echo "All API checks passed."
+echo ""
+echo "Note: production auth routes use rate limits (login/register). Repeated runs may return 429."
 exit 0

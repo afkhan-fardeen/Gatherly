@@ -8,6 +8,7 @@ import { AuthLayout } from "@/components/ui/AuthLayout";
 import { AuthInput } from "@/components/ui/AuthInput";
 import { AuthButton } from "@/components/ui/AuthButton";
 import { VENDOR_CATEGORIES } from "@/lib/categories";
+import toast from "react-hot-toast";
 import { API_URL, parseJsonResponse } from "@/lib/api";
 
 function VendorRegisterForm() {
@@ -48,7 +49,7 @@ function VendorRegisterForm() {
 
       const cuisineArr = cuisineTypes.split(",").map((s) => s.trim()).filter(Boolean);
       const areasArr = serviceAreas.split(",").map((s) => s.trim()).filter(Boolean);
-      await fetch(`${API_URL}/api/vendor/me`, {
+      const patchRes = await fetch(`${API_URL}/api/vendor/me`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
@@ -60,6 +61,13 @@ function VendorRegisterForm() {
           ...(areasArr.length > 0 && { serviceAreas: areasArr }),
         }),
       });
+      const patchData = await parseJsonResponse<{ error?: string }>(patchRes);
+      if (!patchRes.ok) {
+        toast.error(
+          patchData.error ||
+            "Could not save profile details. You can update them under Profile."
+        );
+      }
       router.replace(redirectTo.startsWith("/") ? redirectTo : `/${redirectTo}`);
       router.refresh();
     } catch (err) {

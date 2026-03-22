@@ -2,6 +2,7 @@ import { Router, Request, Response } from "express";
 import { z } from "zod";
 import { Prisma } from "@prisma/client";
 import { prisma } from "../lib/prisma.js";
+import { assertVendorBookingStatusTransition } from "../lib/vendorBookingStatus.js";
 import { authMiddleware } from "../middleware/auth.js";
 import { vendorAuthMiddleware } from "../middleware/vendorAuth.js";
 
@@ -443,6 +444,13 @@ vendorRouter.patch("/bookings/:id/status", vendorAuth, async (req: Request, res:
   }
 
   const newStatus = parsed.data.status;
+  try {
+    assertVendorBookingStatusTransition(existing.status, newStatus, existing.paymentStatus);
+  } catch (e) {
+    const err = e as { status?: number; message?: string };
+    return res.status(err.status ?? 400).json({ error: err.message ?? "Invalid status change" });
+  }
+
   const booking = await prisma.booking.update({
     where: { id: req.params.id },
     data: {

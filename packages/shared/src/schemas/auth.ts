@@ -5,7 +5,7 @@ export const registerSchema = z
     email: z.string().email("Invalid email"),
     password: z.string().min(8, "Password must be at least 8 characters"),
     name: z.string().min(2, "Name must be at least 2 characters"),
-    role: z.enum(["consumer", "vendor", "admin"]).default("consumer"),
+    role: z.enum(["consumer", "vendor"]).default("consumer"),
     businessName: z.string().min(1).optional(),
   })
   .refine((data) => data.role !== "vendor" || (data.businessName && data.businessName.trim().length > 0), {

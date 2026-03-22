@@ -54,7 +54,13 @@ const SETTINGS_ITEMS = [
 ] as const;
 
 const SUPPORT_ITEMS = [
-  { href: "#", icon: Question, label: "Help & Support", sublabel: "FAQs, contact us", iconClass: "bg-primary/10 text-primary" },
+  {
+    href: "mailto:support@gatherly.com?subject=Gatherly%20support",
+    icon: Question,
+    label: "Help & Support",
+    sublabel: "Email us",
+    iconClass: "bg-primary/10 text-primary",
+  },
 ] as const;
 
 function MenuCard({ children }: { children: React.ReactNode }) {

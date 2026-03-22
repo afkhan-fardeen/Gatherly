@@ -22,7 +22,7 @@ import { StepIndicator } from "@/components/ui/StepIndicator";
 import { VendorLayout } from "@/components/VendorLayout";
 import { PageHeader } from "@/components/PageHeader";
 
-import { API_URL } from "@/lib/api";
+import { API_URL, vendorFetch } from "@/lib/api";
 
 interface BookingDetail {
   id: string;
@@ -88,11 +88,10 @@ export default function BookingDetailPage() {
     if (!token) return;
     setUpdating(true);
     try {
-      const res = await fetch(`${API_URL}/api/vendor/bookings/${id}/status`, {
+      const res = await vendorFetch(`${API_URL}/api/vendor/bookings/${id}/status`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({ status }),
       });

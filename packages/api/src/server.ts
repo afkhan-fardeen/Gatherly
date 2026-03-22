@@ -7,7 +7,9 @@ dotenv.config({ path: path.resolve(__dirname, "../../.env") });
 dotenv.config(); // Fallback: cwd .env (e.g. packages/api/.env)
 
 import express from "express";
+import "express-async-errors";
 import cors from "cors";
+import helmet from "helmet";
 import { authRouter } from "./routes/auth.js";
 import { bookingsRouter } from "./routes/bookings.js";
 import { paymentMethodsRouter } from "./routes/payment-methods.js";
@@ -20,6 +22,7 @@ import { vendorsRouter } from "./routes/vendors.js";
 import { spotlightRouter } from "./routes/spotlight.js";
 import { spotlightVendorRouter } from "./routes/spotlight-vendor.js";
 import { logRequest } from "./lib/logger.js";
+import { errorHandler } from "./middleware/errorHandler.js";
 
 const app = express();
 const PORT = process.env.PORT || process.env.API_PORT || 3001;
@@ -44,7 +47,8 @@ const corsOptions =
     : { origin: normalizedOrigins, credentials: true };
 
 app.use(cors(corsOptions));
-app.use(express.json());
+app.use(helmet({ crossOriginResourcePolicy: { policy: "cross-origin" } }));
+app.use(express.json({ limit: "1mb" }));
 
 // Request logging (method, path, status, duration)
 app.use((req, res, next) => {
@@ -66,6 +70,13 @@ app.use("/api/spotlight", spotlightRouter);
 app.use("/api/bookings", bookingsRouter);
 app.use("/api/payment-methods", paymentMethodsRouter);
 app.use("/api/notifications", notificationsRouter);
+
+app.use(errorHandler);
+
+if (process.env.NODE_ENV === "production" && !process.env.JWT_SECRET?.trim()) {
+  console.error("FATAL: JWT_SECRET must be set in production");
+  process.exit(1);
+}
 
 app.listen(Number(PORT), "0.0.0.0", () => {
   console.log(`API running at http://localhost:${PORT}`);

@@ -292,7 +292,7 @@ export default function HomePage() {
           <div className="grid md:grid-cols-3 gap-6 max-w-4xl mx-auto">
             {[
               { num: "01", icon: MagnifyingGlass, title: "Discover", body: "Browse curated venues and vendors tailored to your vision and budget. Every partner is vetted for quality." },
-              { num: "02", icon: PencilSimple, title: "Plan", body: "Create your event, manage guests, and coordinate every detail in one beautifully designed workspace." },
+              { num: "02", icon: PencilSimple, title: "Plan", body: "Create your event, add your details, and book catering in one beautifully designed workspace." },
               { num: "03", icon: CheckCircle, title: "Enjoy", body: "Book catering, track orders, and experience a seamless event from the first detail to the final toast." },
             ].map((step, i) => {
               const StepIcon = step.icon;
@@ -317,7 +317,7 @@ export default function HomePage() {
           {/* Features strip */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-px mt-20 rounded-[24px] overflow-hidden border border-primary/5" style={{ background: "rgba(109,13,53,0.06)" }}>
             {[
-              { icon: Users, title: "Guest Management", body: "Invitations, RSVPs, and seating in one place." },
+              { icon: Users, title: "Event details", body: "Guest counts, dates, and venue basics in one place." },
               { icon: Lightning, title: "Curated Catering", body: "Premium vendors for every cuisine and style." },
               { icon: CreditCard, title: "Seamless Payments", body: "Pay vendors directly with secure checkout." },
               { icon: Calendar, title: "Event Timeline", body: "Visual scheduling so nothing is ever missed." },

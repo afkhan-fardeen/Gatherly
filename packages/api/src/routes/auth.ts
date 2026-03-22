@@ -4,7 +4,9 @@ import jwt from "jsonwebtoken";
 import { z } from "zod";
 import { prisma } from "../lib/prisma.js";
 import { authMiddleware } from "../middleware/auth.js";
+import { loginRateLimiter, registerRateLimiter } from "../middleware/authRateLimit.js";
 import { registerSchema, loginSchema } from "@gatherly/shared";
+import { getJwtSecret } from "../lib/jwtSecret.js";
 
 const updateProfileSchema = z.object({
   name: z.string().min(1).optional(),
@@ -14,16 +16,17 @@ const updateProfileSchema = z.object({
 
 export const authRouter = Router();
 
-const JWT_SECRET = process.env.JWT_SECRET || "dev-secret-change-me";
 const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || "7d";
 
-authRouter.post("/register", async (req, res) => {
+authRouter.post("/register", registerRateLimiter, async (req, res) => {
   const parsed = registerSchema.safeParse(req.body);
   if (!parsed.success) {
     return res.status(400).json({ error: "Validation failed", details: parsed.error.flatten() });
   }
 
-  const { email, password, name, role, businessName } = parsed.data;
+  const { email, password, name, businessName } = parsed.data;
+  const role =
+    parsed.data.role === "vendor" && businessName && businessName.trim().length > 0 ? "vendor" : "consumer";
 
   const existing = await prisma.user.findUnique({ where: { email } });
   if (existing) {
@@ -48,7 +51,7 @@ authRouter.post("/register", async (req, res) => {
     },
   });
 
-  if (role === "vendor" && businessName) {
+  if (role === "vendor" && businessName?.trim()) {
     await prisma.vendor.create({
       data: {
         userId: user.id,
@@ -61,7 +64,7 @@ authRouter.post("/register", async (req, res) => {
 
   const token = jwt.sign(
     { userId: user.id, email: user.email, role: user.role },
-    JWT_SECRET,
+    getJwtSecret(),
     { expiresIn: JWT_EXPIRES_IN } as jwt.SignOptions
   );
 
@@ -76,7 +79,7 @@ authRouter.post("/register", async (req, res) => {
   });
 });
 
-authRouter.post("/login", async (req, res) => {
+authRouter.post("/login", loginRateLimiter, async (req, res) => {
   const parsed = loginSchema.safeParse(req.body);
   if (!parsed.success) {
     return res.status(400).json({ error: "Validation failed", details: parsed.error.flatten() });
@@ -96,7 +99,7 @@ authRouter.post("/login", async (req, res) => {
 
   const token = jwt.sign(
     { userId: user.id, email: user.email, role: user.role },
-    JWT_SECRET,
+    getJwtSecret(),
     { expiresIn: JWT_EXPIRES_IN } as jwt.SignOptions
   );
 

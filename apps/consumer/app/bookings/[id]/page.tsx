@@ -18,7 +18,7 @@ import { AppLayout } from "@/components/AppLayout";
 import { OrderProgress } from "@/components/OrderProgress";
 import { TYPO } from "@/lib/events-ui";
 
-import { API_URL } from "@/lib/api";
+import { API_URL, fetchAuth } from "@/lib/api";
 import { formatTime, formatDateLong } from "@/lib/date-utils";
 
 interface BookingDetail {
@@ -74,18 +74,14 @@ export default function BookingDetailPage() {
       router.push("/login");
       return;
     }
-    fetch(`${API_URL}/api/bookings/${id}`, {
-      headers: { Authorization: `Bearer ${token}` },
-    })
+    fetchAuth(`${API_URL}/api/bookings/${id}`)
       .then((r) => r.json())
       .then((data) => {
         if (data.error) setError(data.error);
         else {
           setBooking(data);
           if (data?.event?.id) {
-            fetch(`${API_URL}/api/bookings?eventId=${data.event.id}`, {
-              headers: { Authorization: `Bearer ${token}` },
-            })
+            fetchAuth(`${API_URL}/api/bookings?eventId=${data.event.id}`)
               .then((r) => (r.ok ? r.json() : []))
               .then((bks) => setEventBookings(Array.isArray(bks) ? bks : []))
               .catch(() => setEventBookings([]));
@@ -103,7 +99,7 @@ export default function BookingDetailPage() {
     setNewCardNumber("");
     const token = localStorage.getItem("token");
     if (token) {
-      fetch(`${API_URL}/api/payment-methods`, { headers: { Authorization: `Bearer ${token}` } })
+      fetchAuth(`${API_URL}/api/payment-methods`)
         .then((res) => (res.ok ? res.json() : { items: [] }))
         .then((data) => {
           const items = data.items ?? [];
@@ -131,9 +127,9 @@ export default function BookingDetailPage() {
       let paymentMethodId: string | undefined;
       if (useNewCard && newCardNumber.replace(/\D/g, "").length >= 13) {
         const num = newCardNumber.replace(/\D/g, "");
-        const addRes = await fetch(`${API_URL}/api/payment-methods`, {
+        const addRes = await fetchAuth(`${API_URL}/api/payment-methods`, {
           method: "POST",
-          headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ number: num }),
         });
         const addData = await addRes.json();
@@ -141,9 +137,9 @@ export default function BookingDetailPage() {
       } else if (selectedPaymentId) {
         paymentMethodId = selectedPaymentId;
       }
-      const res = await fetch(`${API_URL}/api/bookings/${booking.id}/pay`, {
+      const res = await fetchAuth(`${API_URL}/api/bookings/${booking.id}/pay`, {
         method: "PATCH",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ paymentMethodId: paymentMethodId || undefined }),
       });
       const data = await res.json();
@@ -164,11 +160,10 @@ export default function BookingDetailPage() {
     if (!token) return;
     setSubmittingReview(true);
     try {
-      const res = await fetch(`${API_URL}/api/bookings/${booking.id}/review`, {
+      const res = await fetchAuth(`${API_URL}/api/bookings/${booking.id}/review`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
           ratingOverall: reviewRating,

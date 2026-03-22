@@ -1,6 +1,10 @@
 import { Router } from "express";
 import { z } from "zod";
 import { prisma } from "../lib/prisma.js";
+import {
+  assertBookingEligibleForInitialPayment,
+  assertNoPendingBookingsForEvent,
+} from "../lib/bookingPayment.js";
 import { authMiddleware } from "../middleware/auth.js";
 
 export const bookingsRouter = Router();
@@ -56,6 +60,22 @@ bookingsRouter.post("/", async (req, res) => {
   }
   if (pkg.maxGuests != null && guestCount > pkg.maxGuests) {
     return res.status(400).json({ error: `Maximum ${pkg.maxGuests} guests for this package` });
+  }
+
+  const duplicate = await prisma.booking.findFirst({
+    where: {
+      userId,
+      eventId,
+      vendorId,
+      packageId,
+      status: { not: "cancelled" },
+    },
+    select: { id: true },
+  });
+  if (duplicate) {
+    return res.status(409).json({
+      error: "You already have an active booking for this package at this event.",
+    });
   }
 
   const basePrice = Number(pkg.basePrice);
@@ -177,20 +197,13 @@ bookingsRouter.post("/pay-event", async (req, res) => {
     return res.status(404).json({ error: "Event not found" });
   }
 
-  const allEventBookings = await prisma.booking.findMany({
-    where: { eventId, userId, status: { not: "cancelled" } },
-    select: { status: true },
-  });
-  const hasPending = allEventBookings.some((b) => b.status === "pending");
-  if (hasPending) {
-    return res.status(400).json({ error: "All vendors must accept before payment. Some bookings are still pending." });
-  }
+  await assertNoPendingBookingsForEvent(eventId, userId);
 
   const toPay = await prisma.booking.findMany({
     where: {
       eventId,
       userId,
-      status: { in: ["confirmed", "in_preparation", "delivered"] },
+      status: "confirmed",
       paymentStatus: "unpaid",
     },
     include: {
@@ -299,21 +312,9 @@ bookingsRouter.patch("/:id/pay", async (req, res) => {
   if (!booking) {
     return res.status(404).json({ error: "Booking not found" });
   }
-  if (booking.status !== "confirmed") {
-    return res.status(400).json({ error: "Only confirmed bookings can be paid" });
-  }
-  if (booking.paymentStatus === "paid") {
-    return res.status(400).json({ error: "Booking is already paid" });
-  }
 
-  const otherEventBookings = await prisma.booking.findMany({
-    where: { eventId: booking.eventId, userId, status: { not: "cancelled" }, id: { not: id } },
-    select: { status: true },
-  });
-  const hasPending = otherEventBookings.some((b) => b.status === "pending");
-  if (hasPending) {
-    return res.status(400).json({ error: "All vendors must accept before payment. Some bookings are still pending." });
-  }
+  assertBookingEligibleForInitialPayment(booking);
+  await assertNoPendingBookingsForEvent(booking.eventId, userId);
 
   let paymentMethodLabel = "card";
   if (paymentMethodId) {

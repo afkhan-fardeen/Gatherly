@@ -330,17 +330,21 @@ Files that exist but are never imported or used.
 
 These must be completed before integrating a real payment gateway (Stripe, Tap, etc.):
 
+### Remediation status (implemented in codebase)
+
+The following items from the audit remediation plan are **done**: global async error handling (`express-async-errors` + error middleware), JSON body limit, Helmet, JWT startup guard in production + shared `getJwtSecret`, auth rate limits, removal of public `admin` registration, vendor booking status transitions + payment-before-prep, duplicate active booking check, aligned initial payment rules for `PATCH /pay` and `POST /pay-event`, consumer `fetchAuth` on key pages, vendor `vendorFetch` + reviews “Load more”, UX honesty (Help mailto, disabled favorites/save/share, landing copy, vendor register PATCH error toast). Smoke script notes rate limits.
+
 ### Must have (blocking)
 
-- [ ] **A1** — Add try-catch to all 45 unprotected async handlers + add global error middleware
-- [ ] **A2** — Add `express-rate-limit` on auth endpoints
-- [ ] **A3** — Throw on startup if `JWT_SECRET` is missing (remove hardcoded fallback)
-- [ ] **A4** — Add status transition state machine in vendor booking status update
-- [ ] **A5** — Add duplicate booking prevention (unique constraint or code check)
-- [ ] **A6** — Block admin registration via public endpoint
-- [ ] **A7** — Add `helmet()` middleware + explicit `express.json({ limit: '1mb' })`
+- [x] **A1** — Add try-catch to all 45 unprotected async handlers + add global error middleware *(global error middleware + `express-async-errors`; per-route try/catch still recommended for finer control)*
+- [x] **A2** — Add `express-rate-limit` on auth endpoints
+- [x] **A3** — Throw on startup if `JWT_SECRET` is missing (remove hardcoded fallback) *(production exit + `getJwtSecret`; dev fallback when `NODE_ENV !== production`)*
+- [x] **A4** — Add status transition state machine in vendor booking status update
+- [x] **A5** — Add duplicate booking prevention (unique constraint or code check) *(application-level check; DB unique optional)*
+- [x] **A6** — Block admin registration via public endpoint
+- [x] **A7** — Add `helmet()` middleware + explicit `express.json({ limit: '1mb' })`
 - [ ] **A8** — Add database indexes on frequently queried columns
-- [ ] **A9** — Enforce `paymentStatus === "paid"` server-side before allowing `in_preparation`
+- [x] **A9** — Enforce `paymentStatus === "paid"` server-side before allowing `in_preparation`
 - [ ] **M39** — Add `paidAt` timestamp to Booking model, add `stripePaymentMethodId`/`isDefault` to PaymentMethod model
 - [ ] **H6** — Replace dummy payment UI with Stripe Elements or Tap checkout widget
 
@@ -354,15 +358,15 @@ These must be completed before integrating a real payment gateway (Stripe, Tap, 
 - [ ] **H4** — Add search debounce on catering page
 - [ ] **M34** — Add password change endpoint
 - [ ] **M35** — Add consumer booking cancellation endpoint
-- [ ] **M36** — Align pay-single and pay-event allowed statuses
+- [x] **M36** — Align pay-single and pay-event allowed statuses
 - [ ] **M38** — Check vendor status in vendorAuthMiddleware
 - [ ] **M40** — Add event status transition validation
 
 ### Nice to have (can follow payment integration)
 
 - [ ] **H9** — Add dietary requirements UI in event create
-- [ ] **H10** — Add reviews pagination UI in vendor app
-- [ ] **M1–M2** — Implement favorites and sorting, or remove the buttons
+- [x] **H10** — Add reviews pagination UI in vendor app
+- [ ] **M1–M2** — Implement favorites and sorting, or remove the buttons *(favorites on Discover are non-interactive “coming soon”; sorting still open)*
 - [ ] **M4–M5** — Create Terms, Privacy, and Help pages, or remove the links
 - [ ] **M6–M8** — Replace hardcoded badges and stats with real data
 - [ ] **M37** — Add missing notification types

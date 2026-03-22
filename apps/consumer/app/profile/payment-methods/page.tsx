@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import { ArrowLeft, CreditCard, Plus, Trash } from "@phosphor-icons/react";
 import { AppLayout } from "@/components/AppLayout";
-import { API_URL, parseApiError } from "@/lib/api";
+import { API_URL, fetchAuth, parseApiError } from "@/lib/api";
 
 interface PaymentMethod {
   id: string;
@@ -28,9 +28,7 @@ export default function PaymentMethodsPage() {
       router.push("/login?redirect=" + encodeURIComponent("/profile/payment-methods"));
       return;
     }
-    fetch(`${API_URL}/api/payment-methods`, {
-      headers: { Authorization: `Bearer ${token}` },
-    })
+    fetchAuth(`${API_URL}/api/payment-methods`)
       .then((res) => (res.ok ? res.json() : { items: [] }))
       .then((data) => setMethods(data.items ?? []))
       .catch(() => setMethods([]))
@@ -52,11 +50,10 @@ export default function PaymentMethodsPage() {
     }
     setAdding(true);
     try {
-      const res = await fetch(`${API_URL}/api/payment-methods`, {
+      const res = await fetchAuth(`${API_URL}/api/payment-methods`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({ number: num }),
       });
@@ -77,9 +74,8 @@ export default function PaymentMethodsPage() {
     if (!token) return;
     setDeletingId(id);
     try {
-      const res = await fetch(`${API_URL}/api/payment-methods/${id}`, {
+      const res = await fetchAuth(`${API_URL}/api/payment-methods/${id}`, {
         method: "DELETE",
-        headers: { Authorization: `Bearer ${token}` },
       });
       if (!res.ok) throw new Error("Failed to remove card");
       toast.success("Card removed");

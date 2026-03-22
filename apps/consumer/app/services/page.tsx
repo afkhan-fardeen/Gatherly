@@ -186,13 +186,13 @@ export default function ServicesPage() {
                         <div className="absolute top-2.5 left-2.5 bg-black/45 backdrop-blur-sm rounded-full px-2.5 py-1 text-[9px] font-medium uppercase tracking-wider text-white">
                           ⭐ Premium
                         </div>
-                        <button
-                          type="button"
-                          onClick={(e) => e.preventDefault()}
-                          className="absolute top-2.5 right-2.5 w-[30px] h-[30px] rounded-full bg-white/90 flex items-center justify-center text-primary hover:bg-white transition-colors"
+                        <span
+                          className="absolute top-2.5 right-2.5 w-[30px] h-[30px] rounded-full bg-white/90 flex items-center justify-center text-primary opacity-60 pointer-events-none"
+                          title="Favorites coming soon"
+                          aria-hidden
                         >
                           <Heart size={14} weight="regular" />
-                        </button>
+                        </span>
                       </div>
                       <div className="p-3.5">
                         <div className="flex items-center gap-1 mb-1">
@@ -312,14 +312,14 @@ export default function ServicesPage() {
                           <h3 className="font-serif text-[17px] font-semibold text-[#1e0f14] tracking-[-0.3px] leading-tight line-clamp-2">
                             {vendor.businessName}
                           </h3>
-                          <button
-                            type="button"
-                            onClick={(e) => e.preventDefault()}
-                            className="w-8 h-8 rounded-full flex items-center justify-center shrink-0 border border-primary/10 transition-colors"
+                          <span
+                            className="w-8 h-8 rounded-full flex items-center justify-center shrink-0 border border-primary/10 opacity-60 pointer-events-none"
                             style={{ background: "rgba(109,13,53,0.07)" }}
+                            title="Favorites coming soon"
+                            aria-hidden
                           >
                             <Heart size={14} weight="regular" className="text-primary" />
-                          </button>
+                          </span>
                         </div>
                         <div className="flex flex-wrap gap-1.5 mb-3">
                           {(vendor.cuisineTypes?.slice(0, 3) || ["Catering"]).map((tag) => (

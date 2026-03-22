@@ -1,11 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Package, Star } from "@phosphor-icons/react";
 import { VendorLayout } from "@/components/VendorLayout";
 import { PageHeader } from "@/components/PageHeader";
 
-import { API_URL } from "@/lib/api";
+import { API_URL, vendorFetch } from "@/lib/api";
 
 interface Review {
   id: string;
@@ -27,18 +27,45 @@ interface ReviewsData {
 
 export default function ReviewsPage() {
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [data, setData] = useState<ReviewsData | null>(null);
+  const [reviews, setReviews] = useState<Review[]>([]);
 
-  useEffect(() => {
+  const loadPage = useCallback(async (page: number, append: boolean) => {
     const token = localStorage.getItem("token");
     if (!token) return;
-    fetch(`${API_URL}/api/vendor/reviews`, {
-      headers: { Authorization: `Bearer ${token}` },
-    })
-      .then((r) => (r.ok ? r.json() : null))
-      .then(setData)
-      .finally(() => setLoading(false));
+    const res = await vendorFetch(`${API_URL}/api/vendor/reviews?page=${page}&limit=20`);
+    if (!res.ok) return;
+    const json = (await res.json()) as ReviewsData;
+    setData(json);
+    if (append) {
+      setReviews((prev) => [...prev, ...json.reviews]);
+    } else {
+      setReviews(json.reviews);
+    }
   }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      setLoading(true);
+      await loadPage(1, false);
+      if (!cancelled) setLoading(false);
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [loadPage]);
+
+  async function handleLoadMore() {
+    if (!data || data.pagination.page >= data.pagination.totalPages) return;
+    setLoadingMore(true);
+    try {
+      await loadPage(data.pagination.page + 1, true);
+    } finally {
+      setLoadingMore(false);
+    }
+  }
 
   if (loading) {
     return (
@@ -53,11 +80,13 @@ export default function ReviewsPage() {
     );
   }
 
-  const { overall, reviews, pagination } = data ?? {
+  const { overall, pagination } = data ?? {
     overall: { rating: 0, count: 0 },
     reviews: [],
     pagination: { page: 1, totalPages: 0, total: 0, limit: 20 },
   };
+
+  const showLoadMore = pagination.totalPages > 0 && pagination.page < pagination.totalPages;
 
   return (
     <VendorLayout>
@@ -94,69 +123,83 @@ export default function ReviewsPage() {
               </p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {reviews.map((r) => (
-                <div
-                  key={r.id}
-                  className="p-6 rounded-xl border border-slate-200 bg-white"
-                >
-                  <div className="flex items-start gap-4">
-                    <div className="w-12 h-12 rounded-xl bg-slate-100 flex items-center justify-center overflow-hidden shrink-0">
-                      {r.booking?.package?.imageUrl ? (
-                        <img
-                          src={r.booking.package.imageUrl}
-                          alt=""
-                          className="w-full h-full object-cover"
-                        />
-                      ) : (
-                        <Package size={24} weight="regular" className="text-slate-500" />
-                      )}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-1">
-                        <div className="flex gap-0.5">
-                          {[1, 2, 3, 4, 5].map((i) => (
-                            <Star
-                              key={i}
-                              size={16}
-                              weight={i <= r.ratingOverall ? "fill" : "regular"}
-                              className={
-                                i <= r.ratingOverall
-                                  ? "text-amber-400"
-                                  : "text-slate-200"
-                              }
-                            />
-                          ))}
-                        </div>
-                        <span className="text-sm font-medium text-slate-700">
-                          {r.ratingOverall}/5
-                        </span>
+            <>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {reviews.map((r) => (
+                  <div
+                    key={r.id}
+                    className="p-6 rounded-xl border border-slate-200 bg-white"
+                  >
+                    <div className="flex items-start gap-4">
+                      <div className="w-12 h-12 rounded-xl bg-slate-100 flex items-center justify-center overflow-hidden shrink-0">
+                        {r.booking?.package?.imageUrl ? (
+                          <img
+                            src={r.booking.package.imageUrl}
+                            alt=""
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <Package size={24} weight="regular" className="text-slate-500" />
+                        )}
                       </div>
-                      <p className="text-sm font-medium text-slate-900">
-                        {r.user?.name ?? "Anonymous"}
-                      </p>
-                      {r.booking?.package?.name && (
-                        <p className="text-xs text-primary font-medium mt-0.5">
-                          For: {r.booking.package.name}
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-1">
+                          <div className="flex gap-0.5">
+                            {[1, 2, 3, 4, 5].map((i) => (
+                              <Star
+                                key={i}
+                                size={16}
+                                weight={i <= r.ratingOverall ? "fill" : "regular"}
+                                className={
+                                  i <= r.ratingOverall
+                                    ? "text-amber-400"
+                                    : "text-slate-200"
+                                }
+                              />
+                            ))}
+                          </div>
+                          <span className="text-sm font-medium text-slate-700">
+                            {r.ratingOverall}/5
+                          </span>
+                        </div>
+                        <p className="text-sm font-medium text-slate-900">
+                          {r.user?.name ?? "Anonymous"}
                         </p>
-                      )}
-                      <p className="text-xs text-slate-500 mt-1">
-                        {new Date(r.createdAt).toLocaleDateString(undefined, {
-                          year: "numeric",
-                          month: "long",
-                          day: "numeric",
-                        })}
-                      </p>
+                        {r.booking?.package?.name && (
+                          <p className="text-xs text-primary font-medium mt-0.5">
+                            For: {r.booking.package.name}
+                          </p>
+                        )}
+                        <p className="text-xs text-slate-500 mt-1">
+                          {new Date(r.createdAt).toLocaleDateString(undefined, {
+                            year: "numeric",
+                            month: "long",
+                            day: "numeric",
+                          })}
+                        </p>
+                      </div>
                     </div>
+                    {r.reviewText && (
+                      <p className="mt-3 text-slate-700 whitespace-pre-wrap">
+                        {r.reviewText}
+                      </p>
+                    )}
                   </div>
-                  {r.reviewText && (
-                    <p className="mt-3 text-slate-700 whitespace-pre-wrap">
-                      {r.reviewText}
-                    </p>
-                  )}
+                ))}
+              </div>
+              {showLoadMore && (
+                <div className="flex justify-center">
+                  <button
+                    type="button"
+                    onClick={handleLoadMore}
+                    disabled={loadingMore}
+                    className="px-6 py-2.5 rounded-xl border border-slate-200 bg-white text-slate-800 font-medium hover:bg-slate-50 disabled:opacity-50"
+                  >
+                    {loadingMore ? "Loading…" : "Load more"}
+                  </button>
                 </div>
-              ))}
-            </div>
+              )}
+            </>
           )}
         </div>
       </div>

@@ -1,6 +1,26 @@
 const raw = (typeof process !== "undefined" && process.env?.NEXT_PUBLIC_API_URL) || "";
 export const API_URL = (raw || "http://localhost:3001").trim().replace(/^["'\s]+|["'\s]+$/g, "");
 
+/**
+ * Auth-aware fetch for the vendor app. Adds Bearer token from localStorage.
+ * On 401, clears session and redirects to /login (same keys as consumer: token, user).
+ */
+export async function vendorFetch(input: RequestInfo | URL, init?: RequestInit): Promise<Response> {
+  if (typeof window === "undefined") {
+    return fetch(input, init);
+  }
+  const token = localStorage.getItem("token");
+  const headers = new Headers(init?.headers);
+  if (token) headers.set("Authorization", `Bearer ${token}`);
+  const res = await fetch(input, { ...init, headers });
+  if (res.status === 401) {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    window.location.href = "/login";
+  }
+  return res;
+}
+
 /** Safely parse JSON from fetch response. */
 export async function parseJsonResponse<T = unknown>(res: Response): Promise<T> {
   const text = await res.text();
