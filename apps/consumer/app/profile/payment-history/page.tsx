@@ -7,7 +7,7 @@ import { ArrowLeft, Receipt } from "@phosphor-icons/react";
 import { AppLayout } from "@/components/AppLayout";
 import { TYPO } from "@/lib/events-ui";
 
-import { API_URL } from "@/lib/api";
+import { API_URL, fetchAuth } from "@/lib/api";
 
 interface PaidBooking {
   id: string;
@@ -30,9 +30,7 @@ export default function PaymentHistoryPage() {
       router.push("/login");
       return;
     }
-    fetch(`${API_URL}/api/bookings?paymentStatus=paid`, {
-      headers: { Authorization: `Bearer ${token}` },
-    })
+    fetchAuth(`${API_URL}/api/bookings?paymentStatus=paid`)
       .then((res) => (res.ok ? res.json() : []))
       .then(setBookings)
       .catch(() => setBookings([]))

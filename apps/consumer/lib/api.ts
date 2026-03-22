@@ -2,6 +2,12 @@
 const raw = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 export const API_URL = typeof raw === "string" ? raw.replace(/^["'\s]+|["'\s]+$/g, "") : "http://localhost:3001";
 
+/** Format API money fields that may be number or numeric string; avoids crashing on `.toFixed`. */
+export function formatBdAmount(value: unknown): string {
+  const n = Number(value);
+  return Number.isFinite(n) ? n.toFixed(2) : "—";
+}
+
 /** Extract user-friendly error message from API error response (Zod validation details, etc.) */
 export function parseApiError(data: { error?: string; details?: { fieldErrors?: Record<string, string[]>; formErrors?: string[] } }): string {
   const details = data.details;

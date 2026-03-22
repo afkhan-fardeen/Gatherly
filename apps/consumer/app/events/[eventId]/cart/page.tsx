@@ -15,7 +15,7 @@ import {
 import { AppLayout } from "@/components/AppLayout";
 import { PullToRefresh } from "@/components/PullToRefresh";
 import toast from "react-hot-toast";
-import { API_URL, fetchAuth, parseApiError } from "@/lib/api";
+import { API_URL, fetchAuth, formatBdAmount, parseApiError } from "@/lib/api";
 import { getToken } from "@/lib/session";
 import { CHERRY } from "@/lib/events-ui";
 
@@ -83,7 +83,9 @@ export default function EventCartPage() {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(parseApiError(data) || data.error || "Payment failed");
-      toast.success(`Paid ${data.totalAmount?.toFixed(2) ?? ""} BD for ${data.paid} booking(s)`);
+      const paidCount = Number(data.paid);
+      const nPaid = Number.isFinite(paidCount) ? paidCount : 0;
+      toast.success(`Paid ${formatBdAmount(data.totalAmount)} BD for ${nPaid} booking(s)`);
       setShowPayAllModal(false);
       fetchData();
     } catch (err) {

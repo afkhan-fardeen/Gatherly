@@ -14,7 +14,7 @@ import {
 } from "@phosphor-icons/react";
 import { AppLayout } from "@/components/AppLayout";
 import { PullToRefresh } from "@/components/PullToRefresh";
-import { API_URL } from "@/lib/api";
+import { API_URL, fetchAuth } from "@/lib/api";
 import { formatTime } from "@/lib/date-utils";
 import { PARTNER_GRADIENTS } from "@/lib/gradients";
 
@@ -54,9 +54,7 @@ export default function EventsPage() {
   const fetchEvents = useCallback(async () => {
     const token = localStorage.getItem("token");
     if (!token) return;
-    const res = await fetch(`${API_URL}/api/events`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+    const res = await fetchAuth(`${API_URL}/api/events`);
     const data = res.ok ? await res.json() : [];
     setEvents(Array.isArray(data) ? data : []);
   }, []);

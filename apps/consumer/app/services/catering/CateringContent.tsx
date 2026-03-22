@@ -10,7 +10,6 @@ import {
   ForkKnife,
   Heart,
   Star,
-  List,
 } from "@phosphor-icons/react";
 import { AppLayout } from "@/components/AppLayout";
 import { PullToRefresh } from "@/components/PullToRefresh";
@@ -48,20 +47,35 @@ function getCapacityLabel(minCap: number | null | undefined, maxCap: number | nu
   return "";
 }
 
+function sortByRatingDesc(list: Vendor[]): Vendor[] {
+  return [...list].sort((a, b) => {
+    const ra = Number(a.ratingAvg) || 0;
+    const rb = Number(b.ratingAvg) || 0;
+    if (rb !== ra) return rb - ra;
+    return (Number(b.ratingCount) || 0) - (Number(a.ratingCount) || 0);
+  });
+}
+
 export function CateringContent() {
   const searchParams = useSearchParams();
   const eventId = searchParams.get("eventId");
   const guestCountParam = searchParams.get("guestCount");
   const eventGuests = guestCountParam ? parseInt(guestCountParam, 10) : null;
   const [vendors, setVendors] = useState<Vendor[]>([]);
-  const [search, setSearch] = useState("");
+  const [searchInput, setSearchInput] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
   const [filter, setFilter] = useState("All");
   const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const t = setTimeout(() => setDebouncedSearch(searchInput.trim()), 300);
+    return () => clearTimeout(t);
+  }, [searchInput]);
 
   const fetchVendors = useCallback(async () => {
     const params = new URLSearchParams();
     params.set("businessType", "catering");
-    if (search) params.set("search", search);
+    if (debouncedSearch) params.set("search", debouncedSearch);
     const res = await fetch(`${API_URL}/api/vendors?${params}`);
     const data = res.ok ? await res.json() : [];
     let list = Array.isArray(data) ? data : [];
@@ -78,9 +92,11 @@ export function CateringContent() {
         const bMin = b.minCapacity ?? 0;
         return aMin - bMin;
       });
+    } else {
+      list = sortByRatingDesc(list);
     }
     setVendors(list);
-  }, [search, filter, eventGuests]);
+  }, [debouncedSearch, filter, eventGuests]);
 
   useEffect(() => {
     setLoading(true);
@@ -120,8 +136,8 @@ export function CateringContent() {
               />
               <input
                 type="text"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
+                value={searchInput}
+                onChange={(e) => setSearchInput(e.target.value)}
                 placeholder="Search caterers…"
                 className="w-full py-3.5 pl-11 pr-4 rounded-[14px] text-sm font-normal text-[#1e0f14] placeholder:text-[#a0888d] placeholder:font-light outline-none transition-all bg-[#fdfaf7] border border-transparent focus:border-primary focus:shadow-[0_0_0_4px_rgba(109,13,53,0.07)]"
                 style={{ boxShadow: "0 2px 12px rgba(109,13,53,0.05)" }}
@@ -150,14 +166,15 @@ export function CateringContent() {
             </div>
 
             {/* Sort row */}
-            <div className="flex items-center justify-between px-0.5">
+            <div className="flex items-center justify-between px-0.5 gap-2">
               <span className="text-[12px] font-light text-[#a0888d]">
                 <strong className="font-medium text-[#5c3d47]">{vendors.length}</strong> caterers found
               </span>
-              <button type="button" className="flex items-center gap-1.5 text-[12px] font-normal text-[#5c3d47] hover:text-primary transition-colors">
-                <List size={13} weight="regular" />
-                Sort: Top Rated
-              </button>
+              <span className="text-[11px] font-light text-[#a0888d] text-right shrink-0 max-w-[55%]">
+                {eventGuests != null && !isNaN(eventGuests) && eventGuests >= 1
+                  ? "Best fit for headcount first"
+                  : "Sorted by rating"}
+              </span>
             </div>
 
             {/* Vendor cards */}
@@ -182,6 +199,7 @@ export function CateringContent() {
                   const priceSuffix = priceType === "per_person" ? "/ person" : "/ event";
                   const rating = Number(vendor.ratingAvg) || 0;
                   const count = Number(vendor.ratingCount) || 0;
+                  const showPremiumBadge = rating >= 4.5 && count >= 3;
                   const minCap = vendor.minCapacity;
                   const maxCap = vendor.maxCapacity;
                   const capacityLabel = getCapacityLabel(minCap, maxCap);
@@ -219,16 +237,20 @@ export function CateringContent() {
                           }}
                         />
                         <div className="absolute top-2.5 left-2.5 right-2.5 flex items-start justify-between">
-                          <span
-                            className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[9.5px] font-semibold uppercase tracking-wider"
-                            style={{
-                              background: "rgba(184,147,90,0.25)",
-                              border: "1px solid rgba(184,147,90,0.4)",
-                              color: "#f5d99a",
-                            }}
-                          >
-                            Premium
-                          </span>
+                          {showPremiumBadge ? (
+                            <span
+                              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[9.5px] font-semibold uppercase tracking-wider"
+                              style={{
+                                background: "rgba(184,147,90,0.25)",
+                                border: "1px solid rgba(184,147,90,0.4)",
+                                color: "#f5d99a",
+                              }}
+                            >
+                              Premium
+                            </span>
+                          ) : (
+                            <span />
+                          )}
                           <button
                             type="button"
                             onClick={(e) => e.preventDefault()}

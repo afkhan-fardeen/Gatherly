@@ -421,8 +421,8 @@ export default function DashboardPage() {
                 <Users size={17} weight="regular" />
               </div>
               <div>
-                <p className="font-serif text-[13px] font-semibold text-[#1e0f14]">Guest Lists</p>
-                <p className="text-[11px] font-light text-[#a0888d] -mt-1">Manage invites</p>
+                <p className="font-serif text-[13px] font-semibold text-[#1e0f14]">My Events</p>
+                <p className="text-[11px] font-light text-[#a0888d] -mt-1">View &amp; plan</p>
               </div>
             </Link>
           </div>

@@ -9,7 +9,7 @@ import { AppLayout } from "@/components/AppLayout";
 import { CHERRY } from "@/lib/events-ui";
 import { getBookingDraft, clearBookingDraft, saveBookingDraft } from "@/lib/booking-draft";
 
-import { API_URL, parseApiError, getNetworkErrorMessage } from "@/lib/api";
+import { API_URL, fetchAuth, parseApiError, getNetworkErrorMessage } from "@/lib/api";
 import { logInfo, logError } from "@/lib/logger";
 
 interface Event {
@@ -81,9 +81,8 @@ export default function BookVendorPage() {
       return;
     }
 
-    const headers = { Authorization: `Bearer ${token}` };
     Promise.all([
-      fetch(`${API_URL}/api/events`, { headers }).then((r) => (r.ok ? r.json() : [])),
+      fetchAuth(`${API_URL}/api/events`).then((r) => (r.ok ? r.json() : [])),
       fetch(`${API_URL}/api/vendors/${vendorId}/packages`, {}).then(async (r) => {
         if (!r.ok) {
           const data = await r.json().catch(() => ({}));
@@ -173,11 +172,10 @@ export default function BookVendorPage() {
 
     try {
       logInfo("BookVendor", "submitting booking", { eventId, vendorId, packageId: pkg.id, guestCount: count });
-      const res = await fetch(`${API_URL}/api/bookings`, {
+      const res = await fetchAuth(`${API_URL}/api/bookings`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
           eventId,

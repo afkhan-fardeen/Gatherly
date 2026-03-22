@@ -36,21 +36,40 @@ const CATEGORIES = [
   { id: "florals", name: "Florals", image: "/images/services/pexels-gcman105-916416.jpg", emoji: "💐", href: "/services/coming-soon/florals", available: false },
 ];
 
+function sortVendorsByRating(list: Vendor[]): Vendor[] {
+  return [...list].sort((a, b) => {
+    const ra = Number(a.ratingAvg) || 0;
+    const rb = Number(b.ratingAvg) || 0;
+    if (rb !== ra) return rb - ra;
+    return (Number(b.ratingCount) || 0) - (Number(a.ratingCount) || 0);
+  });
+}
+
 export default function ServicesPage() {
   const [vendors, setVendors] = useState<Vendor[]>([]);
-  const [search, setSearch] = useState("");
+  const [searchInput, setSearchInput] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    const t = setTimeout(() => setDebouncedSearch(searchInput.trim()), 300);
+    return () => clearTimeout(t);
+  }, [searchInput]);
+
+  useEffect(() => {
+    setLoading(true);
     const params = new URLSearchParams();
     params.set("businessType", "catering");
-    if (search.trim()) params.set("search", search.trim());
+    if (debouncedSearch) params.set("search", debouncedSearch);
     fetch(`${API_URL}/api/vendors?${params}`)
       .then((res) => (res.ok ? res.json() : []))
-      .then(setVendors)
+      .then((raw) => {
+        const list = Array.isArray(raw) ? raw : [];
+        setVendors(sortVendorsByRating(list));
+      })
       .catch(() => setVendors([]))
       .finally(() => setLoading(false));
-  }, [search]);
+  }, [debouncedSearch]);
 
   const featuredVendors = vendors.slice(0, 3);
   const allVendors = vendors;
@@ -79,8 +98,8 @@ export default function ServicesPage() {
             />
             <input
               type="text"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
               placeholder="Search venues, catering, music…"
               className="w-full py-3.5 pl-11 pr-4 rounded-2xl text-sm font-normal text-[#1e0f14] placeholder:text-[#9e8085] placeholder:font-light outline-none transition-all"
               style={{
@@ -160,6 +179,7 @@ export default function ServicesPage() {
                   const priceSuffix = priceType === "per_person" ? "/ person" : "/ event";
                   const rating = Number(vendor.ratingAvg) || 0;
                   const count = Number(vendor.ratingCount) || 0;
+                  const showPremiumBadge = rating >= 4.5 && count >= 3;
 
                   return (
                     <Link
@@ -183,9 +203,11 @@ export default function ServicesPage() {
                               </div>
                             }
                           />
+                        {showPremiumBadge && (
                         <div className="absolute top-2.5 left-2.5 bg-black/45 backdrop-blur-sm rounded-full px-2.5 py-1 text-[9px] font-medium uppercase tracking-wider text-white">
                           ⭐ Premium
                         </div>
+                        )}
                         <span
                           className="absolute top-2.5 right-2.5 w-[30px] h-[30px] rounded-full bg-white/90 flex items-center justify-center text-primary opacity-60 pointer-events-none"
                           title="Favorites coming soon"

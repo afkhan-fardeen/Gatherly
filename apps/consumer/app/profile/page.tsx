@@ -20,7 +20,7 @@ import {
 } from "@phosphor-icons/react";
 import { AppLayout } from "@/components/AppLayout";
 import { TYPO } from "@/lib/events-ui";
-import { API_URL } from "@/lib/api";
+import { API_URL, fetchAuth } from "@/lib/api";
 
 interface UserData {
   id: string;
@@ -133,8 +133,8 @@ export default function ProfilePage() {
       return;
     }
     Promise.all([
-      fetch(`${API_URL}/api/auth/me`, { headers: { Authorization: `Bearer ${token}` } }).then((r) => (r.ok ? r.json() : null)),
-      fetch(`${API_URL}/api/events`, { headers: { Authorization: `Bearer ${token}` } }).then((r) => (r.ok ? r.json() : [])),
+      fetchAuth(`${API_URL}/api/auth/me`).then((r) => (r.ok ? r.json() : null)),
+      fetchAuth(`${API_URL}/api/events`).then((r) => (r.ok ? r.json() : [])),
     ])
       .then(([data, evs]) => {
         if (data) {
@@ -250,7 +250,7 @@ export default function ProfilePage() {
                   <div className="w-px bg-slate-200 self-stretch my-1" />
                   <div className="flex-1 text-center">
                     <span className="text-[20px] font-medium text-primary block leading-none mb-1">{events.totalGuests}</span>
-                    <span className="text-[10px] font-normal text-text-tertiary uppercase tracking-wider">Guests</span>
+                    <span className="text-[10px] font-normal text-text-tertiary uppercase tracking-wider">Expected guests</span>
                   </div>
                 </div>
 

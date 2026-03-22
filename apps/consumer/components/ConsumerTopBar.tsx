@@ -5,7 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { Bell } from "@phosphor-icons/react";
 
-import { API_URL } from "@/lib/api";
+import { API_URL, fetchAuth } from "@/lib/api";
 
 export function ConsumerTopBar() {
   const [unreadCount, setUnreadCount] = useState(0);
@@ -14,9 +14,7 @@ export function ConsumerTopBar() {
     const token = localStorage.getItem("token");
     if (!token) return;
     function fetchUnread() {
-      fetch(`${API_URL}/api/notifications/unread-count`, {
-        headers: { Authorization: `Bearer ${token}` },
-      })
+      fetchAuth(`${API_URL}/api/notifications/unread-count`)
         .then((r) => (r.ok ? r.json() : { count: 0 }))
         .then((d) => setUnreadCount(d.count ?? 0))
         .catch(() => setUnreadCount(0));

@@ -100,7 +100,7 @@ Sections in order:
 2. **Upcoming events** — Horizontal scroll of event cards with gradient date blocks. Empty state with dashed border + `CalendarPlus` icon
 3. **Featured partners** — Horizontal scroll (mobile) / 6-column grid (desktop). Vendor cards with avatar, name, cuisine, capacity
 4. **Spotlight** — Horizontally scrollable cards (200×240px) for promoted packages
-5. **Quick actions** — 2×2 grid: New Event, Browse Catering, Payments, Guest Lists
+5. **Quick actions** — 2×2 grid: New Event, Browse Catering, Payments, My Events (links to `/events`)
 
 ### 3.4 Events
 
@@ -599,7 +599,7 @@ src/
 │   └── vendorAuth.ts             # Role check → req.vendor
 └── routes/
     ├── auth.ts                   # Register, login, me, update profile
-    ├── events.ts                 # Event CRUD + guest management
+    ├── events.ts                 # Event CRUD + guest list API (consumer app uses headcount only, not invite lists)
     ├── bookings.ts               # Booking CRUD, pay, review
     ├── vendors.ts                # Public vendor listing + detail
     ├── vendor.ts                 # Vendor dashboard (packages, bookings, profile)

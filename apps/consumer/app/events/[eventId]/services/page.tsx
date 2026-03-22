@@ -32,7 +32,7 @@ export default function EventServicesPage() {
       return;
     }
     Promise.all([
-      fetch(`${API_URL}/api/events/${eventId}`, { headers: { Authorization: `Bearer ${token}` } }),
+      fetchAuth(`${API_URL}/api/events/${eventId}`),
       fetchAuth(`${API_URL}/api/bookings?eventId=${eventId}`),
     ])
       .then(async ([eventRes, bookingsRes]) => {

@@ -17,7 +17,7 @@ import { AppLayout } from "@/components/AppLayout";
 import { PullToRefresh } from "@/components/PullToRefresh";
 import { getBookingStatusStyle } from "@/components/ui/Tag";
 import { getBookingStatusLine } from "@/lib/bookingStatus";
-import { API_URL, fetchAuth, parseApiError } from "@/lib/api";
+import { API_URL, fetchAuth, formatBdAmount, parseApiError } from "@/lib/api";
 import { getToken } from "@/lib/session";
 import { CHERRY } from "@/lib/events-ui";
 import { formatEventDate, formatDateLong } from "@/lib/date-utils";
@@ -153,7 +153,8 @@ export default function BookingsPage() {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(parseApiError(data) || "Payment failed");
-      toast.success("Payment successful!");
+      const amt = formatBdAmount(data.totalAmount);
+      toast.success(amt !== "—" ? `Payment successful — ${amt} BD` : "Payment successful!");
       setBookings((prev) =>
         prev.map((b) =>
           b.id === bookingId ? { ...b, paymentStatus: "paid" } : b

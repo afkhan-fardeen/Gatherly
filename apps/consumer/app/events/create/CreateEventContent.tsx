@@ -20,7 +20,7 @@ import {
   CloudCheck,
 } from "@phosphor-icons/react";
 import { AppLayout } from "@/components/AppLayout";
-import { parseApiError, API_URL, getNetworkErrorMessage } from "@/lib/api";
+import { parseApiError, API_URL, fetchAuth, getNetworkErrorMessage } from "@/lib/api";
 import { compressImage } from "@/lib/compress-image";
 import { formatDateShort, formatTimeFromHHMM } from "@/lib/date-utils";
 import { getEventCreateDraft, saveEventCreateDraft, clearEventCreateDraft } from "@/lib/event-create-draft";
@@ -66,13 +66,10 @@ export function CreateEventContent() {
       router.replace("/login?redirect=/events/create");
       return;
     }
-    fetch(`${API_URL}/api/auth/me`, {
-      headers: { Authorization: `Bearer ${token}` },
-    }).then((res) => {
+    fetchAuth(`${API_URL}/api/auth/me`).then((res) => {
       if (!res.ok) {
-        localStorage.removeItem("token");
-        localStorage.removeItem("user");
-        router.replace("/login?redirect=/events/create");
+        setAuthChecked(true);
+        return;
       }
       setAuthChecked(true);
     }).catch(() => setAuthChecked(true));
@@ -155,11 +152,10 @@ export function CreateEventContent() {
       return;
     }
     try {
-      const res = await fetch(`${API_URL}/api/events`, {
+      const res = await fetchAuth(`${API_URL}/api/events`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
           name: form.name,
@@ -306,9 +302,8 @@ export function CreateEventContent() {
                         const compressed = await compressImage(file).catch(() => file);
                         const fd = new FormData();
                         fd.append("file", compressed);
-                        const res = await fetch(`${API_URL}/api/upload/image?folder=events`, {
+                        const res = await fetchAuth(`${API_URL}/api/upload/image?folder=events`, {
                           method: "POST",
-                          headers: { Authorization: `Bearer ${token}` },
                           body: fd,
                         });
                         const data = await res.json().catch(() => ({}));
@@ -316,7 +311,6 @@ export function CreateEventContent() {
                           update({ imageUrl: data.url });
                           toast.success("Image added");
                         } else if (res.status === 401) {
-                          localStorage.removeItem("token");
                           router.push("/login?redirect=/events/create");
                         } else {
                           toast.error(data?.error || "Upload failed");

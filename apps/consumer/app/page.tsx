@@ -352,7 +352,7 @@ export default function HomePage() {
           <div className="grid md:grid-cols-3 gap-5 max-w-4xl mx-auto">
             {[
               { text: '"Gatherlii transformed how I plan events. The vendor discovery alone saved me weeks of searching."', name: "Fatima Al-Khalifa", role: "Wedding Planner, Manama", initial: "F" },
-              { text: '"The guest management tools are extraordinary. Everything I needed in one elegant platform."', name: "Ahmad Al-Rashid", role: "Corporate Events, Dubai", initial: "A" },
+              { text: '"Catering and event details in one place made coordinating our corporate dinners effortless."', name: "Ahmad Al-Rashid", role: "Corporate Events, Dubai", initial: "A" },
               { text: '"I planned my entire wedding through Gatherlii. The experience was as beautiful as the day itself."', name: "Maryam Hassan", role: "Bride, Kuwait City", initial: "M" },
             ].map((t, i) => (
               <div

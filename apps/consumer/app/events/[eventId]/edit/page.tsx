@@ -18,7 +18,7 @@ import {
   BUTTON,
   TYPO,
 } from "@/lib/events-ui";
-import { parseApiError, API_URL } from "@/lib/api";
+import { parseApiError, API_URL, fetchAuth } from "@/lib/api";
 import toast from "react-hot-toast";
 import { compressImage } from "@/lib/compress-image";
 
@@ -59,9 +59,7 @@ export default function EditEventPage() {
       window.location.href = "/login";
       return;
     }
-    fetch(`${API_URL}/api/events/${eventId}`, {
-      headers: { Authorization: `Bearer ${token}` },
-    })
+    fetchAuth(`${API_URL}/api/events/${eventId}`)
       .then((res) => (res.ok ? res.json() : null))
       .then((ev) => {
         if (ev) {
@@ -90,11 +88,10 @@ export default function EditEventPage() {
     const token = localStorage.getItem("token");
     if (!token) return;
     try {
-      const res = await fetch(`${API_URL}/api/events/${eventId}`, {
+      const res = await fetchAuth(`${API_URL}/api/events/${eventId}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
           name: form.name,
@@ -196,19 +193,17 @@ export default function EditEventPage() {
                         const compressed = await compressImage(file).catch(() => file);
                         const fd = new FormData();
                         fd.append("file", compressed);
-                        const res = await fetch(`${API_URL}/api/upload/image?folder=events`, {
+                        const res = await fetchAuth(`${API_URL}/api/upload/image?folder=events`, {
                           method: "POST",
-                          headers: { Authorization: `Bearer ${token}` },
                           body: fd,
                         });
                         const data = await res.json().catch(() => ({}));
                         if (res.ok && data.url) {
                           setForm((f) => ({ ...f, imageUrl: data.url }));
-                          const patchRes = await fetch(`${API_URL}/api/events/${eventId}`, {
+                          const patchRes = await fetchAuth(`${API_URL}/api/events/${eventId}`, {
                             method: "PUT",
                             headers: {
                               "Content-Type": "application/json",
-                              Authorization: `Bearer ${token}`,
                             },
                             body: JSON.stringify({ imageUrl: data.url }),
                           });

@@ -8,7 +8,7 @@ import { ArrowLeft, Camera } from "@phosphor-icons/react";
 import { AppLayout } from "@/components/AppLayout";
 import { TYPO, INPUT } from "@/lib/events-ui";
 
-import { API_URL } from "@/lib/api";
+import { API_URL, fetchAuth } from "@/lib/api";
 
 interface UserData {
   id: string;
@@ -38,7 +38,7 @@ export default function EditProfilePage() {
       router.push("/login");
       return;
     }
-    fetch(`${API_URL}/api/auth/me`, { headers: { Authorization: `Bearer ${token}` } })
+    fetchAuth(`${API_URL}/api/auth/me`)
       .then((res) => (res.ok ? res.json() : null))
       .then((data) => {
         if (data) {
@@ -63,9 +63,8 @@ export default function EditProfilePage() {
     try {
       const fd = new FormData();
       fd.append("file", file);
-      const res = await fetch(`${API_URL}/api/upload/image?folder=profile`, {
+      const res = await fetchAuth(`${API_URL}/api/upload/image?folder=profile`, {
         method: "POST",
-        headers: { Authorization: `Bearer ${token}` },
         body: fd,
       });
       const data = await res.json();
@@ -93,11 +92,10 @@ export default function EditProfilePage() {
     }
     setSaving(true);
     try {
-      const res = await fetch(`${API_URL}/api/auth/me`, {
+      const res = await fetchAuth(`${API_URL}/api/auth/me`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
           name: form.name.trim(),
