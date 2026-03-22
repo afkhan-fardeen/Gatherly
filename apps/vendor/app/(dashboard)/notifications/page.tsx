@@ -5,7 +5,7 @@ import Link from "next/link";
 import { Bell, CaretRight } from "@phosphor-icons/react";
 import { VendorLayout } from "@/components/VendorLayout";
 
-import { API_URL } from "@/lib/api";
+import { API_URL, vendorFetch } from "@/lib/api";
 
 interface Notification {
   id: string;
@@ -24,9 +24,7 @@ export default function NotificationsPage() {
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (!token) return;
-    fetch(`${API_URL}/api/notifications`, {
-      headers: { Authorization: `Bearer ${token}` },
-    })
+    vendorFetch(`${API_URL}/api/notifications`)
       .then((res) => (res.ok ? res.json() : { items: [] }))
       .then((data) => setNotifications(data.items ?? []))
       .catch(() => setNotifications([]))
@@ -34,11 +32,8 @@ export default function NotificationsPage() {
   }, []);
 
   async function markAsRead(id: string) {
-    const token = localStorage.getItem("token");
-    if (!token) return;
-    await fetch(`${API_URL}/api/notifications/${id}/read`, {
+    await vendorFetch(`${API_URL}/api/notifications/${id}/read`, {
       method: "PATCH",
-      headers: { Authorization: `Bearer ${token}` },
     });
     setNotifications((prev) =>
       prev.map((n) => (n.id === id ? { ...n, isRead: true } : n))
@@ -46,11 +41,8 @@ export default function NotificationsPage() {
   }
 
   async function markAllRead() {
-    const token = localStorage.getItem("token");
-    if (!token) return;
-    await fetch(`${API_URL}/api/notifications/read-all`, {
+    await vendorFetch(`${API_URL}/api/notifications/read-all`, {
       method: "PATCH",
-      headers: { Authorization: `Bearer ${token}` },
     });
     setNotifications((prev) => prev.map((n) => ({ ...n, isRead: true })));
   }

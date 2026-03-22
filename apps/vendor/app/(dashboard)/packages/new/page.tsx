@@ -10,7 +10,7 @@ import { FormSection } from "@/components/FormSection";
 import { AuthButton } from "@/components/ui/AuthButton";
 import { StepIndicator } from "@/components/ui/StepIndicator";
 
-import { API_URL } from "@/lib/api";
+import { API_URL, parseApiError, vendorFetch } from "@/lib/api";
 import { compressImage } from "@/lib/compress-image";
 
 const inputClass =
@@ -48,15 +48,13 @@ export default function NewPackagePage() {
   });
 
   async function createPackage() {
-    const token = localStorage.getItem("token");
-    if (!token) return null;
+    if (!localStorage.getItem("token")) return null;
     setCreating(true);
     try {
-      const res = await fetch(`${API_URL}/api/vendor/packages`, {
+      const res = await vendorFetch(`${API_URL}/api/vendor/packages`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
           name: form.name.trim(),
@@ -73,7 +71,7 @@ export default function NewPackagePage() {
         }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Create failed");
+      if (!res.ok) throw new Error(parseApiError(data) || "Create failed");
       return data.id as string;
     } finally {
       setCreating(false);
@@ -82,15 +80,13 @@ export default function NewPackagePage() {
 
   async function addMenuItem() {
     if (!newItem.name.trim() || !packageId) return;
-    const token = localStorage.getItem("token");
-    if (!token) return;
+    if (!localStorage.getItem("token")) return;
     setLoading(true);
     try {
-      const res = await fetch(`${API_URL}/api/vendor/packages/${packageId}/items`, {
+      const res = await vendorFetch(`${API_URL}/api/vendor/packages/${packageId}/items`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
           name: newItem.name.trim(),
@@ -99,7 +95,7 @@ export default function NewPackagePage() {
         }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Failed to add item");
+      if (!res.ok) throw new Error(parseApiError(data) || "Failed to add item");
       setMenuItems((prev) => [...prev, { id: data.id, name: data.name, description: data.description, category: data.category }]);
       setNewItem({ name: "", description: "", category: "" });
     } catch (err) {
@@ -179,9 +175,8 @@ export default function NewPackagePage() {
                         const compressed = await compressImage(file).catch(() => file);
                         const fd = new FormData();
                         fd.append("file", compressed);
-                        const res = await fetch(`${API_URL}/api/upload/image?folder=packages`, {
+                        const res = await vendorFetch(`${API_URL}/api/upload/image?folder=packages`, {
                           method: "POST",
-                          headers: { Authorization: `Bearer ${token}` },
                           body: fd,
                         });
                         const data = await res.json().catch(() => ({}));
@@ -314,9 +309,9 @@ export default function NewPackagePage() {
                       const token = localStorage.getItem("token");
                       if (!token) return;
                       try {
-                        const res = await fetch(
+                        const res = await vendorFetch(
                           `${API_URL}/api/vendor/packages/${packageId}/items/${item.id}`,
-                          { method: "DELETE", headers: { Authorization: `Bearer ${token}` } }
+                          { method: "DELETE" }
                         );
                         if (res.ok) setMenuItems((prev) => prev.filter((i) => i.id !== item.id));
                       } catch {

@@ -11,7 +11,7 @@ import { AuthButton } from "@/components/ui/AuthButton";
 import { StepIndicator } from "@/components/ui/StepIndicator";
 import { ConfirmModal } from "@/components/ConfirmModal";
 
-import { API_URL } from "@/lib/api";
+import { API_URL, parseApiError, vendorFetch } from "@/lib/api";
 import { compressImage } from "@/lib/compress-image";
 
 const inputClass =
@@ -44,11 +44,10 @@ function MenuItemsSection({
     if (!newItem.name.trim() || !token) return;
     setAdding(true);
     try {
-      const res = await fetch(`${API_URL}/api/vendor/packages/${packageId}/items`, {
+      const res = await vendorFetch(`${API_URL}/api/vendor/packages/${packageId}/items`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
           name: newItem.name.trim(),
@@ -57,7 +56,7 @@ function MenuItemsSection({
         }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Failed to add item");
+      if (!res.ok) throw new Error(parseApiError(data) || "Failed to add item");
       onItemsChange([...items, data]);
       setNewItem({ name: "", description: "", category: "" });
     } catch (err) {
@@ -70,16 +69,15 @@ function MenuItemsSection({
   async function updateItem(itemId: string, updates: Partial<PackageItem>) {
     if (!token) return;
     try {
-      const res = await fetch(`${API_URL}/api/vendor/packages/${packageId}/items/${itemId}`, {
+      const res = await vendorFetch(`${API_URL}/api/vendor/packages/${packageId}/items/${itemId}`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify(updates),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Failed to update item");
+      if (!res.ok) throw new Error(parseApiError(data) || "Failed to update item");
       onItemsChange(items.map((i) => (i.id === itemId ? data : i)));
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Failed to update item");
@@ -94,13 +92,12 @@ function MenuItemsSection({
     setConfirmRemoveId(null);
     if (!token) return;
     try {
-      const res = await fetch(`${API_URL}/api/vendor/packages/${packageId}/items/${itemId}`, {
+      const res = await vendorFetch(`${API_URL}/api/vendor/packages/${packageId}/items/${itemId}`, {
         method: "DELETE",
-        headers: { Authorization: `Bearer ${token}` },
       });
       if (!res.ok) {
         const data = await res.json();
-        throw new Error(data.error || "Failed to remove item");
+        throw new Error(parseApiError(data) || "Failed to remove item");
       }
       onItemsChange(items.filter((i) => i.id !== itemId));
     } catch (err) {
@@ -136,9 +133,8 @@ function MenuItemsSection({
                     const compressed = await compressImage(file).catch(() => file);
                     const fd = new FormData();
                     fd.append("file", compressed);
-                    const res = await fetch(`${API_URL}/api/upload/image?folder=menu-items`, {
+                    const res = await vendorFetch(`${API_URL}/api/upload/image?folder=menu-items`, {
                       method: "POST",
-                      headers: { Authorization: `Bearer ${token}` },
                       body: fd,
                     });
                     const data = await res.json().catch(() => ({}));
@@ -281,9 +277,7 @@ export default function EditPackagePage() {
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (!token) return;
-    fetch(`${API_URL}/api/vendor/packages`, {
-      headers: { Authorization: `Bearer ${token}` },
-    })
+    vendorFetch(`${API_URL}/api/vendor/packages`)
       .then((r) => (r.ok ? r.json() : []))
       .then((pkgs: { id: string; name: string; description: string | null; imageUrl: string | null; priceType: string; basePrice: string; minGuests: number | null; maxGuests: number | null; dietaryTags: string[]; isActive: boolean; packageItems?: PackageItem[] }[]) => {
         const found = pkgs.find((p) => p.id === id);
@@ -308,14 +302,12 @@ export default function EditPackagePage() {
     e.preventDefault();
     setError("");
     setSaving(true);
-    const token = localStorage.getItem("token");
-    if (!token) return;
+    if (!localStorage.getItem("token")) return;
     try {
-      const res = await fetch(`${API_URL}/api/vendor/packages/${id}`, {
+      const res = await vendorFetch(`${API_URL}/api/vendor/packages/${id}`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
           name: form.name.trim(),
@@ -333,7 +325,7 @@ export default function EditPackagePage() {
         }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Update failed");
+      if (!res.ok) throw new Error(parseApiError(data) || "Update failed");
       router.push("/packages");
       router.refresh();
     } catch (err) {
@@ -427,9 +419,8 @@ export default function EditPackagePage() {
                         const compressed = await compressImage(file).catch(() => file);
                         const fd = new FormData();
                         fd.append("file", compressed);
-                        const res = await fetch(`${API_URL}/api/upload/image?folder=packages`, {
+                        const res = await vendorFetch(`${API_URL}/api/upload/image?folder=packages`, {
                           method: "POST",
-                          headers: { Authorization: `Bearer ${token}` },
                           body: fd,
                         });
                         const data = await res.json().catch(() => ({}));

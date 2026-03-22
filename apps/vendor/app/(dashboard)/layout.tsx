@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter, usePathname } from "next/navigation";
+import { useRouter } from "next/navigation";
+import { API_URL, vendorFetch } from "@/lib/api";
 
 interface User {
   id: string;
@@ -16,7 +17,6 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   const router = useRouter();
-  const pathname = usePathname();
   const [user, setUser] = useState<User | null>(null);
   const [checking, setChecking] = useState(true);
 
@@ -32,8 +32,29 @@ export default function DashboardLayout({
       router.replace("/login");
       return;
     }
-    setUser(parsed);
-    setChecking(false);
+    let cancelled = false;
+    vendorFetch(`${API_URL}/api/vendor/me`)
+      .then((res) => {
+        if (cancelled) return;
+        if (res.status === 401) return;
+        if (!res.ok) {
+          localStorage.removeItem("token");
+          localStorage.removeItem("user");
+          router.replace("/login");
+          return;
+        }
+        setUser(parsed);
+        setChecking(false);
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setUser(parsed);
+          setChecking(false);
+        }
+      });
+    return () => {
+      cancelled = true;
+    };
   }, [router]);
 
   if (checking || !user) {

@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
 import { MagnifyingGlass, CalendarCheck, Package, Spinner, CaretRight } from "@phosphor-icons/react";
-import { API_URL } from "@/lib/api";
+import { API_URL, parseApiError, vendorFetch } from "@/lib/api";
 
 interface SearchBooking {
   id: string;
@@ -31,30 +31,35 @@ export function SearchBar() {
   const [results, setResults] = useState<SearchResults | null>(null);
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
+  const [searchError, setSearchError] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   const doSearch = useCallback(async (q: string) => {
     if (q.length < 2) {
       setResults(null);
+      setSearchError(null);
       return;
     }
     setLoading(true);
+    setSearchError(null);
     try {
       const token = localStorage.getItem("token");
       if (!token) return;
-      const res = await fetch(
-        `${API_URL}/api/vendor/search?q=${encodeURIComponent(q)}`,
-        { headers: { Authorization: `Bearer ${token}` } }
+      const res = await vendorFetch(
+        `${API_URL}/api/vendor/search?q=${encodeURIComponent(q)}`
       );
       if (res.ok) {
         const data = await res.json();
         setResults(data);
       } else {
+        const data = await res.json().catch(() => ({}));
         setResults({ bookings: [], packages: [] });
+        setSearchError(parseApiError(data as { error?: string; details?: { fieldErrors?: Record<string, string[]>; formErrors?: string[] } }) || "Search failed");
       }
     } catch {
       setResults({ bookings: [], packages: [] });
+      setSearchError("Unable to search. Try again.");
     } finally {
       setLoading(false);
     }
@@ -131,6 +136,8 @@ export function SearchBar() {
             <div className="p-8 text-center text-slate-500 text-sm">
               Searching...
             </div>
+          ) : searchError ? (
+            <div className="p-8 text-center text-rose-600 text-sm">{searchError}</div>
           ) : !hasResults ? (
             <div className="p-8 text-center text-slate-500 text-sm">
               No results for &quot;{query}&quot;

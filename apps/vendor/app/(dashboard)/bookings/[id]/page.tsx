@@ -22,7 +22,7 @@ import { StepIndicator } from "@/components/ui/StepIndicator";
 import { VendorLayout } from "@/components/VendorLayout";
 import { PageHeader } from "@/components/PageHeader";
 
-import { API_URL, vendorFetch } from "@/lib/api";
+import { API_URL, parseApiError, vendorFetch } from "@/lib/api";
 
 interface BookingDetail {
   id: string;
@@ -69,13 +69,14 @@ export default function BookingDetailPage() {
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (!token) return;
-    fetch(`${API_URL}/api/vendor/bookings/${id}`, {
-      headers: { Authorization: `Bearer ${token}` },
-    })
-      .then((r) => r.json())
-      .then((data) => {
-        if (data.error) setError(data.error);
-        else setBooking(data);
+    vendorFetch(`${API_URL}/api/vendor/bookings/${id}`)
+      .then(async (r) => {
+        const data = (await r.json().catch(() => ({}))) as BookingDetail & { error?: string };
+        if (!r.ok) {
+          setError(parseApiError(data) || data.error || "Failed to load booking");
+          return;
+        }
+        setBooking(data as BookingDetail);
       })
       .catch(() => setError("Failed to load booking"))
       .finally(() => setLoading(false));
@@ -84,8 +85,6 @@ export default function BookingDetailPage() {
   type StatusAction = "confirmed" | "cancelled" | "in_preparation" | "delivered" | "completed";
 
   async function updateStatus(status: StatusAction) {
-    const token = localStorage.getItem("token");
-    if (!token) return;
     setUpdating(true);
     try {
       const res = await vendorFetch(`${API_URL}/api/vendor/bookings/${id}/status`, {
@@ -96,7 +95,7 @@ export default function BookingDetailPage() {
         body: JSON.stringify({ status }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Update failed");
+      if (!res.ok) throw new Error(parseApiError(data) || (data as { error?: string }).error || "Update failed");
       setBooking((b) => (b ? { ...b, status } : null));
       const messages: Record<StatusAction, string> = {
         confirmed: "Booking confirmed",

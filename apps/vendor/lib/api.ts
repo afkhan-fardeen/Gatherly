@@ -1,6 +1,33 @@
 const raw = (typeof process !== "undefined" && process.env?.NEXT_PUBLIC_API_URL) || "";
 export const API_URL = (raw || "http://localhost:3001").trim().replace(/^["'\s]+|["'\s]+$/g, "");
 
+/** Extract user-friendly error message from API error response (Zod validation details, etc.) */
+export function parseApiError(data: {
+  error?: string;
+  details?: { fieldErrors?: Record<string, string[]>; formErrors?: string[] };
+}): string {
+  const details = data.details;
+  if (details?.fieldErrors) {
+    const first = Object.values(details.fieldErrors).flat().find(Boolean);
+    if (first) return first;
+  }
+  if (details?.formErrors?.length) return details.formErrors[0];
+  if (data.error && data.error !== "Validation failed") return data.error;
+  return "Please check your input and try again.";
+}
+
+/** Returns user-friendly message for network/offline errors. Use in catch blocks. */
+export function getNetworkErrorMessage(err: unknown, fallback: string): string {
+  if (typeof navigator !== "undefined" && !navigator.onLine) {
+    return "You're offline. Please check your connection and try again.";
+  }
+  const msg = err instanceof Error ? err.message : String(err);
+  if (msg === "Failed to fetch" || msg.includes("NetworkError")) {
+    return "Unable to connect. Please check your connection and try again.";
+  }
+  return fallback;
+}
+
 /**
  * Auth-aware fetch for the vendor app. Adds Bearer token from localStorage.
  * On 401, clears session and redirects to /login (same keys as consumer: token, user).

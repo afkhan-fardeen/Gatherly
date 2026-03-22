@@ -9,7 +9,7 @@ import { AuthInput } from "@/components/ui/AuthInput";
 import { AuthButton } from "@/components/ui/AuthButton";
 import { VENDOR_CATEGORIES } from "@/lib/categories";
 import toast from "react-hot-toast";
-import { API_URL, parseJsonResponse } from "@/lib/api";
+import { API_URL, parseJsonResponse, vendorFetch } from "@/lib/api";
 
 function VendorRegisterForm() {
   const router = useRouter();
@@ -49,11 +49,10 @@ function VendorRegisterForm() {
 
       const cuisineArr = cuisineTypes.split(",").map((s) => s.trim()).filter(Boolean);
       const areasArr = serviceAreas.split(",").map((s) => s.trim()).filter(Boolean);
-      const patchRes = await fetch(`${API_URL}/api/vendor/me`, {
+      const patchRes = await vendorFetch(`${API_URL}/api/vendor/me`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${data.token}`,
         },
         body: JSON.stringify({
           businessType: category,

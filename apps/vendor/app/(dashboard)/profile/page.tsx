@@ -6,7 +6,7 @@ import { VendorLayout } from "@/components/VendorLayout";
 import { AuthButton } from "@/components/ui/AuthButton";
 import { VENDOR_CATEGORIES } from "@/lib/categories";
 
-import { API_URL } from "@/lib/api";
+import { API_URL, parseApiError, vendorFetch } from "@/lib/api";
 
 const DAYS = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"] as const;
 
@@ -55,9 +55,7 @@ export default function VendorProfilePage() {
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (!token) return;
-    fetch(`${API_URL}/api/vendor/me`, {
-      headers: { Authorization: `Bearer ${token}` },
-    })
+    vendorFetch(`${API_URL}/api/vendor/me`)
       .then((r) => (r.ok ? r.json() : null))
       .then((v) => {
         if (v) {
@@ -94,14 +92,12 @@ export default function VendorProfilePage() {
     e.preventDefault();
     setError("");
     setSaving(true);
-    const token = localStorage.getItem("token");
-    if (!token) return;
+    if (!localStorage.getItem("token")) return;
     try {
-      const res = await fetch(`${API_URL}/api/vendor/me`, {
+      const res = await vendorFetch(`${API_URL}/api/vendor/me`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
           businessName: form.businessName.trim() || undefined,
@@ -131,7 +127,7 @@ export default function VendorProfilePage() {
         }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Update failed");
+      if (!res.ok) throw new Error(parseApiError(data) || "Update failed");
       setVendor(data);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Update failed");
@@ -389,9 +385,9 @@ export default function VendorProfilePage() {
                     const fd = new FormData();
                     fd.append("file", file);
                     try {
-                      const res = await fetch(
+                      const res = await vendorFetch(
                         `${API_URL}/api/upload/image?folder=vendor-logos`,
-                        { method: "POST", headers: { Authorization: `Bearer ${token}` }, body: fd }
+                        { method: "POST", body: fd }
                       );
                       const data = await res.json();
                       if (res.ok && data.url) {
@@ -443,9 +439,9 @@ export default function VendorProfilePage() {
                       const fd = new FormData();
                       fd.append("file", file);
                       try {
-                        const res = await fetch(
+                        const res = await vendorFetch(
                           `${API_URL}/api/upload/image?folder=vendor-featured`,
-                          { method: "POST", headers: { Authorization: `Bearer ${token}` }, body: fd }
+                          { method: "POST", body: fd }
                         );
                         const data = await res.json();
                         if (res.ok && data.url) {

@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { VendorLayout } from "@/components/VendorLayout";
 import { PageHeader } from "@/components/PageHeader";
 
-import { API_URL } from "@/lib/api";
+import { API_URL, parseApiError, vendorFetch } from "@/lib/api";
 
 function toYMD(d: Date): string {
   return d.toISOString().slice(0, 10);
@@ -23,9 +23,7 @@ export default function AvailabilityPage() {
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (!token) return;
-    fetch(`${API_URL}/api/vendor/availability`, {
-      headers: { Authorization: `Bearer ${token}` },
-    })
+    vendorFetch(`${API_URL}/api/vendor/availability`)
       .then((r) => (r.ok ? r.json() : { blockedDates: [] }))
       .then((data) => {
         setBlockedDates(data.blockedDates ?? []);
@@ -34,21 +32,18 @@ export default function AvailabilityPage() {
   }, []);
 
   async function saveBlockedDates(dates: string[]) {
-    const token = localStorage.getItem("token");
-    if (!token) return;
     setSaving(true);
     setError("");
     try {
-      const res = await fetch(`${API_URL}/api/vendor/availability`, {
+      const res = await vendorFetch(`${API_URL}/api/vendor/availability`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({ blockedDates: dates }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Save failed");
+      if (!res.ok) throw new Error(parseApiError(data) || "Save failed");
       setBlockedDates(data.blockedDates ?? []);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Save failed");

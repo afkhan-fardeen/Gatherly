@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Sparkle, CaretRight, ArrowLeft, CreditCard, Clock } from "@phosphor-icons/react";
 import { VendorLayout } from "@/components/VendorLayout";
-import { API_URL, parseJsonResponse } from "@/lib/api";
+import { API_URL, parseApiError, parseJsonResponse, vendorFetch } from "@/lib/api";
 
 const CHERRY = "#6D0D35";
 
@@ -43,11 +43,10 @@ export default function SpotlightPage() {
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (!token) return;
-    const headers = { Authorization: `Bearer ${token}` };
     Promise.all([
-      fetch(`${API_URL}/api/vendor/packages`, { headers }).then((r) => (r.ok ? r.json() : [])),
-      fetch(`${API_URL}/api/vendor/spotlight/pricing`, { headers }).then((r) => (r.ok ? r.json() : [])),
-      fetch(`${API_URL}/api/vendor/spotlight/active`, { headers }).then((r) => (r.ok ? r.json() : [])),
+      vendorFetch(`${API_URL}/api/vendor/packages`).then((r) => (r.ok ? r.json() : [])),
+      vendorFetch(`${API_URL}/api/vendor/spotlight/pricing`).then((r) => (r.ok ? r.json() : [])),
+      vendorFetch(`${API_URL}/api/vendor/spotlight/active`).then((r) => (r.ok ? r.json() : [])),
     ])
       .then(([pkgs, prices, active]) => {
         setPackages(pkgs.filter((p: Pkg & { isActive?: boolean }) => p.isActive !== false));
@@ -62,14 +61,11 @@ export default function SpotlightPage() {
 
   async function handlePurchase() {
     if (!selectedPackage || !selectedDuration) return;
-    const token = localStorage.getItem("token");
-    if (!token) return;
     setPurchasing(true);
     try {
-      const res = await fetch(`${API_URL}/api/vendor/spotlight/purchase`, {
+      const res = await vendorFetch(`${API_URL}/api/vendor/spotlight/purchase`, {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
@@ -78,7 +74,7 @@ export default function SpotlightPage() {
         }),
       });
       const data = await parseJsonResponse<{ error?: string; message?: string }>(res);
-      if (!res.ok) throw new Error(data.error || "Purchase failed");
+      if (!res.ok) throw new Error(parseApiError(data) || data.error || "Purchase failed");
       setSuccess(true);
     } catch (err) {
       alert(err instanceof Error ? err.message : "Purchase failed");
@@ -127,6 +123,9 @@ export default function SpotlightPage() {
         <h1 className="text-3xl font-bold tracking-tight text-slate-900">Feature in Spotlight</h1>
         <p className="text-slate-500 mt-1">
           Get your package featured on the consumer dashboard. Pay once, appear for your chosen duration.
+        </p>
+        <p className="mt-3 text-sm text-amber-800 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 max-w-2xl">
+          Payments are simulated for now (no live card processing). Before launch we will switch to real payments—use this flow for testing only.
         </p>
       </header>
 

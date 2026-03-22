@@ -16,7 +16,7 @@ import {
 } from "@phosphor-icons/react";
 import { VendorLayout } from "@/components/VendorLayout";
 
-import { API_URL } from "@/lib/api";
+import { API_URL, parseApiError, vendorFetch } from "@/lib/api";
 
 type Tab = "pending" | "confirmed" | "in_progress" | "completed" | "cancelled";
 
@@ -51,12 +51,11 @@ export default function BookingsPage() {
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (!token) return;
-    const headers = { Authorization: `Bearer ${token}` };
     Promise.all([
-      fetch(`${API_URL}/api/vendor/me`, { headers }).then((r) =>
+      vendorFetch(`${API_URL}/api/vendor/me`).then((r) =>
         r.ok ? r.json() : null
       ),
-      fetch(`${API_URL}/api/vendor/bookings`, { headers }).then((r) =>
+      vendorFetch(`${API_URL}/api/vendor/bookings`).then((r) =>
         r.ok ? r.json() : []
       ),
     ])
@@ -68,18 +67,16 @@ export default function BookingsPage() {
   }, []);
 
   async function updateStatus(bookingId: string, status: "confirmed" | "cancelled") {
-    const token = localStorage.getItem("token");
-    if (!token) return;
     setUpdating(bookingId);
     try {
-      const res = await fetch(`${API_URL}/api/vendor/bookings/${bookingId}/status`, {
+      const res = await vendorFetch(`${API_URL}/api/vendor/bookings/${bookingId}/status`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({ status }),
       });
+      const data = await res.json().catch(() => ({}));
       if (res.ok) {
         setBookings((prev) =>
           prev.map((b) =>
@@ -87,6 +84,8 @@ export default function BookingsPage() {
           )
         );
         toast.success(status === "confirmed" ? "Booking confirmed" : "Booking declined");
+      } else {
+        toast.error(parseApiError(data));
       }
     } finally {
       setUpdating(null);

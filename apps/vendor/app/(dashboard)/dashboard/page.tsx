@@ -14,7 +14,7 @@ import { VendorLayout } from "@/components/VendorLayout";
 import { PageHeader } from "@/components/PageHeader";
 import { MetricCard } from "@/components/MetricCard";
 
-import { API_URL } from "@/lib/api";
+import { API_URL, vendorFetch } from "@/lib/api";
 
 interface Vendor {
   id: string;
@@ -44,12 +44,11 @@ export default function VendorDashboardPage() {
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (!token) return;
-    const headers = { Authorization: `Bearer ${token}` };
     Promise.all([
-      fetch(`${API_URL}/api/vendor/me`, { headers }).then((r) =>
+      vendorFetch(`${API_URL}/api/vendor/me`).then((r) =>
         r.ok ? r.json() : null
       ),
-      fetch(`${API_URL}/api/vendor/bookings`, { headers }).then((r) =>
+      vendorFetch(`${API_URL}/api/vendor/bookings`).then((r) =>
         r.ok ? r.json() : []
       ),
     ])

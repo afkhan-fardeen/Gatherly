@@ -6,7 +6,7 @@ import { Package, Plus, PencilSimple, Trash, Sparkle } from "@phosphor-icons/rea
 import { VendorLayout } from "@/components/VendorLayout";
 import { ConfirmModal } from "@/components/ConfirmModal";
 
-import { API_URL } from "@/lib/api";
+import { API_URL, vendorFetch } from "@/lib/api";
 
 interface Pkg {
   id: string;
@@ -31,15 +31,14 @@ export default function PackagesListPage() {
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (!token) return;
-    const headers = { Authorization: `Bearer ${token}` };
     Promise.all([
-      fetch(`${API_URL}/api/vendor/me`, { headers }).then((r) =>
+      vendorFetch(`${API_URL}/api/vendor/me`).then((r) =>
         r.ok ? r.json() : null
       ),
-      fetch(`${API_URL}/api/vendor/packages`, { headers }).then((r) =>
+      vendorFetch(`${API_URL}/api/vendor/packages`).then((r) =>
         r.ok ? r.json() : []
       ),
-      fetch(`${API_URL}/api/vendor/spotlight/active`, { headers }).then((r) =>
+      vendorFetch(`${API_URL}/api/vendor/spotlight/active`).then((r) =>
         r.ok ? r.json() : []
       ),
     ])
@@ -57,13 +56,10 @@ export default function PackagesListPage() {
 
   async function handleDelete(id: string) {
     setConfirmDeactivate(null);
-    const token = localStorage.getItem("token");
-    if (!token) return;
     setDeleting(id);
     try {
-      const res = await fetch(`${API_URL}/api/vendor/packages/${id}`, {
+      const res = await vendorFetch(`${API_URL}/api/vendor/packages/${id}`, {
         method: "DELETE",
-        headers: { Authorization: `Bearer ${token}` },
       });
       if (res.ok) {
         setPackages((prev) => prev.filter((p) => p.id !== id));

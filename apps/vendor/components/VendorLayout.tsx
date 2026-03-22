@@ -16,7 +16,7 @@ import {
 } from "@phosphor-icons/react";
 import { Logo } from "./Logo";
 import { SearchBar } from "./SearchBar";
-import { API_URL } from "@/lib/api";
+import { API_URL, vendorFetch } from "@/lib/api";
 
 interface VendorLayoutProps {
   children: React.ReactNode;
@@ -54,9 +54,7 @@ export function VendorLayout({ children }: VendorLayoutProps) {
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (!token) return;
-    fetch(`${API_URL}/api/vendor/me`, {
-      headers: { Authorization: `Bearer ${token}` },
-    })
+    vendorFetch(`${API_URL}/api/vendor/me`)
       .then((r) => (r.ok ? r.json() : null))
       .then((v) => {
         if (v) {
@@ -72,9 +70,7 @@ export function VendorLayout({ children }: VendorLayoutProps) {
     if (!notificationOpen) return;
     const token = localStorage.getItem("token");
     if (!token) return;
-    fetch(`${API_URL}/api/notifications?limit=5`, {
-      headers: { Authorization: `Bearer ${token}` },
-    })
+    vendorFetch(`${API_URL}/api/notifications?limit=5`)
       .then((r) => (r.ok ? r.json() : { items: [] }))
       .then((d) => setNotifications(d.items ?? []))
       .catch(() => setNotifications([]));
@@ -94,9 +90,7 @@ export function VendorLayout({ children }: VendorLayoutProps) {
     const token = localStorage.getItem("token");
     if (!token) return;
     function fetchUnread() {
-      fetch(`${API_URL}/api/notifications/unread-count`, {
-        headers: { Authorization: `Bearer ${token}` },
-      })
+      vendorFetch(`${API_URL}/api/notifications/unread-count`)
         .then((r) => (r.ok ? r.json() : { count: 0 }))
         .then((d) => setUnreadCount(d.count ?? 0))
         .catch(() => setUnreadCount(0));
