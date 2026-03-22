@@ -23,7 +23,7 @@ export default function RootLayout({
     <html lang="en" className={poppins.className}>
       <body className="antialiased min-h-screen">
         {children}
-        <Toaster position="top-center" />
+        <Toaster position="top-center" toastOptions={{ duration: 4000 }} />
       </body>
     </html>
   );

@@ -11,7 +11,7 @@ import { AuthButton } from "@/components/ui/AuthButton";
 import { StepIndicator } from "@/components/ui/StepIndicator";
 import { ConfirmModal } from "@/components/ConfirmModal";
 
-import { API_URL, parseApiError, vendorFetch } from "@/lib/api";
+import { API_URL, getNetworkErrorMessage, parseApiError, vendorFetch } from "@/lib/api";
 import { compressImage } from "@/lib/compress-image";
 
 const inputClass =
@@ -60,7 +60,7 @@ function MenuItemsSection({
       onItemsChange([...items, data]);
       setNewItem({ name: "", description: "", category: "" });
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Failed to add item");
+      toast.error(getNetworkErrorMessage(err, "Failed to add item"));
     } finally {
       setAdding(false);
     }
@@ -80,7 +80,7 @@ function MenuItemsSection({
       if (!res.ok) throw new Error(parseApiError(data) || "Failed to update item");
       onItemsChange(items.map((i) => (i.id === itemId ? data : i)));
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Failed to update item");
+      toast.error(getNetworkErrorMessage(err, "Failed to update item"));
     }
   }
 
@@ -101,7 +101,7 @@ function MenuItemsSection({
       }
       onItemsChange(items.filter((i) => i.id !== itemId));
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Failed to remove item");
+      toast.error(getNetworkErrorMessage(err, "Failed to remove item"));
     }
   }
 
@@ -144,7 +144,7 @@ function MenuItemsSection({
                       toast.error(data?.error || `Upload failed${res.status === 401 ? " – please sign in again" : ""}`);
                     }
                   } catch (err) {
-                    toast.error(err instanceof Error ? err.message : "Upload failed");
+                    toast.error(getNetworkErrorMessage(err, "Upload failed"));
                   }
                   e.target.value = "";
                 }}
@@ -277,9 +277,30 @@ export default function EditPackagePage() {
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (!token) return;
+    let cancelled = false;
     vendorFetch(`${API_URL}/api/vendor/packages`)
-      .then((r) => (r.ok ? r.json() : []))
-      .then((pkgs: { id: string; name: string; description: string | null; imageUrl: string | null; priceType: string; basePrice: string; minGuests: number | null; maxGuests: number | null; dietaryTags: string[]; isActive: boolean; packageItems?: PackageItem[] }[]) => {
+      .then(async (r) => {
+        const data = await r.json().catch(() => []);
+        if (!r.ok) {
+          toast.error(parseApiError(data as { error?: string }) || "Could not load packages");
+          return [];
+        }
+        return data as {
+          id: string;
+          name: string;
+          description: string | null;
+          imageUrl: string | null;
+          priceType: string;
+          basePrice: string;
+          minGuests: number | null;
+          maxGuests: number | null;
+          dietaryTags: string[];
+          isActive: boolean;
+          packageItems?: PackageItem[];
+        }[];
+      })
+      .then((pkgs) => {
+        if (cancelled) return;
         const found = pkgs.find((p) => p.id === id);
         if (found) {
           setPkg({ ...found, packageItems: found.packageItems ?? [] });
@@ -293,9 +314,19 @@ export default function EditPackagePage() {
             maxGuests: found.maxGuests != null ? String(found.maxGuests) : "",
             dietaryTags: (found.dietaryTags || []).join(", "),
           });
+        } else {
+          toast.error("Package not found");
         }
       })
-      .finally(() => setLoading(false));
+      .catch((err) => {
+        if (!cancelled) toast.error(getNetworkErrorMessage(err, "Could not load package"));
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
   }, [id]);
 
   async function handleSubmit(e: React.FormEvent) {
@@ -326,10 +357,16 @@ export default function EditPackagePage() {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(parseApiError(data) || "Update failed");
+      toast.success("Package saved");
       router.push("/packages");
       router.refresh();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Update failed");
+      const msg = getNetworkErrorMessage(
+        err,
+        err instanceof Error ? err.message : "Update failed"
+      );
+      setError(msg);
+      toast.error(msg);
     } finally {
       setSaving(false);
     }
@@ -427,7 +464,7 @@ export default function EditPackagePage() {
                         if (res.ok && data.url) setForm((f) => ({ ...f, imageUrl: data.url }));
                         else toast.error(data?.error || "Upload failed");
                       } catch (err) {
-                        toast.error(err instanceof Error ? err.message : "Upload failed");
+                        toast.error(getNetworkErrorMessage(err, "Upload failed"));
                       }
                       e.target.value = "";
                     }}

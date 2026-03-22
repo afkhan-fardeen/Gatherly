@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
 import { MagnifyingGlass, CalendarCheck, Package, Spinner, CaretRight } from "@phosphor-icons/react";
-import { API_URL, parseApiError, vendorFetch } from "@/lib/api";
+import { API_URL, getNetworkErrorMessage, parseApiError, vendorFetch } from "@/lib/api";
 
 interface SearchBooking {
   id: string;
@@ -57,9 +57,9 @@ export function SearchBar() {
         setResults({ bookings: [], packages: [] });
         setSearchError(parseApiError(data as { error?: string; details?: { fieldErrors?: Record<string, string[]>; formErrors?: string[] } }) || "Search failed");
       }
-    } catch {
+    } catch (err) {
       setResults({ bookings: [], packages: [] });
-      setSearchError("Unable to search. Try again.");
+      setSearchError(getNetworkErrorMessage(err, "Unable to search. Try again."));
     } finally {
       setLoading(false);
     }

@@ -17,6 +17,9 @@ import {
 import { Logo } from "./Logo";
 import { SearchBar } from "./SearchBar";
 import { API_URL, vendorFetch } from "@/lib/api";
+
+const UNREAD_POLL_VISIBLE_MS = 15_000;
+const UNREAD_POLL_HIDDEN_MS = 60_000;
 import { useVendorProfile } from "@/contexts/VendorProfileContext";
 
 interface VendorLayoutProps {
@@ -104,8 +107,24 @@ export function VendorLayout({ children }: VendorLayoutProps) {
         .catch(() => setUnreadCount(0));
     }
     fetchUnread();
-    const interval = setInterval(fetchUnread, 30000);
-    return () => clearInterval(interval);
+    let intervalId: ReturnType<typeof setInterval> | null = null;
+    function schedule() {
+      if (intervalId) clearInterval(intervalId);
+      const ms = document.hidden ? UNREAD_POLL_HIDDEN_MS : UNREAD_POLL_VISIBLE_MS;
+      intervalId = setInterval(fetchUnread, ms);
+    }
+    schedule();
+    function onVisibility() {
+      if (!document.hidden) fetchUnread();
+      schedule();
+    }
+    window.addEventListener("focus", fetchUnread);
+    document.addEventListener("visibilitychange", onVisibility);
+    return () => {
+      if (intervalId) clearInterval(intervalId);
+      window.removeEventListener("focus", fetchUnread);
+      document.removeEventListener("visibilitychange", onVisibility);
+    };
   }, [pathname]);
 
   function handleLogout() {

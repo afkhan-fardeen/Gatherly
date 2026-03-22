@@ -1,10 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import toast from "react-hot-toast";
 import { VendorLayout } from "@/components/VendorLayout";
 import { PageHeader } from "@/components/PageHeader";
 
-import { API_URL, parseApiError, vendorFetch } from "@/lib/api";
+import { API_URL, getNetworkErrorMessage, parseApiError, vendorFetch } from "@/lib/api";
 
 function toYMD(d: Date): string {
   return d.toISOString().slice(0, 10);
@@ -24,9 +25,18 @@ export default function AvailabilityPage() {
     const token = localStorage.getItem("token");
     if (!token) return;
     vendorFetch(`${API_URL}/api/vendor/availability`)
-      .then((r) => (r.ok ? r.json() : { blockedDates: [] }))
-      .then((data) => {
-        setBlockedDates(data.blockedDates ?? []);
+      .then(async (r) => {
+        const data = await r.json().catch(() => ({}));
+        if (!r.ok) {
+          toast.error(parseApiError(data) || "Could not load availability");
+          setBlockedDates([]);
+          return;
+        }
+        setBlockedDates((data as { blockedDates?: string[] }).blockedDates ?? []);
+      })
+      .catch((err) => {
+        toast.error(getNetworkErrorMessage(err, "Could not load availability"));
+        setBlockedDates([]);
       })
       .finally(() => setLoading(false));
   }, []);
@@ -46,7 +56,12 @@ export default function AvailabilityPage() {
       if (!res.ok) throw new Error(parseApiError(data) || "Save failed");
       setBlockedDates(data.blockedDates ?? []);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Save failed");
+      const msg = getNetworkErrorMessage(
+        err,
+        err instanceof Error ? err.message : "Save failed"
+      );
+      setError(msg);
+      toast.error(msg);
     } finally {
       setSaving(false);
     }

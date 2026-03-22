@@ -6,7 +6,7 @@ import { Package, Star } from "@phosphor-icons/react";
 import { VendorLayout } from "@/components/VendorLayout";
 import { PageHeader } from "@/components/PageHeader";
 
-import { API_URL, parseApiError, vendorFetch } from "@/lib/api";
+import { API_URL, getNetworkErrorMessage, parseApiError, vendorFetch } from "@/lib/api";
 
 interface Review {
   id: string;
@@ -36,10 +36,28 @@ export default function ReviewsPage() {
   const loadPage = useCallback(async (page: number, append: boolean) => {
     const token = localStorage.getItem("token");
     if (!token) return false;
-    const res = await vendorFetch(`${API_URL}/api/vendor/reviews?page=${page}&limit=20`);
-    if (!res.ok) {
-      const errBody = await res.json().catch(() => ({}));
-      const msg = parseApiError(errBody) || "Could not load reviews";
+    try {
+      const res = await vendorFetch(`${API_URL}/api/vendor/reviews?page=${page}&limit=20`);
+      const body = (await res.json().catch(() => ({}))) as ReviewsData & Parameters<typeof parseApiError>[0];
+      if (!res.ok) {
+        const msg = parseApiError(body) || "Could not load reviews";
+        if (append) {
+          toast.error(msg);
+        } else {
+          setLoadError(msg);
+        }
+        return false;
+      }
+      setLoadError(null);
+      setData(body);
+      if (append) {
+        setReviews((prev) => [...prev, ...body.reviews]);
+      } else {
+        setReviews(body.reviews);
+      }
+      return true;
+    } catch (err) {
+      const msg = getNetworkErrorMessage(err, "Could not load reviews");
       if (append) {
         toast.error(msg);
       } else {
@@ -47,15 +65,6 @@ export default function ReviewsPage() {
       }
       return false;
     }
-    setLoadError(null);
-    const json = (await res.json()) as ReviewsData;
-    setData(json);
-    if (append) {
-      setReviews((prev) => [...prev, ...json.reviews]);
-    } else {
-      setReviews(json.reviews);
-    }
-    return true;
   }, []);
 
   useEffect(() => {

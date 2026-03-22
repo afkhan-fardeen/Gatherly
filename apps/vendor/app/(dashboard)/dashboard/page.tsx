@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import toast from "react-hot-toast";
 import {
   CalendarCheck,
   Clock,
@@ -13,8 +14,9 @@ import {
 import { VendorLayout } from "@/components/VendorLayout";
 import { PageHeader } from "@/components/PageHeader";
 import { MetricCard } from "@/components/MetricCard";
+import { GettingStartedCard } from "@/components/GettingStartedCard";
 
-import { API_URL, vendorFetch } from "@/lib/api";
+import { API_URL, getNetworkErrorMessage, parseApiError, vendorFetch } from "@/lib/api";
 
 interface Vendor {
   id: string;
@@ -22,6 +24,8 @@ interface Vendor {
   totalBookings: number;
   ratingAvg: number;
   ratingCount: number;
+  description?: string | null;
+  logoUrl?: string | null;
 }
 
 interface Booking {
@@ -39,25 +43,66 @@ interface Booking {
 export default function VendorDashboardPage() {
   const [vendor, setVendor] = useState<Vendor | null>(null);
   const [bookings, setBookings] = useState<Booking[]>([]);
+  const [activePackageCount, setActivePackageCount] = useState(0);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (!token) return;
-    Promise.all([
-      vendorFetch(`${API_URL}/api/vendor/me`).then((r) =>
-        r.ok ? r.json() : null
-      ),
-      vendorFetch(`${API_URL}/api/vendor/bookings`).then((r) =>
-        r.ok ? r.json() : []
-      ),
-    ])
-      .then(([v, bks]) => {
-        setVendor(v);
-        setBookings(bks);
-      })
-      .catch(() => {})
-      .finally(() => setLoading(false));
+    let cancelled = false;
+    (async () => {
+      try {
+        const meRes = await vendorFetch(`${API_URL}/api/vendor/me`);
+        const meData = (await meRes.json().catch(() => ({}))) as Vendor & { error?: string };
+        if (!meRes.ok) {
+          if (!cancelled) {
+            toast.error(parseApiError(meData) || "Could not load profile");
+            setVendor(null);
+            setBookings([]);
+            setActivePackageCount(0);
+          }
+          return;
+        }
+        const [bksRes, pkgsRes] = await Promise.all([
+          vendorFetch(`${API_URL}/api/vendor/bookings`),
+          vendorFetch(`${API_URL}/api/vendor/packages`),
+        ]);
+        const bksJson = bksRes.ok
+          ? await bksRes.json().catch(() => [])
+          : await bksRes.json().catch(() => ({}));
+        const pkgsJson = pkgsRes.ok
+          ? await pkgsRes.json().catch(() => [])
+          : await pkgsRes.json().catch(() => ({}));
+        if (!cancelled) {
+          setVendor(meData);
+          if (!bksRes.ok) {
+            toast.error(parseApiError(bksJson as Parameters<typeof parseApiError>[0]) || "Could not load bookings");
+            setBookings([]);
+          } else {
+            setBookings(Array.isArray(bksJson) ? bksJson : []);
+          }
+          if (!pkgsRes.ok) {
+            toast.error(parseApiError(pkgsJson as Parameters<typeof parseApiError>[0]) || "Could not load packages");
+            setActivePackageCount(0);
+          } else {
+            const pkgs = Array.isArray(pkgsJson) ? pkgsJson : [];
+            setActivePackageCount(pkgs.filter((p: { isActive?: boolean }) => p.isActive !== false).length);
+          }
+        }
+      } catch (err) {
+        if (!cancelled) {
+          toast.error(getNetworkErrorMessage(err, "Could not load dashboard"));
+          setVendor(null);
+          setBookings([]);
+          setActivePackageCount(0);
+        }
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   const pendingCount = bookings.filter((b) => b.status === "pending").length;
@@ -72,9 +117,20 @@ export default function VendorDashboardPage() {
     )
     .reduce((sum, b) => sum + parseFloat(b.totalAmount || "0"), 0);
 
+  const profileComplete = Boolean(
+    vendor &&
+      ((vendor.description && vendor.description.trim().length >= 20) || !!vendor.logoUrl)
+  );
+
   return (
     <VendorLayout>
       <div className="space-y-12">
+        {!loading && (
+          <GettingStartedCard
+            activePackageCount={activePackageCount}
+            profileComplete={profileComplete}
+          />
+        )}
         <PageHeader
           title="Dashboard"
           subtitle="Good morning! Here's what's happening with your catering business today."

@@ -5,9 +5,10 @@ import Link from "next/link";
 import { Package, Plus, PencilSimple, Trash, Sparkle } from "@phosphor-icons/react";
 import { VendorLayout } from "@/components/VendorLayout";
 import { ConfirmModal } from "@/components/ConfirmModal";
+import { HelpHint } from "@/components/HelpHint";
 
 import toast from "react-hot-toast";
-import { API_URL, parseApiError, vendorFetch } from "@/lib/api";
+import { API_URL, getNetworkErrorMessage, parseApiError, vendorFetch } from "@/lib/api";
 
 interface Pkg {
   id: string;
@@ -32,23 +33,55 @@ export default function PackagesListPage() {
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (!token) return;
-    Promise.all([
-      vendorFetch(`${API_URL}/api/vendor/me`).then((r) =>
-        r.ok ? r.json() : null
-      ),
-      vendorFetch(`${API_URL}/api/vendor/packages`).then((r) =>
-        r.ok ? r.json() : []
-      ),
-      vendorFetch(`${API_URL}/api/vendor/spotlight/active`).then((r) =>
-        r.ok ? r.json() : []
-      ),
-    ])
-      .then(([v, pkgs, active]) => {
-        setVendor(v);
-        setPackages(pkgs);
-        setSpotlightPackageIds(new Set((active as { packageId: string }[]).map((a) => a.packageId)));
-      })
-      .finally(() => setLoading(false));
+    let cancelled = false;
+    (async () => {
+      try {
+        const meRes = await vendorFetch(`${API_URL}/api/vendor/me`);
+        const meData = await meRes.json().catch(() => ({}));
+        if (!meRes.ok) {
+          if (!cancelled) {
+            toast.error(parseApiError(meData) || "Could not load profile");
+            setVendor(null);
+            setPackages([]);
+            setSpotlightPackageIds(new Set());
+          }
+          return;
+        }
+        const [pkgsRes, activeRes] = await Promise.all([
+          vendorFetch(`${API_URL}/api/vendor/packages`),
+          vendorFetch(`${API_URL}/api/vendor/spotlight/active`),
+        ]);
+        const pkgsData = pkgsRes.ok ? await pkgsRes.json().catch(() => []) : await pkgsRes.json().catch(() => ({}));
+        const activeData = activeRes.ok ? await activeRes.json().catch(() => []) : await activeRes.json().catch(() => ({}));
+        if (!cancelled) {
+          setVendor(meData as { businessName: string });
+          if (!pkgsRes.ok) {
+            toast.error(parseApiError(pkgsData as { error?: string }) || "Could not load packages");
+            setPackages([]);
+          } else {
+            setPackages(Array.isArray(pkgsData) ? pkgsData : []);
+          }
+          if (!activeRes.ok) {
+            toast.error(parseApiError(activeData as { error?: string }) || "Could not load spotlight status");
+            setSpotlightPackageIds(new Set());
+          } else {
+            const active = Array.isArray(activeData) ? activeData : [];
+            setSpotlightPackageIds(new Set((active as { packageId: string }[]).map((a) => a.packageId)));
+          }
+        }
+      } catch (err) {
+        if (!cancelled) {
+          toast.error(getNetworkErrorMessage(err, "Could not load packages"));
+          setVendor(null);
+          setPackages([]);
+        }
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   function requestDeactivate(id: string) {
@@ -69,6 +102,8 @@ export default function PackagesListPage() {
       } else {
         toast.error(parseApiError(data) || "Could not deactivate package");
       }
+    } catch (err) {
+      toast.error(getNetworkErrorMessage(err, "Could not deactivate package"));
     } finally {
       setDeleting(null);
     }
@@ -172,7 +207,7 @@ export default function PackagesListPage() {
                       <Link
                         href="/packages/spotlight"
                         className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary hover:bg-primary/20"
-                        title="Put in Spotlight"
+                        title="Put in Spotlight — simulated payment until launch"
                       >
                         <Sparkle size={18} weight="fill" />
                       </Link>

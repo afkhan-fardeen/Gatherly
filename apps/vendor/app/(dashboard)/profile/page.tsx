@@ -6,7 +6,7 @@ import { VendorLayout } from "@/components/VendorLayout";
 import { AuthButton } from "@/components/ui/AuthButton";
 import { VENDOR_CATEGORIES } from "@/lib/categories";
 
-import { API_URL, parseApiError, vendorFetch } from "@/lib/api";
+import { API_URL, getNetworkErrorMessage, parseApiError, vendorFetch } from "@/lib/api";
 
 const DAYS = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"] as const;
 
@@ -56,34 +56,40 @@ export default function VendorProfilePage() {
     const token = localStorage.getItem("token");
     if (!token) return;
     vendorFetch(`${API_URL}/api/vendor/me`)
-      .then((r) => (r.ok ? r.json() : null))
-      .then((v) => {
-        if (v) {
-          setVendor(v);
-          const hours = v.operatingHours as Record<string, { open?: string; close?: string }> | null;
-          const mergedHours = DAYS.reduce(
-            (acc, d) => ({
-              ...acc,
-              [d]: {
-                open: hours?.[d]?.open ?? "",
-                close: hours?.[d]?.close ?? "",
-              },
-            }),
-            {} as Record<string, { open: string; close: string }>
-          );
-          setForm({
-            businessName: v.businessName || "",
-            businessType: v.businessType || "catering",
-            ownerName: v.ownerName || "",
-            description: v.description || "",
-            cuisineTypes: (v.cuisineTypes || []).join(", "),
-            serviceAreas: (v.serviceAreas || []).join(", "),
-            physicalAddress: v.physicalAddress || "",
-            logoUrl: v.logoUrl || "",
-            featuredImageUrl: v.featuredImageUrl || "",
-            operatingHours: mergedHours,
-          });
+      .then(async (r) => {
+        const data = await r.json().catch(() => ({}));
+        if (!r.ok) {
+          toast.error(parseApiError(data) || "Could not load profile");
+          return;
         }
+        const v = data as Vendor;
+        setVendor(v);
+        const hours = v.operatingHours as Record<string, { open?: string; close?: string }> | null;
+        const mergedHours = DAYS.reduce(
+          (acc, d) => ({
+            ...acc,
+            [d]: {
+              open: hours?.[d]?.open ?? "",
+              close: hours?.[d]?.close ?? "",
+            },
+          }),
+          {} as Record<string, { open: string; close: string }>
+        );
+        setForm({
+          businessName: v.businessName || "",
+          businessType: v.businessType || "catering",
+          ownerName: v.ownerName || "",
+          description: v.description || "",
+          cuisineTypes: (v.cuisineTypes || []).join(", "),
+          serviceAreas: (v.serviceAreas || []).join(", "),
+          physicalAddress: v.physicalAddress || "",
+          logoUrl: v.logoUrl || "",
+          featuredImageUrl: v.featuredImageUrl || "",
+          operatingHours: mergedHours,
+        });
+      })
+      .catch((err) => {
+        toast.error(getNetworkErrorMessage(err, "Could not load profile"));
       })
       .finally(() => setLoading(false));
   }, []);
@@ -129,8 +135,14 @@ export default function VendorProfilePage() {
       const data = await res.json();
       if (!res.ok) throw new Error(parseApiError(data) || "Update failed");
       setVendor(data);
+      toast.success("Profile saved");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Update failed");
+      const msg = getNetworkErrorMessage(
+        err,
+        err instanceof Error ? err.message : "Update failed"
+      );
+      setError(msg);
+      toast.error(msg);
     } finally {
       setSaving(false);
     }
@@ -397,8 +409,8 @@ export default function VendorProfilePage() {
                       } else {
                         toast.error(data.error || "Upload failed");
                       }
-                    } catch {
-                      toast.error("Upload failed");
+                    } catch (err) {
+                      toast.error(getNetworkErrorMessage(err, "Upload failed"));
                     }
                     e.target.value = "";
                   }}
@@ -451,8 +463,8 @@ export default function VendorProfilePage() {
                         } else {
                           toast.error(data.error || "Upload failed");
                         }
-                      } catch {
-                        toast.error("Upload failed");
+                      } catch (err) {
+                        toast.error(getNetworkErrorMessage(err, "Upload failed"));
                       }
                       e.target.value = "";
                     }}

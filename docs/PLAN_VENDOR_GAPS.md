@@ -34,6 +34,23 @@ This document tracks agreed behavior for the Gatherly **vendor** dashboard so au
 - Package deactivate failures surface **`parseApiError`** via toast; reviews list shows load failure state / toasts.
 - Notification dropdown rows with a **`link`** navigate on row click and close the panel.
 
+### Error UX convention
+
+- Use **`parseApiError`** from [`apps/vendor/lib/api.ts`](../apps/vendor/lib/api.ts) for JSON error bodies on **`!res.ok`** responses (validation and API messages).
+- Use **`getNetworkErrorMessage(err, fallback)`** in **`catch`** blocks so offline / **Failed to fetch** gets a clear line instead of a generic failure.
+- **Toast** for background failures, global actions, and mutations where inline state is not already shown; **inline** (`setError` / banner) for long forms when the user needs to correct fields. Profile save uses **both** inline error and toast for visibility.
+- Global **`Toaster`** uses **`toastOptions.duration`** (~4s) for consistent timing.
+
+### Guidance and empty states
+
+- **Getting started** card on the dashboard ([`GettingStartedCard`](../apps/vendor/components/GettingStartedCard.tsx)): prompts **active package** + **profile** completion (description ≥ 20 chars or logo); dismiss persists via **`localStorage`** key `vendor_getting_started_dismissed`. Optional line links to **Unavailable dates**.
+- **Bookings** empty list (no bookings at all): copy + **Create a package** CTA.
+- **Notifications** empty and error states distinguish “no items yet” vs **load failure** (with refresh).
+
+### Near real-time (notifications)
+
+- Unread count: **`focus`** refetch; **`visibilitychange`** to visible refetches once and adjusts interval (**~15s** when tab visible, **~60s** when hidden) to balance freshness and background load. Not WebSocket/SSE.
+
 ---
 
 ## Regression checklist (manual)
@@ -46,8 +63,11 @@ This document tracks agreed behavior for the Gatherly **vendor** dashboard so au
 6. **Packages** list, **new package**, **edit package** (including image upload and menu items).
 7. **Spotlight**: load pricing/active; **purchase** completes (simulated) or shows clear error.
 8. **Availability** save blocked dates.
-9. **Notifications** list; mark read / mark all read.
-10. **Profile** load and save; logo/featured uploads.
+9. **Notifications** list; mark read / mark all read; failed load shows error + refresh; failed mark shows toast.
+10. **Profile** load and save; logo/featured uploads; save success toast.
+11. **Getting started** card appears for new vendors; **Dismiss** hides until `localStorage` cleared.
+12. **Offline** or network error on dashboard/bookings load → toast with connection copy, not silent empty state.
+13. Return to tab after backgrounding → unread badge updates (focus / visibility).
 
 ---
 

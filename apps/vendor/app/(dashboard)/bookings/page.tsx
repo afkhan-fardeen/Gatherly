@@ -16,7 +16,7 @@ import {
 } from "@phosphor-icons/react";
 import { VendorLayout } from "@/components/VendorLayout";
 
-import { API_URL, parseApiError, vendorFetch } from "@/lib/api";
+import { API_URL, getNetworkErrorMessage, parseApiError, vendorFetch } from "@/lib/api";
 
 type Tab = "pending" | "confirmed" | "in_progress" | "completed" | "cancelled";
 
@@ -57,19 +57,44 @@ export default function BookingsPage() {
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (!token) return;
-    Promise.all([
-      vendorFetch(`${API_URL}/api/vendor/me`).then((r) =>
-        r.ok ? r.json() : null
-      ),
-      vendorFetch(`${API_URL}/api/vendor/bookings`).then((r) =>
-        r.ok ? r.json() : []
-      ),
-    ])
-      .then(([v, bks]) => {
-        setVendor(v);
-        setBookings(bks);
-      })
-      .finally(() => setLoading(false));
+    let cancelled = false;
+    (async () => {
+      try {
+        const meRes = await vendorFetch(`${API_URL}/api/vendor/me`);
+        const meData = await meRes.json().catch(() => ({}));
+        if (!meRes.ok) {
+          if (!cancelled) {
+            toast.error(parseApiError(meData) || "Could not load profile");
+            setVendor(null);
+            setBookings([]);
+          }
+          return;
+        }
+        const bksRes = await vendorFetch(`${API_URL}/api/vendor/bookings`);
+        const bksData = await bksRes.json().catch(() => []);
+        if (!cancelled) {
+          if (!bksRes.ok) {
+            toast.error(parseApiError(bksData as { error?: string }) || "Could not load bookings");
+            setVendor(meData as { businessName: string });
+            setBookings([]);
+          } else {
+            setVendor(meData as { businessName: string });
+            setBookings(Array.isArray(bksData) ? bksData : []);
+          }
+        }
+      } catch (err) {
+        if (!cancelled) {
+          toast.error(getNetworkErrorMessage(err, "Could not load bookings"));
+          setVendor(null);
+          setBookings([]);
+        }
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   async function updateStatus(bookingId: string, status: "confirmed" | "cancelled") {
@@ -93,6 +118,8 @@ export default function BookingsPage() {
       } else {
         toast.error(parseApiError(data));
       }
+    } catch (err) {
+      toast.error(getNetworkErrorMessage(err, "Could not update booking"));
     } finally {
       setUpdating(null);
     }
@@ -191,6 +218,20 @@ export default function BookingsPage() {
               ? "No completed bookings"
               : "No cancelled bookings"}
           </p>
+          {bookings.length === 0 && (
+            <div className="mt-6">
+              <p className="text-sm text-slate-500 max-w-sm mx-auto">
+                Customers book through your published packages. Add at least one active package to start receiving requests.
+              </p>
+              <Link
+                href="/packages/new"
+                className="inline-flex items-center gap-2 mt-4 px-5 py-2.5 bg-primary text-white font-semibold rounded-xl hover:bg-primary/90"
+              >
+                <Package size={18} weight="bold" />
+                Create a package
+              </Link>
+            </div>
+          )}
         </div>
       ) : (
         <div className="space-y-4">

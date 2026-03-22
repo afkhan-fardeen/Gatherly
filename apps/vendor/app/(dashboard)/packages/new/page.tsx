@@ -10,7 +10,7 @@ import { FormSection } from "@/components/FormSection";
 import { AuthButton } from "@/components/ui/AuthButton";
 import { StepIndicator } from "@/components/ui/StepIndicator";
 
-import { API_URL, parseApiError, vendorFetch } from "@/lib/api";
+import { API_URL, getNetworkErrorMessage, parseApiError, vendorFetch } from "@/lib/api";
 import { compressImage } from "@/lib/compress-image";
 
 const inputClass =
@@ -73,6 +73,11 @@ export default function NewPackagePage() {
       const data = await res.json();
       if (!res.ok) throw new Error(parseApiError(data) || "Create failed");
       return data.id as string;
+    } catch (err) {
+      toast.error(
+        getNetworkErrorMessage(err, err instanceof Error ? err.message : "Could not create package")
+      );
+      return null;
     } finally {
       setCreating(false);
     }
@@ -99,7 +104,9 @@ export default function NewPackagePage() {
       setMenuItems((prev) => [...prev, { id: data.id, name: data.name, description: data.description, category: data.category }]);
       setNewItem({ name: "", description: "", category: "" });
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to add item");
+      setError(
+        getNetworkErrorMessage(err, err instanceof Error ? err.message : "Failed to add item")
+      );
     } finally {
       setLoading(false);
     }
@@ -183,7 +190,7 @@ export default function NewPackagePage() {
                         if (res.ok && data.url) setForm((f) => ({ ...f, imageUrl: data.url }));
                         else toast.error(data?.error || "Upload failed");
                       } catch (err) {
-                        toast.error(err instanceof Error ? err.message : "Upload failed");
+                        toast.error(getNetworkErrorMessage(err, "Upload failed"));
                       }
                       e.target.value = "";
                     }}

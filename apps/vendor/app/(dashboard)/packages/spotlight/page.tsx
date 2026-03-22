@@ -5,7 +5,8 @@ import Link from "next/link";
 import toast from "react-hot-toast";
 import { Sparkle, CaretRight, ArrowLeft, CreditCard, Clock } from "@phosphor-icons/react";
 import { VendorLayout } from "@/components/VendorLayout";
-import { API_URL, parseApiError, parseJsonResponse, vendorFetch } from "@/lib/api";
+import { HelpHint } from "@/components/HelpHint";
+import { API_URL, getNetworkErrorMessage, parseApiError, parseJsonResponse, vendorFetch } from "@/lib/api";
 
 const CHERRY = "#6D0D35";
 
@@ -44,17 +45,56 @@ export default function SpotlightPage() {
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (!token) return;
-    Promise.all([
-      vendorFetch(`${API_URL}/api/vendor/packages`).then((r) => (r.ok ? r.json() : [])),
-      vendorFetch(`${API_URL}/api/vendor/spotlight/pricing`).then((r) => (r.ok ? r.json() : [])),
-      vendorFetch(`${API_URL}/api/vendor/spotlight/active`).then((r) => (r.ok ? r.json() : [])),
-    ])
-      .then(([pkgs, prices, active]) => {
-        setPackages(pkgs.filter((p: Pkg & { isActive?: boolean }) => p.isActive !== false));
-        setPricing(prices);
-        setActiveSpotlight(active);
-      })
-      .finally(() => setLoading(false));
+    let cancelled = false;
+    (async () => {
+      try {
+        const [pkgsRes, pricesRes, activeRes] = await Promise.all([
+          vendorFetch(`${API_URL}/api/vendor/packages`),
+          vendorFetch(`${API_URL}/api/vendor/spotlight/pricing`),
+          vendorFetch(`${API_URL}/api/vendor/spotlight/active`),
+        ]);
+        const pkgsJson = pkgsRes.ok ? await pkgsRes.json().catch(() => []) : await pkgsRes.json().catch(() => ({}));
+        const pricesJson = pricesRes.ok
+          ? await pricesRes.json().catch(() => [])
+          : await pricesRes.json().catch(() => ({}));
+        const activeJson = activeRes.ok
+          ? await activeRes.json().catch(() => [])
+          : await activeRes.json().catch(() => ({}));
+        if (!cancelled) {
+          if (!pkgsRes.ok) {
+            toast.error(parseApiError(pkgsJson as { error?: string }) || "Could not load packages");
+            setPackages([]);
+          } else {
+            const pkgs = Array.isArray(pkgsJson) ? pkgsJson : [];
+            setPackages(pkgs.filter((p: Pkg & { isActive?: boolean }) => p.isActive !== false));
+          }
+          if (!pricesRes.ok) {
+            toast.error(parseApiError(pricesJson as { error?: string }) || "Could not load pricing");
+            setPricing([]);
+          } else {
+            setPricing(Array.isArray(pricesJson) ? pricesJson : []);
+          }
+          if (!activeRes.ok) {
+            toast.error(parseApiError(activeJson as { error?: string }) || "Could not load spotlight");
+            setActiveSpotlight([]);
+          } else {
+            setActiveSpotlight(Array.isArray(activeJson) ? activeJson : []);
+          }
+        }
+      } catch (err) {
+        if (!cancelled) {
+          toast.error(getNetworkErrorMessage(err, "Could not load spotlight"));
+          setPackages([]);
+          setPricing([]);
+          setActiveSpotlight([]);
+        }
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   const selectedPrice = selectedDuration ? pricing.find((p) => p.durationDays === selectedDuration) : null;
@@ -78,7 +118,9 @@ export default function SpotlightPage() {
       if (!res.ok) throw new Error(parseApiError(data) || data.error || "Purchase failed");
       setSuccess(true);
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Purchase failed");
+      toast.error(
+        getNetworkErrorMessage(err, err instanceof Error ? err.message : "Purchase failed")
+      );
     } finally {
       setPurchasing(false);
     }
@@ -121,7 +163,10 @@ export default function SpotlightPage() {
           <ArrowLeft size={18} weight="bold" />
           Back to Packages
         </Link>
-        <h1 className="text-3xl font-bold tracking-tight text-slate-900">Feature in Spotlight</h1>
+        <h1 className="text-3xl font-bold tracking-tight text-slate-900 inline-flex items-center gap-2 flex-wrap">
+          Feature in Spotlight
+          <HelpHint text="Payment is simulated (no real charge). Same stance as consumer test checkouts until a payment provider is connected." />
+        </h1>
         <p className="text-slate-500 mt-1">
           Get your package featured on the consumer dashboard. Pay once, appear for your chosen duration.
         </p>

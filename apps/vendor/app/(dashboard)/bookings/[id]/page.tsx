@@ -22,7 +22,7 @@ import { StepIndicator } from "@/components/ui/StepIndicator";
 import { VendorLayout } from "@/components/VendorLayout";
 import { PageHeader } from "@/components/PageHeader";
 
-import { API_URL, parseApiError, vendorFetch } from "@/lib/api";
+import { API_URL, getNetworkErrorMessage, parseApiError, vendorFetch } from "@/lib/api";
 
 interface BookingDetail {
   id: string;
@@ -78,7 +78,9 @@ export default function BookingDetailPage() {
         }
         setBooking(data as BookingDetail);
       })
-      .catch(() => setError("Failed to load booking"))
+      .catch((err) =>
+        setError(getNetworkErrorMessage(err, "Failed to load booking"))
+      )
       .finally(() => setLoading(false));
   }, [id]);
 
@@ -107,7 +109,12 @@ export default function BookingDetailPage() {
       toast.success(messages[status]);
       if (status === "confirmed") router.refresh();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Update failed");
+      const msg = getNetworkErrorMessage(
+        err,
+        err instanceof Error ? err.message : "Update failed"
+      );
+      setError(msg);
+      toast.error(msg);
     } finally {
       setUpdating(false);
     }
