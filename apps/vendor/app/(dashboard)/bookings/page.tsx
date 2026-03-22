@@ -15,7 +15,9 @@ import {
   CheckCircle,
 } from "@phosphor-icons/react";
 import { VendorLayout } from "@/components/VendorLayout";
+import { SkeletonBookingCard } from "@/components/VendorSkeleton";
 
+import { bookingStatusBadgeClass, formatBookingStatus } from "@/lib/booking-status-ui";
 import { API_URL, getNetworkErrorMessage, parseApiError, vendorFetch } from "@/lib/api";
 
 type Tab = "pending" | "confirmed" | "in_progress" | "completed" | "cancelled";
@@ -199,7 +201,7 @@ export default function BookingsPage() {
       {loading ? (
         <div className="space-y-4">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="h-32 bg-slate-100 rounded-xl animate-pulse" />
+            <SkeletonBookingCard key={i} />
           ))}
         </div>
       ) : filtered.length === 0 ? (
@@ -278,20 +280,8 @@ export default function BookingsPage() {
                     {parseFloat(b.totalAmount).toLocaleString()} BD
                   </p>
                   <div className="flex flex-wrap gap-2 mt-2">
-                    <span
-                      className={`inline-block px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase ${
-                        b.status === "confirmed"
-                          ? "bg-emerald-100 text-emerald-700"
-                          : b.status === "pending"
-                          ? "bg-amber-100 text-amber-700"
-                          : ["in_preparation", "delivered"].includes(b.status)
-                          ? "bg-blue-100 text-blue-700"
-                          : b.status === "completed"
-                          ? "bg-slate-200 text-slate-600"
-                          : "bg-slate-100 text-slate-500"
-                      }`}
-                    >
-                      {b.status.replace(/_/g, " ")}
+                    <span className={bookingStatusBadgeClass(b.status)}>
+                      {formatBookingStatus(b.status)}
                     </span>
                     {b.status === "confirmed" && (
                       <span

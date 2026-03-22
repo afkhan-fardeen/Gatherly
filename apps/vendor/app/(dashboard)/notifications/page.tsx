@@ -5,6 +5,7 @@ import Link from "next/link";
 import toast from "react-hot-toast";
 import { Bell, CaretRight } from "@phosphor-icons/react";
 import { VendorLayout } from "@/components/VendorLayout";
+import { SkeletonListRow } from "@/components/VendorSkeleton";
 
 import { API_URL, getNetworkErrorMessage, parseApiError, vendorFetch } from "@/lib/api";
 
@@ -102,7 +103,7 @@ export default function NotificationsPage() {
       {loading ? (
         <div className="space-y-4">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="h-20 bg-slate-100 rounded-lg animate-pulse" />
+            <SkeletonListRow key={i} className="h-20 rounded-lg" />
           ))}
         </div>
       ) : loadError ? (

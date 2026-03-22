@@ -6,6 +6,7 @@ import Link from "next/link";
 import toast from "react-hot-toast";
 import { VendorLayout } from "@/components/VendorLayout";
 import { PageHeader } from "@/components/PageHeader";
+import { SkeletonFormPage } from "@/components/VendorSkeleton";
 import { FormSection } from "@/components/FormSection";
 import { AuthButton } from "@/components/ui/AuthButton";
 import { StepIndicator } from "@/components/ui/StepIndicator";
@@ -376,10 +377,7 @@ export default function EditPackagePage() {
     return (
       <VendorLayout>
         <div>
-          <div className="animate-pulse space-y-4">
-            <div className="h-8 bg-slate-100 rounded-lg w-48" />
-            <div className="h-64 bg-slate-100 rounded-xl" />
-          </div>
+          <SkeletonFormPage panelHeight="h-64" />
         </div>
       </VendorLayout>
     );

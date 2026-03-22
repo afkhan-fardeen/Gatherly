@@ -6,6 +6,7 @@ import toast from "react-hot-toast";
 import { Sparkle, CaretRight, ArrowLeft, CreditCard, Clock } from "@phosphor-icons/react";
 import { VendorLayout } from "@/components/VendorLayout";
 import { HelpHint } from "@/components/HelpHint";
+import { SkeletonSpotlightPage } from "@/components/VendorSkeleton";
 import { API_URL, getNetworkErrorMessage, parseApiError, parseJsonResponse, vendorFetch } from "@/lib/api";
 
 const CHERRY = "#6D0D35";
@@ -176,10 +177,7 @@ export default function SpotlightPage() {
       </header>
 
       {loading ? (
-        <div className="space-y-6">
-          <div className="h-24 bg-slate-100 rounded-xl animate-pulse" />
-          <div className="h-32 bg-slate-100 rounded-xl animate-pulse" />
-        </div>
+        <SkeletonSpotlightPage />
       ) : (
         <div className="space-y-10">
           {/* Active spotlight */}
@@ -354,6 +352,9 @@ export default function SpotlightPage() {
           {selectedPackage && selectedDuration && selectedPrice && (
             <section>
               <h2 className="text-lg font-semibold text-slate-900 mb-4">4. Pay</h2>
+              <p className="text-sm text-slate-600 mb-4 max-w-2xl">
+                Checkout is <strong>simulated</strong>: no real card is charged. This uses the same test payment path as the consumer app until a payment provider is connected.
+              </p>
               <div className="flex flex-wrap items-center gap-6">
                 <div className="text-slate-600">
                   <span className="font-semibold text-slate-900">{selectedPackage.name}</span>
@@ -368,7 +369,7 @@ export default function SpotlightPage() {
                   style={{ backgroundColor: CHERRY }}
                 >
                   <CreditCard size={22} weight="bold" />
-                  {purchasing ? "Processing..." : `Pay ${selectedPrice.amountBhd} BHD`}
+                  {purchasing ? "Processing..." : `Complete test payment (${selectedPrice.amountBhd} BHD)`}
                 </button>
               </div>
             </section>

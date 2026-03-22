@@ -5,6 +5,7 @@ import toast from "react-hot-toast";
 import { Package, Star } from "@phosphor-icons/react";
 import { VendorLayout } from "@/components/VendorLayout";
 import { PageHeader } from "@/components/PageHeader";
+import { SkeletonReviewsPage } from "@/components/VendorSkeleton";
 
 import { API_URL, getNetworkErrorMessage, parseApiError, vendorFetch } from "@/lib/api";
 
@@ -94,10 +95,7 @@ export default function ReviewsPage() {
     return (
       <VendorLayout>
         <div>
-          <div className="animate-pulse space-y-4">
-            <div className="h-8 bg-slate-100 rounded-lg w-48" />
-            <div className="h-32 bg-slate-100 rounded-xl" />
-          </div>
+          <SkeletonReviewsPage />
         </div>
       </VendorLayout>
     );

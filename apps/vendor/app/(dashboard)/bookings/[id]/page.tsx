@@ -21,7 +21,9 @@ import {
 import { StepIndicator } from "@/components/ui/StepIndicator";
 import { VendorLayout } from "@/components/VendorLayout";
 import { PageHeader } from "@/components/PageHeader";
+import { SkeletonFormPage } from "@/components/VendorSkeleton";
 
+import { formatBookingStatus } from "@/lib/booking-status-ui";
 import { API_URL, getNetworkErrorMessage, parseApiError, vendorFetch } from "@/lib/api";
 
 interface BookingDetail {
@@ -124,10 +126,7 @@ export default function BookingDetailPage() {
     return (
       <VendorLayout>
         <div>
-          <div className="animate-pulse space-y-4">
-            <div className="h-8 bg-slate-100 rounded-lg w-48" />
-            <div className="h-64 bg-slate-100 rounded-xl" />
-          </div>
+          <SkeletonFormPage panelHeight="h-64" />
         </div>
       </VendorLayout>
     );
@@ -271,7 +270,7 @@ export default function BookingDetailPage() {
           title={booking.event.name}
           subtitle={
             <span className="flex items-center gap-2">
-              <span>Booking {booking.bookingReference} · {booking.status.replace(/_/g, " ")}</span>
+              <span>Booking {booking.bookingReference} · {formatBookingStatus(booking.status)}</span>
               {booking.status === "confirmed" && (
                 <span
                   className={`px-2.5 py-0.5 rounded-lg text-[10px] font-bold ${

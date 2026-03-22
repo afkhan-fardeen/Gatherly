@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useId } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
@@ -13,7 +13,9 @@ import {
   SignOut,
   Bell,
   CaretRight,
+  Sparkle,
 } from "@phosphor-icons/react";
+import { Breadcrumb } from "./Breadcrumb";
 import { Logo } from "./Logo";
 import { SearchBar } from "./SearchBar";
 import { API_URL, vendorFetch } from "@/lib/api";
@@ -38,11 +40,24 @@ interface Notification {
 const NAV_ITEMS = [
   { href: "/dashboard", label: "Dashboard", icon: House },
   { href: "/packages", label: "Packages", icon: Package },
+  { href: "/packages/spotlight", label: "Spotlight", icon: Sparkle },
   { href: "/bookings", label: "Bookings", icon: CalendarCheck },
   { href: "/notifications", label: "Notifications", icon: Bell },
   { href: "/availability", label: "Unavailable dates", icon: CalendarBlank },
   { href: "/reviews", label: "Reviews", icon: Star },
 ];
+
+function isNavActive(href: string, pathname: string): boolean {
+  if (href === "/packages") {
+    if (pathname === "/packages") return true;
+    if (pathname.startsWith("/packages/new")) return true;
+    return /^\/packages\/[^/]+\/edit$/.test(pathname);
+  }
+  if (href === "/packages/spotlight") {
+    return pathname === "/packages/spotlight" || pathname.startsWith("/packages/spotlight/");
+  }
+  return pathname === href || pathname.startsWith(`${href}/`);
+}
 
 export function VendorLayout({ children }: VendorLayoutProps) {
   const pathname = usePathname();
@@ -55,6 +70,8 @@ export function VendorLayout({ children }: VendorLayoutProps) {
   const [notificationOpen, setNotificationOpen] = useState(false);
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const notifRef = useRef<HTMLDivElement>(null);
+  const notifButtonRef = useRef<HTMLButtonElement>(null);
+  const notifPanelId = useId();
 
   useEffect(() => {
     if (vendorFromLayout) {
@@ -96,6 +113,18 @@ export function VendorLayout({ children }: VendorLayoutProps) {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
+  useEffect(() => {
+    if (!notificationOpen) return;
+    function onKey(e: KeyboardEvent) {
+      if (e.key === "Escape") {
+        setNotificationOpen(false);
+        queueMicrotask(() => notifButtonRef.current?.focus());
+      }
+    }
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [notificationOpen]);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -143,7 +172,7 @@ export function VendorLayout({ children }: VendorLayoutProps) {
         </div>
         <nav className="flex-1 px-4 space-y-1">
           {NAV_ITEMS.map(({ href, label, icon: Icon }) => {
-            const active = pathname === href || pathname.startsWith(href + "/");
+            const active = isNavActive(href, pathname);
             return (
               <Link
                 key={href}
@@ -184,7 +213,13 @@ export function VendorLayout({ children }: VendorLayoutProps) {
       </aside>
 
       {/* Main content - hidden on mobile when overlay is shown */}
-      <main className="hidden md:flex flex-1 flex-col min-w-0 overflow-hidden">
+      <main className="hidden md:flex flex-1 flex-col min-w-0 overflow-hidden relative">
+        <a
+          href="#vendor-main-scroll"
+          className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[100] focus:px-4 focus:py-2 focus:bg-white focus:rounded-lg focus:shadow-lg focus:outline-none focus:ring-2 focus:ring-primary/30"
+        >
+          Skip to main content
+        </a>
         <header className="h-16 flex items-center justify-between px-6 bg-white border-b border-slate-200 z-10 shrink-0">
           <div className="flex-1 flex items-center gap-4">
             <div className="w-full max-w-md">
@@ -193,10 +228,12 @@ export function VendorLayout({ children }: VendorLayoutProps) {
           </div>
           <div className="relative" ref={notifRef}>
             <button
+              ref={notifButtonRef}
               type="button"
               onClick={() => setNotificationOpen(!notificationOpen)}
               aria-label="Notifications"
               aria-expanded={notificationOpen}
+              aria-controls={notifPanelId}
               className="relative p-2 rounded-lg hover:bg-slate-100 transition-colors"
             >
               <Bell size={22} weight="regular" className="text-slate-600" aria-hidden />
@@ -207,7 +244,12 @@ export function VendorLayout({ children }: VendorLayoutProps) {
               )}
             </button>
             {notificationOpen && (
-              <div className="absolute right-0 top-full mt-2 w-72 max-h-[280px] overflow-y-auto bg-white rounded-lg shadow-lg border border-slate-200 py-2 z-50">
+              <div
+                id={notifPanelId}
+                role="region"
+                aria-label="Recent notifications"
+                className="absolute right-0 top-full mt-2 w-72 max-h-[280px] overflow-y-auto bg-white rounded-lg shadow-lg border border-slate-200 py-2 z-50"
+              >
                 <div className="px-4 py-2 border-b border-slate-100">
                   <span className="font-semibold text-slate-900 text-sm">Notifications</span>
                 </div>
@@ -289,8 +331,17 @@ export function VendorLayout({ children }: VendorLayoutProps) {
           </Link>
         </header>
 
-        <div className="flex-1 overflow-y-auto px-6 py-8 md:py-12 pb-12 bg-slate-50">
-          <div className="max-w-7xl mx-auto w-full">{children}</div>
+        <div
+          id="vendor-main-scroll"
+          tabIndex={-1}
+          className="flex-1 overflow-y-auto px-6 py-8 md:py-12 pb-12 bg-slate-50 outline-none"
+        >
+          <div className="max-w-7xl mx-auto w-full">
+            <div className="mb-6">
+              <Breadcrumb />
+            </div>
+            {children}
+          </div>
         </div>
       </main>
 

@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { VendorLayout } from "@/components/VendorLayout";
 import { PageHeader } from "@/components/PageHeader";
+import { SkeletonFormPage } from "@/components/VendorSkeleton";
 
 import { API_URL, getNetworkErrorMessage, parseApiError, vendorFetch } from "@/lib/api";
 
@@ -98,10 +99,7 @@ export default function AvailabilityPage() {
     return (
       <VendorLayout>
         <div>
-          <div className="animate-pulse space-y-4">
-            <div className="h-8 bg-slate-100 rounded-lg w-48" />
-            <div className="h-80 bg-slate-100 rounded-xl" />
-          </div>
+          <SkeletonFormPage panelHeight="h-80" />
         </div>
       </VendorLayout>
     );

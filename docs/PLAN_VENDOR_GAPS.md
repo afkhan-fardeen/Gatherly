@@ -51,6 +51,17 @@ This document tracks agreed behavior for the Gatherly **vendor** dashboard so au
 
 - Unread count: **`focus`** refetch; **`visibilitychange`** to visible refetches once and adjusts interval (**~15s** when tab visible, **~60s** when hidden) to balance freshness and background load. Not WebSocket/SSE.
 
+### UI patterns (layout, loading, navigation)
+
+- **Breadcrumbs**: [`Breadcrumb`](../apps/vendor/components/Breadcrumb.tsx) is rendered in [`VendorLayout`](../apps/vendor/components/VendorLayout.tsx) above page content. UUID segments under **`/bookings/`** label as **Booking**; under **`/packages/`** as **Package**. Route labels include **Spotlight**, **Unavailable dates**, etc.
+- **Loading placeholders**: shared components in [`VendorSkeleton`](../apps/vendor/components/VendorSkeleton.tsx) replace ad-hoc `animate-pulse` blocks on dashboard, bookings, packages, notifications, profile, availability, reviews, spotlight, and package edit.
+- **Spotlight in sidebar**: primary nav includes **Spotlight** (`/packages/spotlight`). **Packages** stays active for `/packages`, `/packages/new`, and `/packages/[id]/edit` only—not for Spotlight (see `isNavActive` in `VendorLayout`).
+- **Paid revenue metric**: dashboard card shows visible subtext + `title` tooltip aligned with **Dashboard metrics (revenue)** above; [`MetricCard`](../apps/vendor/components/MetricCard.tsx) supports `labelSubtext` / `labelHint`.
+- **Booking status labels**: list, dashboard recent bookings, and booking detail use [`booking-status-ui`](../apps/vendor/lib/booking-status-ui.ts) for consistent wording and badge colors (including **cancelled**).
+- **Spotlight checkout copy**: page header + Pay section state **simulated** payment; primary button label reflects test checkout.
+- **Accessibility**: **Skip to main content** targets `#vendor-main-scroll`; header notification button has **`aria-controls`** + panel **`role="region"`**; **Escape** closes the notification dropdown and returns focus to the bell. **Search** dropdown supports **ArrowUp/Down** highlight and **Enter** to open; input uses **`combobox`** + **`listbox`** roles.
+- **Search**: [`SearchBar`](../apps/vendor/components/SearchBar.tsx) — see roles above.
+
 ---
 
 ## Regression checklist (manual)
@@ -68,6 +79,10 @@ This document tracks agreed behavior for the Gatherly **vendor** dashboard so au
 11. **Getting started** card appears for new vendors; **Dismiss** hides until `localStorage` cleared.
 12. **Offline** or network error on dashboard/bookings load → toast with connection copy, not silent empty state.
 13. Return to tab after backgrounding → unread badge updates (focus / visibility).
+14. **Breadcrumbs** on nested routes (e.g. `/packages/…/edit`, `/bookings/[id]`) show sensible segments; links navigate correctly.
+15. **Spotlight** from sidebar opens `/packages/spotlight`; **Packages** nav is not highlighted on that route.
+16. **Notification** dropdown: **Escape** closes it; bell remains keyboard-reachable.
+17. **Search** (2+ chars): **Arrow** keys move highlight; **Enter** opens highlighted booking or package.
 
 ---
 

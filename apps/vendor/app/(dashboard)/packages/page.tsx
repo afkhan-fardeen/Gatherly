@@ -6,6 +6,7 @@ import { Package, Plus, PencilSimple, Trash, Sparkle } from "@phosphor-icons/rea
 import { VendorLayout } from "@/components/VendorLayout";
 import { ConfirmModal } from "@/components/ConfirmModal";
 import { HelpHint } from "@/components/HelpHint";
+import { SkeletonPackageRow } from "@/components/VendorSkeleton";
 
 import toast from "react-hot-toast";
 import { API_URL, getNetworkErrorMessage, parseApiError, vendorFetch } from "@/lib/api";
@@ -140,7 +141,7 @@ export default function PackagesListPage() {
       {loading ? (
         <div className="space-y-4">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="h-24 bg-slate-100 rounded-xl animate-pulse" />
+            <SkeletonPackageRow key={i} />
           ))}
         </div>
       ) : activePackages.length === 0 && inactivePackages.length === 0 ? (

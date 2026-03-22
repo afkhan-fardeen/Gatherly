@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { VendorLayout } from "@/components/VendorLayout";
+import { SkeletonFormPage } from "@/components/VendorSkeleton";
 import { AuthButton } from "@/components/ui/AuthButton";
 import { VENDOR_CATEGORIES } from "@/lib/categories";
 
@@ -151,10 +152,7 @@ export default function VendorProfilePage() {
   if (loading) {
     return (
       <VendorLayout>
-        <div className="animate-pulse space-y-4">
-          <div className="h-8 bg-slate-100 rounded-lg w-48" />
-          <div className="h-64 bg-slate-100 rounded-xl" />
-        </div>
+        <SkeletonFormPage panelHeight="h-64" />
       </VendorLayout>
     );
   }

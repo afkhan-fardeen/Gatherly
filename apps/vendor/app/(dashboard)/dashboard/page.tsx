@@ -15,7 +15,9 @@ import { VendorLayout } from "@/components/VendorLayout";
 import { PageHeader } from "@/components/PageHeader";
 import { MetricCard } from "@/components/MetricCard";
 import { GettingStartedCard } from "@/components/GettingStartedCard";
+import { SkeletonRecentBookings } from "@/components/VendorSkeleton";
 
+import { bookingStatusBadgeClass, formatBookingStatus } from "@/lib/booking-status-ui";
 import { API_URL, getNetworkErrorMessage, parseApiError, vendorFetch } from "@/lib/api";
 
 interface Vendor {
@@ -195,6 +197,8 @@ export default function VendorDashboardPage() {
           />
           <MetricCard
             label="Paid event revenue (this month)"
+            labelHint="Sum of paid bookings whose event date falls in the current calendar month—not necessarily when payment was received."
+            labelSubtext="Based on event date this month, not payment date."
             value={loading ? "—" : `${revenueThisMonth.toLocaleString()} BD`}
             icon={
               <div className="w-12 h-12 bg-emerald-500/10 rounded-xl flex items-center justify-center">
@@ -246,11 +250,7 @@ export default function VendorDashboardPage() {
             )}
           </div>
           {loading ? (
-            <div className="space-y-4">
-              {[1, 2, 3].map((i) => (
-                <div key={i} className="h-20 bg-slate-100 rounded-xl animate-pulse" />
-              ))}
-            </div>
+            <SkeletonRecentBookings count={3} />
           ) : recentBookings.length === 0 ? (
             <div className="bg-white border border-slate-200 rounded-3xl p-14 flex flex-col items-center text-center">
               <div className="relative mb-8">
@@ -300,16 +300,8 @@ export default function VendorDashboardPage() {
                       <p className="text-xs text-slate-400 mt-2">
                         {new Date(b.event.date).toLocaleDateString()} · {parseFloat(b.totalAmount).toLocaleString()} BD
                       </p>
-                      <span
-                        className={`inline-block mt-2 px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase ${
-                          b.status === "confirmed"
-                            ? "bg-emerald-100 text-emerald-700"
-                            : b.status === "pending"
-                            ? "bg-amber-100 text-amber-700"
-                            : "bg-slate-100 text-slate-500"
-                        }`}
-                      >
-                        {b.status}
+                      <span className={`mt-2 ${bookingStatusBadgeClass(b.status)}`}>
+                        {formatBookingStatus(b.status)}
                       </span>
                     </div>
                     <span className="text-slate-400">→</span>
