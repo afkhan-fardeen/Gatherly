@@ -10,6 +10,7 @@ interface OrderProgressProps {
 
 export function OrderProgress({ status, paymentStatus }: OrderProgressProps) {
   if (status === "cancelled") return null;
+  if ((paymentStatus || "unpaid") === "refunded") return null;
 
   const currentIndex = getCurrentStepIndex(status, paymentStatus);
   const paid = (paymentStatus || "unpaid") === "paid";

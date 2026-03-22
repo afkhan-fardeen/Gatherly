@@ -28,6 +28,7 @@ model User {
   reviews   Review[]
   notifications Notification[]
   paymentMethods PaymentMethod[]
+  adminAuditLogs AdminAuditLog[]
 
   @@map("users")
 }
@@ -73,6 +74,7 @@ model Vendor {
   bookings            Booking[]
   reviews             Review[]
   spotlightPlacements SpotlightPlacement[]
+  payoutLines         PayoutLine[]
 
   @@map("vendors")
 }
@@ -203,6 +205,9 @@ model Booking {
   specialRequirements String? @map("special_requirements")
   vendorNotes        String?  @map("vendor_notes")
   cancellationReason String?  @map("cancellation_reason")
+  cancellationSource String?  @map("cancellation_source")
+  refundedAt         DateTime? @map("refunded_at")
+  refundReason       String?  @map("refund_reason")
   createdAt          DateTime @default(now()) @map("created_at")
   updatedAt          DateTime @updatedAt @map("updated_at")
 
@@ -211,8 +216,57 @@ model Booking {
   event   Event   @relation(fields: [eventId], references: [id])
   package Package @relation(fields: [packageId], references: [id])
   reviews Review[]
+  payoutLines PayoutLine[]
 
   @@map("bookings")
+}
+
+model AdminAuditLog {
+  id          String   @id @default(uuid())
+  actorUserId String   @map("actor_user_id")
+  action      String
+  entityType  String   @map("entity_type")
+  entityId    String   @map("entity_id")
+  metadata    Json?
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  actor User @relation(fields: [actorUserId], references: [id], onDelete: Cascade)
+
+  @@index([entityType, entityId])
+  @@index([createdAt])
+  @@map("admin_audit_logs")
+}
+
+model PayoutBatch {
+  id        String    @id @default(uuid())
+  status    String    @default("draft")
+  notes     String?
+  reference String?
+  paidAt    DateTime? @map("paid_at")
+  createdAt DateTime  @default(now()) @map("created_at")
+
+  lines PayoutLine[]
+
+  @@map("payout_batches")
+}
+
+model PayoutLine {
+  id        String   @id @default(uuid())
+  batchId   String   @map("batch_id")
+  vendorId  String   @map("vendor_id")
+  bookingId String   @map("booking_id")
+  amount    Decimal  @map("amount") @db.Decimal(10, 2)
+  status    String   @default("pending")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  batch   PayoutBatch @relation(fields: [batchId], references: [id], onDelete: Cascade)
+  vendor  Vendor      @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+  booking Booking     @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+
+  @@unique([bookingId])
+  @@index([batchId])
+  @@index([vendorId])
+  @@map("payout_lines")
 }
 
 model Review {

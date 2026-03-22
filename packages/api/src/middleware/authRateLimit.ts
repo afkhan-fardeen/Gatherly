@@ -22,3 +22,15 @@ export const registerRateLimiter = rateLimit({
   legacyHeaders: false,
   message: { error: "Too many registration attempts. Try again later." },
 });
+
+const windowAdmin = Number(process.env.ADMIN_RATE_WINDOW_MS) || 15 * 60 * 1000;
+const maxAdmin = Number(process.env.ADMIN_RATE_MAX) || 500;
+
+/** Applied to /api/admin/* — generous for internal dashboards; tune in production. */
+export const adminRateLimiter = rateLimit({
+  windowMs: windowAdmin,
+  max: maxAdmin,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: "Too many requests. Try again later." },
+});

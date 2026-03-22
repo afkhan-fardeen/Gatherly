@@ -21,6 +21,8 @@ import { vendorRouter } from "./routes/vendor.js";
 import { vendorsRouter } from "./routes/vendors.js";
 import { spotlightRouter } from "./routes/spotlight.js";
 import { spotlightVendorRouter } from "./routes/spotlight-vendor.js";
+import { adminRouter } from "./routes/admin.js";
+import { adminRateLimiter } from "./middleware/authRateLimit.js";
 import { logRequest } from "./lib/logger.js";
 import { errorHandler } from "./middleware/errorHandler.js";
 
@@ -70,6 +72,7 @@ app.use("/api/spotlight", spotlightRouter);
 app.use("/api/bookings", bookingsRouter);
 app.use("/api/payment-methods", paymentMethodsRouter);
 app.use("/api/notifications", notificationsRouter);
+app.use("/api/admin", adminRateLimiter, adminRouter);
 
 app.use(errorHandler);
 

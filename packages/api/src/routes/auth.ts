@@ -57,7 +57,7 @@ authRouter.post("/register", registerRateLimiter, async (req, res) => {
         userId: user.id,
         businessName: businessName.trim(),
         businessType: "catering", // So new vendors appear in catering list
-        status: "approved", // MVP: auto-approve catering vendors
+        status: "pending", // Awaiting admin approval (see /api/admin/vendors)
       },
     });
   }

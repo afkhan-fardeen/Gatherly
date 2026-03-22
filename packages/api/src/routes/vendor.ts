@@ -420,6 +420,11 @@ vendorRouter.get("/bookings/:id", vendorAuth, async (req: Request, res: Response
           packageItems: { orderBy: { displayOrder: "asc" } },
         },
       },
+      payoutLines: {
+        include: {
+          batch: { select: { id: true, status: true, paidAt: true, reference: true } },
+        },
+      },
     },
   });
 

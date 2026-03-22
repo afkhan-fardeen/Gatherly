@@ -9,6 +9,7 @@ export const ORDER_STEPS = [
 
 export function getCurrentStepIndex(status: string, paymentStatus: string | null): number {
   if (status === "cancelled") return -1;
+  if ((paymentStatus || "unpaid") === "refunded") return -1;
   const paid = (paymentStatus || "unpaid") === "paid";
   switch (status) {
     case "pending":
@@ -27,6 +28,7 @@ export function getCurrentStepIndex(status: string, paymentStatus: string | null
 }
 
 export function getStatusBadgeLabel(status: string, paymentStatus: string | null): string {
+  if ((paymentStatus || "unpaid") === "refunded") return "Refunded";
   if (status === "cancelled") return "Declined";
   if (status === "pending") return "Pending";
   if (status === "confirmed") return (paymentStatus || "unpaid") === "paid" ? "Paid" : "Confirmed";
@@ -37,6 +39,7 @@ export function getStatusBadgeLabel(status: string, paymentStatus: string | null
 }
 
 export function getBookingStatusLine(status: string, paymentStatus: string | null): string {
+  if ((paymentStatus || "unpaid") === "refunded") return "Refunded";
   if (status === "cancelled") return "Cancelled";
   if (status === "pending") return "Request sent";
   if (status === "confirmed") {

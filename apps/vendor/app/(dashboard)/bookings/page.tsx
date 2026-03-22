@@ -294,6 +294,11 @@ export default function BookingsPage() {
                         {(b.paymentStatus || "unpaid") === "paid" ? "Paid" : "Awaiting payment"}
                       </span>
                     )}
+                    {(b.paymentStatus || "unpaid") === "refunded" && (
+                      <span className="inline-block px-2.5 py-1 rounded-lg text-[10px] font-bold bg-slate-200 text-slate-700">
+                        Refunded
+                      </span>
+                    )}
                   </div>
                 </div>
                 {tab === "pending" && b.status === "pending" && (

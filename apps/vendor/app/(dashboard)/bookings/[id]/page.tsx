@@ -17,6 +17,7 @@ import {
   CookingPot,
   Truck,
   CheckCircle,
+  Wallet,
 } from "@phosphor-icons/react";
 import { StepIndicator } from "@/components/ui/StepIndicator";
 import { VendorLayout } from "@/components/VendorLayout";
@@ -52,6 +53,12 @@ interface BookingDetail {
     imageUrl: string | null;
     packageItems: { name: string; description: string | null; category: string | null }[];
   };
+  payoutLines?: {
+    id: string;
+    amount: string;
+    status: string;
+    batch: { id: string; status: string; paidAt: string | null; reference: string | null };
+  }[];
 }
 
 function formatTime(iso: string | null): string {
@@ -166,6 +173,14 @@ export default function BookingDetailPage() {
 
   const specialReqs =
     booking.specialRequirements || booking.event.specialRequirements || null;
+  const payoutLine = booking.payoutLines?.[0];
+  const payoutBatch = payoutLine?.batch;
+  const isPaid = (booking.paymentStatus || "unpaid") === "paid";
+  const isRefunded = (booking.paymentStatus || "") === "refunded";
+  const eligibleForPayout =
+    isPaid &&
+    !isRefunded &&
+    (booking.status === "completed" || booking.status === "delivered");
   const isPending = booking.status === "pending";
   const isConfirmed = booking.status === "confirmed";
   const isInPrep = booking.status === "in_preparation";
@@ -294,7 +309,67 @@ export default function BookingDetailPage() {
           </div>
         )}
 
+        {isRefunded && (
+          <div className="mb-6 p-4 rounded-xl border border-slate-200 bg-slate-50">
+            <p className="text-sm font-semibold text-slate-800">Payment refunded</p>
+            <p className="text-xs text-slate-600 mt-1">
+              This booking was refunded to the customer through the platform.
+            </p>
+          </div>
+        )}
+
         <div className="space-y-6">
+          <section className="p-6 rounded-xl border border-slate-200 bg-white">
+            <h2 className="text-lg font-semibold text-slate-900 mb-4 flex items-center gap-2">
+              <Wallet size={20} weight="regular" />
+              Payout
+            </h2>
+            {isRefunded ? (
+              <p className="text-sm text-slate-600">No payout — this booking was refunded.</p>
+            ) : payoutLine && payoutBatch ? (
+              <dl className="grid gap-2 text-sm">
+                <div>
+                  <dt className="text-slate-500">Amount (this booking)</dt>
+                  <dd className="font-medium text-slate-900">
+                    {parseFloat(payoutLine.amount).toLocaleString()} BD
+                  </dd>
+                </div>
+                <div>
+                  <dt className="text-slate-500">Status</dt>
+                  <dd className="font-medium text-slate-900">
+                    {payoutBatch.status === "paid" || payoutBatch.paidAt
+                      ? "Paid"
+                      : "In payout batch (processing)"}
+                  </dd>
+                </div>
+                {(payoutBatch.reference || payoutBatch.id) && (
+                  <div>
+                    <dt className="text-slate-500">Batch</dt>
+                    <dd className="font-medium text-slate-900 font-mono text-xs">
+                      {payoutBatch.reference || payoutBatch.id}
+                    </dd>
+                  </div>
+                )}
+                {payoutBatch.paidAt && (
+                  <div>
+                    <dt className="text-slate-500">Paid at</dt>
+                    <dd className="font-medium text-slate-900">
+                      {new Date(payoutBatch.paidAt).toLocaleString()}
+                    </dd>
+                  </div>
+                )}
+              </dl>
+            ) : eligibleForPayout ? (
+              <p className="text-sm text-slate-600">
+                Eligible for payout. Details appear here once this booking is included in a payout batch.
+              </p>
+            ) : (
+              <p className="text-sm text-slate-600">
+                Payout information is shown after the order is paid and delivered or completed.
+              </p>
+            )}
+          </section>
+
           <section className="p-6 rounded-xl border border-slate-200 bg-white">
             <h2 className="text-lg font-semibold text-slate-900 mb-4 flex items-center gap-2">
               <User size={20} weight="regular" />

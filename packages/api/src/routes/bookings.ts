@@ -299,6 +299,58 @@ bookingsRouter.get("/:id", async (req, res) => {
   res.json(booking);
 });
 
+// PATCH /api/bookings/:id/cancel — consumer cancel (unpaid or pending/confirmed unpaid only)
+bookingsRouter.patch("/:id/cancel", async (req, res) => {
+  const userId = req.user!.userId;
+  const { id } = req.params;
+  const reason =
+    typeof (req.body as { reason?: string })?.reason === "string"
+      ? (req.body as { reason: string }).reason.trim()
+      : "";
+
+  const booking = await prisma.booking.findFirst({
+    where: { id, userId },
+    include: { vendor: { select: { userId: true, businessName: true } }, event: { select: { name: true } } },
+  });
+
+  if (!booking) {
+    return res.status(404).json({ error: "Booking not found" });
+  }
+  if (booking.status === "cancelled") {
+    return res.status(400).json({ error: "Booking is already cancelled" });
+  }
+  if (booking.paymentStatus === "paid") {
+    return res.status(400).json({
+      error: "Paid bookings cannot be cancelled here. Please contact support for a refund.",
+    });
+  }
+  if (booking.status !== "pending" && booking.status !== "confirmed") {
+    return res.status(400).json({ error: "This booking can no longer be cancelled online" });
+  }
+
+  await prisma.booking.update({
+    where: { id },
+    data: {
+      status: "cancelled",
+      cancellationReason: reason || "Cancelled by consumer",
+      cancellationSource: "consumer",
+    },
+  });
+
+  await prisma.notification.create({
+    data: {
+      userId: booking.vendor.userId,
+      type: "booking_cancelled_consumer",
+      title: "Booking cancelled",
+      message: `A customer cancelled their booking for ${booking.event.name}.`,
+      link: `/bookings/${id}`,
+      metadata: { targetApp: "vendor" },
+    },
+  });
+
+  res.json({ ok: true });
+});
+
 // PATCH /api/bookings/:id/pay - dummy payment (consumer only)
 bookingsRouter.patch("/:id/pay", async (req, res) => {
   const userId = req.user!.userId;

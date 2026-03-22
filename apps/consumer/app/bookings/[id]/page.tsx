@@ -67,6 +67,7 @@ export default function BookingDetailPage() {
   const [newCardNumber, setNewCardNumber] = useState("");
   const [useNewCard, setUseNewCard] = useState(false);
   const [eventBookings, setEventBookings] = useState<{ status: string }[]>([]);
+  const [cancelling, setCancelling] = useState(false);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -229,6 +230,33 @@ export default function BookingDetailPage() {
   const canReview =
     (booking.status === "completed" || booking.status === "delivered") &&
     (!booking.reviews || booking.reviews.length === 0);
+  const canCancelBooking =
+    booking.status !== "cancelled" &&
+    (booking.paymentStatus || "unpaid") !== "paid" &&
+    (booking.status === "pending" || booking.status === "confirmed");
+
+  async function cancelBooking() {
+    if (!confirm("Cancel this booking? This cannot be undone.")) return;
+    setCancelling(true);
+    try {
+      const res = await fetchAuth(`${API_URL}/api/bookings/${id}/cancel`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ reason: "Cancelled by customer" }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        toast.error((data as { error?: string }).error || "Could not cancel");
+        return;
+      }
+      toast.success("Booking cancelled");
+      setBooking((b) => (b ? { ...b, status: "cancelled" } : null));
+    } catch {
+      toast.error("Could not cancel");
+    } finally {
+      setCancelling(false);
+    }
+  }
 
   const dateStr = formatDateLong(booking.event.date);
   const timeStart = formatTime(booking.event.timeStart);
@@ -269,6 +297,13 @@ export default function BookingDetailPage() {
         {booking.status === "cancelled" && (
           <div className="p-4 rounded-[16px] bg-red-50 border border-red-200">
             <p className="text-sm font-semibold text-red-700">This booking was cancelled</p>
+          </div>
+        )}
+
+        {(booking.paymentStatus || "") === "refunded" && (
+          <div className="p-4 rounded-[16px] bg-slate-100 border border-slate-200">
+            <p className="text-sm font-semibold text-slate-800">Payment refunded</p>
+            <p className="text-xs text-slate-600 mt-1">Your payment for this order was refunded by the platform.</p>
           </div>
         )}
 
@@ -418,6 +453,16 @@ export default function BookingDetailPage() {
             >
               <Star size={18} weight="bold" />
               Leave a review
+            </button>
+          )}
+          {canCancelBooking && (
+            <button
+              type="button"
+              onClick={cancelBooking}
+              disabled={cancelling}
+              className="w-full py-3.5 rounded-full border border-red-200 text-red-700 font-semibold hover:bg-red-50 disabled:opacity-50"
+            >
+              {cancelling ? "Cancelling…" : "Cancel booking"}
             </button>
           )}
         </div>
